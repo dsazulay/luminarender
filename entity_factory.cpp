@@ -1,0 +1,89 @@
+//
+// Created by Diego Azulay on 15/04/22.
+//
+
+#include <utility>
+#include "entity_factory.h"
+#include "primitives.h"
+
+Entity EntityFactory::createCube(glm::vec3 pos, Material* mat)
+{
+    return createMesh(pos, mat, Primitives::getCubePrimitives());
+}
+
+Entity EntityFactory::createCubeMap(glm::vec3 pos, Material* mat)
+{
+    return createMesh(pos, mat, Primitives::getCubeMapPrimitives());
+}
+
+Entity EntityFactory::createQuad(glm::vec3 pos, Material* mat)
+{
+    return createMesh(pos, mat, Primitives::getQuadPrimitives());
+}
+
+Entity EntityFactory::createSphere(glm::vec3 pos, Material* mat)
+{
+    return createMesh(pos, mat, Primitives::getSpherePrimitives());
+}
+
+Entity EntityFactory::createDirectionalLight(glm::vec3 rot, glm::vec3 color, float intensity)
+{
+    return createLight(LightType::DIRECTIONAL, glm::vec3(0.0), rot, color, intensity, 0.0f, 0.0f);
+}
+
+Entity EntityFactory::createPointLight(glm::vec3 pos, glm::vec3 color, float intensity)
+{
+    return createLight(LightType::POINT, pos, glm::vec3(0.0f, 0.0f, 0.0f), color, intensity, 0.0f, 0.0f);
+}
+
+Entity EntityFactory::createSpotLight(glm::vec3 pos, glm::vec3 rot, glm::vec3 color, float intensity, float cutoff, float outerCutoff)
+{
+    return createLight(LightType::SPOT, pos, rot, color, intensity, cutoff, outerCutoff);
+}
+
+Entity EntityFactory::createMesh(glm::vec3 pos, Material *mat, std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives)
+{
+    Transform transform;
+    transform.position(pos);
+    transform.updateModelMatrix();
+
+    Mesh mesh;
+    mesh.setPrimitives(primitives);
+    mesh.material = mat;
+
+    Entity e;
+    e.addComponent(transform);
+    e.addComponent(mesh);
+
+    return e;
+}
+
+Entity EntityFactory::createLight(LightType lightType, glm::vec3 pos, glm::vec3 rot, glm::vec3 color, float intensity, float cutoff, float outerCutoff)
+{
+//    Tag tag;
+//    if (lightType == 0)
+//        tag.name = "Directional Light";
+//    else if (lightType == 1)
+//        tag.name = "Point Light";
+//    else
+//        tag.name = "Spot Light";
+
+    Transform transform;
+    transform.position(pos);
+    transform.eulerAngles(rot);
+    transform.updateModelMatrix();
+
+    Light light{};
+    light.lightType = lightType;
+    light.color = color;
+    light.intensity = intensity;
+    light.attenuation = glm::vec3(1.0f, 0.09f, 0.032f);
+    light.cutoff = cutoff;
+    light.outerCutoff = outerCutoff;
+
+    Entity e;
+    e.addComponent(transform);
+    e.addComponent(light);
+
+    return e;
+}
