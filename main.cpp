@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "log.h"
 #include "window.h"
 #include "imgui_renderer.h"
 #include <glm/glm.hpp>
