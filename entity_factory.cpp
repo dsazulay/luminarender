@@ -87,3 +87,18 @@ Entity EntityFactory::createLight(LightType lightType, glm::vec3 pos, glm::vec3 
 
     return e;
 }
+
+Entity EntityFactory::createFromMesh(glm::vec3 pos, Material *mat, Mesh& mesh)
+{
+    Transform transform;
+    transform.position(pos);
+    transform.updateModelMatrix();
+
+    mesh.material = mat;
+
+    Entity e;
+    e.addComponent(transform);
+    e.addComponent(mesh);
+
+    return e;
+}

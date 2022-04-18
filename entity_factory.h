@@ -19,9 +19,12 @@ public:
     static Entity createQuad(glm::vec3 pos, Material* mat);
     static Entity createSphere(glm::vec3 pos, Material* mat);
 
+    static Entity createFromMesh(glm::vec3 pos, Material* mat, Mesh& mesh);
+
     static Entity createDirectionalLight(glm::vec3 rot, glm::vec3 color, float intensity);
     static Entity createPointLight(glm::vec3 pos, glm::vec3 color, float intensity);
     static Entity createSpotLight(glm::vec3 pos, glm::vec3 rot, glm::vec3 color, float intensity, float cutoff, float outerCutoff);
+
 
 private:
     static Entity createLight(LightType lightType, glm::vec3 pos, glm::vec3 rot, glm::vec3 color, float intensity, float cutoff, float outerCutoff);

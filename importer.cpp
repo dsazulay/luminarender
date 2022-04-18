@@ -114,3 +114,78 @@ unsigned int Importer::loadHDRTextureFromFile(const char *path, const std::strin
 
     return textureID;
 }
+
+std::vector<Mesh> Importer::loadModel(const char* path)
+{
+    std::vector<Mesh> meshes;
+
+    Assimp::Importer import;
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        return meshes;
+    }
+
+    processNode(scene->mRootNode, scene, meshes);
+
+    return meshes;
+}
+
+void Importer::processNode(aiNode *node, const aiScene *scene, std::vector<Mesh>& meshes)
+{
+    for(unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        Mesh newMesh;
+        newMesh.setPrimitives(processMesh(mesh, scene));
+        meshes.push_back(newMesh);
+    }
+
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+        processNode(node->mChildren[i], scene, meshes);
+    }
+}
+
+std::pair<std::vector<Vertex>, std::vector<unsigned int>> Importer::processMesh(aiMesh *mesh, const aiScene *scene)
+{
+    std::vector<Vertex> outVertices;
+    std::vector<unsigned int> outIndices;
+
+    outVertices.reserve(mesh->mNumVertices);
+    for (unsigned int i = 0; i < mesh->mNumVertices; i++)
+    {
+        Vertex vert{};
+        glm::vec3 vec;
+
+        vec.x = mesh->mVertices[i].x;
+        vec.y = mesh->mVertices[i].y;
+        vec.z = mesh->mVertices[i].z;
+        vert.position = vec;
+
+        vec.x = mesh->mNormals[i].x;
+        vec.y = mesh->mNormals[i].y;
+        vec.z = mesh->mNormals[i].z;
+        vert.normal = vec;
+
+        glm::vec2 uv;
+        uv.x = mesh->mTextureCoords[0][i].x;
+        uv.y = mesh->mTextureCoords[0][i].y;
+        vert.texCoords = uv;
+
+        outVertices.push_back(vert);
+    }
+
+//    outIndices.reserve(indicesSize);
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
+    {
+        aiFace face = mesh->mFaces[i];
+        for (unsigned int j = 0; j < face.mNumIndices; j++) {
+            outIndices.push_back(face.mIndices[j]);
+        }
+    }
+
+    return std::make_pair(outVertices, outIndices);
+}

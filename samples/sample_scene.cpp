@@ -260,8 +260,14 @@ void SampleScene::createMaterials()
     Material matTexture;
     matTexture.shader = &m_shaders["lambert"];
     matTexture.setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    unsigned int tex = Importer::loadTextureFromFile("container2.png", "Resources/Textures");
+    unsigned int tex = Importer::loadTextureFromFile("container2.png", "resources/textures");
     matTexture.setTexture("u_mainTex", tex, 0);
+
+    Material backpackMat;
+    backpackMat.shader = &m_shaders["lambert"];
+    backpackMat.setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    unsigned int backpackTex = Importer::loadTextureFromFile("spitfire_d.png", "resources/textures/spitfire");
+    backpackMat.setTexture("u_mainTex", backpackTex, 0);
 
     Material skyboxMat;
     skyboxMat.shader = &m_shaders["skybox"];
@@ -276,20 +282,32 @@ void SampleScene::createMaterials()
     m_material["new"] = newMat;
     m_material["tex"] = matTexture;
     m_material["skybox"] = skyboxMat;
+    m_material["backpack"] = backpackMat;
 }
 
 void SampleScene::addSceneObjects()
 {
     m_scene->addObject(EntityFactory::createCube(m_cubePositions[2], &m_material["red"]));
-    m_scene->addObject(EntityFactory::createCube(m_cubePositions[4], &m_material["red"]));
-    m_scene->addObject(EntityFactory::createCube(m_cubePositions[6], &m_material["tex"]));
+//    m_scene->addObject(EntityFactory::createCube(m_cubePositions[4], &m_material["red"]));
+//    m_scene->addObject(EntityFactory::createCube(m_cubePositions[6], &m_material["tex"]));
+//
+//    m_scene->addObject(EntityFactory::createQuad(m_cubePositions[7], &m_material["blue"]));
+//
+//    m_scene->addObject(EntityFactory::createSphere(m_cubePositions[0], &m_material["new"]));
+//    m_scene->addObject(EntityFactory::createSphere(m_cubePositions[9], &m_material["new"]));
 
-    m_scene->addObject(EntityFactory::createQuad(m_cubePositions[7], &m_material["blue"]));
-
-    m_scene->addObject(EntityFactory::createSphere(m_cubePositions[0], &m_material["new"]));
-    m_scene->addObject(EntityFactory::createSphere(m_cubePositions[9], &m_material["new"]));
-
-
+    std::vector<Mesh> meshes = Importer::loadModel("resources/models/spitfire.FBX");
+    std::cout << meshes.size() << std::endl;
+    for (auto mesh : meshes)
+    {
+        Entity e = EntityFactory::createFromMesh(m_cubePositions[0], &m_material["backpack"], mesh);
+        auto t = e.getComponent<Transform>();
+        t->position(glm::vec3(0.0, -3.0, -5.0));
+        t->scale(glm::vec3(0.05, 0.05, 0.05));
+        t->eulerAngles(glm::vec3(-90, 0, 0));
+        t->updateModelMatrix();
+        m_scene->addObject(e);
+    }
 }
 
 void SampleScene::addLights()

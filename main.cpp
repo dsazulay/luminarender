@@ -7,19 +7,13 @@
 #include <glm/glm.hpp>
 #include "shader.h"
 #include "material.h"
-#include "importer.h"
 #include "camera.h"
 #include "uniform_buffer_object.h"
 #include "frame_buffer.h"
-#include "components/transform.h"
-#include "components/mesh.h"
-#include "primitives.h"
 #include "renderer.h"
-#include "components/light.h"
-#include "entity_factory.h"
-#include "entity.h"
 #include "scene.h"
 #include "samples/sample_scene.h"
+
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
