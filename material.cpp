@@ -3,6 +3,7 @@
 //
 
 #include "material.h"
+#include "log.h"
 
 #include <typeindex>
 
@@ -99,4 +100,13 @@ void Material::setTexture(const std::string &name, unsigned int texID, int texUn
 
 std::unordered_map<std::string, std::any>& Material::getUniformData() {
     return uniforms;
+}
+
+Material::~Material()
+{
+}
+
+Material::Material(Shader* s)
+{
+    shader = s;
 }

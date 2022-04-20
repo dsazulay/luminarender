@@ -10,6 +10,7 @@
 #include "../scene.h"
 #include "../shader.h"
 #include "../material.h"
+#include "../asset_library.h"
 
 class SampleScene
 {
@@ -20,13 +21,13 @@ private:
     void createIrradianceMaps();
     void createShaders();
     void createMaterials();
+    void loadMeshes();
     void addSceneObjects();
     void addLights();
     void addSkybox();
 
     Scene* m_scene;
-    std::unordered_map<std::string, Shader> m_shaders;
-    std::unordered_map<std::string, Material> m_material;
+    AssetLibrary m_assetLibrary;
 
     glm::vec3 m_cubePositions[10] = {
         glm::vec3( 0.0f,  0.0f,  0.0f),

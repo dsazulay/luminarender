@@ -7,7 +7,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
-#include "components/mesh.h"
+#include "mesh.h"
 
 
 class Primitives

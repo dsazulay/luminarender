@@ -30,13 +30,13 @@ add_executable(InteractiveGraphics
         material.cpp material.h
         renderer.cpp renderer.h
         components/transform.cpp components/transform.h
-        components/mesh.cpp components/mesh.h
+        mesh.cpp mesh.h
         components/light.cpp components/light.h
         entity_factory.cpp entity_factory.h
         components/icomponent.h
         entity.cpp entity.h
         scene.cpp scene.h
-        samples/sample_scene.cpp samples/sample_scene.h log.h)
+        samples/sample_scene.cpp samples/sample_scene.h log.h asset_library.cpp asset_library.h components/mesh_renderer.cpp components/mesh_renderer.h model.cpp model.h)
 
 find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(InteractiveGraphics PUBLIC glfw)

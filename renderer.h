@@ -7,7 +7,7 @@
 
 #include <vector>
 #include "components/transform.h"
-#include "components/mesh.h"
+#include "mesh.h"
 #include "entity.h"
 #include "uniform_buffer_object.h"
 

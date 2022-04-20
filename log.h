@@ -19,9 +19,9 @@
 #define WHITE   "\033[37m"      /* White */
 
 #if DEBUG
-#define LOG_ERROR(msg) log_(RED, "[ERROR]", msg)
-#define LOG_WARN(msg)  log_(YELLOW, "[WARN]", msg)
-#define LOG_INFO(msg)  log_(GREEN, "[INFO]", msg)
+#define LOG_ERROR(msg) std::cout << RED << "[ERROR] " << msg << RESET << std::endl
+#define LOG_WARN(msg)  std::cout << YELLOW << "[WARN] " << msg << RESET << std::endl
+#define LOG_INFO(msg)  std::cout << GREEN << "[INFO] " << msg << RESET << std::endl
 #else
 #define LOG_ERROR(x)
 #define LOG_WARN(x)
@@ -29,20 +29,13 @@
 #endif
 
 #if DEBUG
-#define ASSERT(exp, msg) if (!(exp)) assert_(__ASSERT_FILE_NAME, __LINE__, #exp, msg)
+#define ASSERT(exp, msg)                                             \
+    if (!(exp))                                                      \
+        std::cout << RED << "[ASSERT] " << __ASSERT_FILE_NAME << ":" \
+        << __LINE__ << " \'" << #exp << "\' failed: " << msg         \
+        << RESET << std::endl
 #else
-#define ASSERT(cond, msg)
+#define ASSERT(exp, msg)
 #endif
-
-void log_(const char* color, const char* tag, const char* msg)
-{
-    std::cout << color << tag << " " << msg << RESET << std::endl;
-}
-
-void assert_(const char* filename, int line, const char* exp, const char* msg)
-{
-    std::cout << RED << "[ASSERT] " << filename << ":" << line << " \'" << exp
-        << "\' failed: " << msg << RESET << std::endl;
-}
 
 #endif //INTERACTIVEGRAPHICS_LOG_H

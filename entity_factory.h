@@ -10,16 +10,13 @@
 #include "components/light.h"
 #include "entity.h"
 #include "material.h"
-#include "components/mesh.h"
+#include "mesh.h"
+#include "model.h"
 
 class EntityFactory {
 public:
-    static Entity createCube(glm::vec3 pos, Material* mat);
-    static Entity createCubeMap(glm::vec3 pos, Material* mat);
-    static Entity createQuad(glm::vec3 pos, Material* mat);
-    static Entity createSphere(glm::vec3 pos, Material* mat);
-
-    static Entity createFromMesh(glm::vec3 pos, Material* mat, Mesh& mesh);
+    static Entity createFromMesh(glm::vec3 pos, Material* mat, Mesh* mesh);
+    static std::vector<Entity> createFromModel(glm::vec3 pos, Material* mat, Model* model);
 
     static Entity createDirectionalLight(glm::vec3 rot, glm::vec3 color, float intensity);
     static Entity createPointLight(glm::vec3 pos, glm::vec3 color, float intensity);

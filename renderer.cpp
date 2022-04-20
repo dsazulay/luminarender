@@ -5,6 +5,8 @@
 #include "renderer.h"
 #include "material.h"
 #include "components/light.h"
+#include "components/mesh_renderer.h"
+#include "log.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -13,7 +15,9 @@ void Renderer::render(std::vector<Entity>& objects) {
     for (auto& entity : objects)
     {
         auto transform = entity.getComponent<Transform>();
-        auto mesh = entity.getComponent<Mesh>();
+        auto mesh = entity.getComponent<MeshRenderer>();
+        if (mesh == nullptr)
+            continue;
         Material* material = mesh->material;
 
 
@@ -47,16 +51,16 @@ void Renderer::render(std::vector<Entity>& objects) {
         glBindTexture(GL_TEXTURE_2D, brdfLUT);
 
         material->setUniformData();
-
+        
         glBindVertexArray(mesh->vao());
-        glDrawElements(GL_TRIANGLES, (int)mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
 }
 
 void Renderer::renderSkybox(Entity &skybox)
 {
-    auto mesh = skybox.getComponent<Mesh>();
+    auto mesh = skybox.getComponent<MeshRenderer>();
     Material* material = mesh->material;
 
     material->shader->use();
@@ -70,7 +74,7 @@ void Renderer::renderSkybox(Entity &skybox)
     }
 
     glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int)mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }
 

@@ -16,6 +16,9 @@ class Material
 {
 public:
     Shader* shader;
+    Material(Shader* s);
+    ~Material();
+
 
     void setProperty(const std::string& name, const std::any& value);
     void setTexture(const std::string& name, unsigned int texID, int texUnit);

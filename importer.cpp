@@ -9,9 +9,8 @@
 #include <glad/glad.h>
 #include <iostream>
 
-unsigned int Importer::loadTextureFromFile(const char *path, const std::string &directory) {
-    std::string filename = std::string(path);
-    filename = directory + '/' + filename;
+unsigned int Importer::loadTextureFromFile(const std::string& file, const std::string &directory) {
+    std::string filename = directory + '/' + file;
 
     unsigned int textureID;
     glGenTextures(1, &textureID);
@@ -83,10 +82,9 @@ unsigned int Importer::loadCubeMapFromFiles(std::vector<std::string> faces, cons
     return textureID;
 }
 
-unsigned int Importer::loadHDRTextureFromFile(const char *path, const std::string &directory)
+unsigned int Importer::loadHDRTextureFromFile(const std::string& file, const std::string &directory)
 {
-    std::string filename = std::string(path);
-    filename = directory + '/' + filename;
+    std::string filename = directory + '/' + file;
 
     unsigned int textureID;
     glGenTextures(1, &textureID);
@@ -115,9 +113,9 @@ unsigned int Importer::loadHDRTextureFromFile(const char *path, const std::strin
     return textureID;
 }
 
-std::vector<Mesh> Importer::loadModel(const char* path)
+Model* Importer::loadModel(const char* path)
 {
-    std::vector<Mesh> meshes;
+    Model* model = new Model();
 
     Assimp::Importer import;
     const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate);
@@ -125,27 +123,26 @@ std::vector<Mesh> Importer::loadModel(const char* path)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
-        return meshes;
+        return model;
     }
 
-    processNode(scene->mRootNode, scene, meshes);
+    processNode(scene->mRootNode, scene, model);
 
-    return meshes;
+    return model;
 }
 
-void Importer::processNode(aiNode *node, const aiScene *scene, std::vector<Mesh>& meshes)
+void Importer::processNode(aiNode *node, const aiScene *scene, Model* model)
 {
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        Mesh newMesh;
-        newMesh.setPrimitives(processMesh(mesh, scene));
-        meshes.push_back(newMesh);
+        Mesh* newMesh = new Mesh(processMesh(mesh, scene));
+        model->m_meshes.push_back(std::make_pair(std::string(mesh->mName.C_Str()), newMesh));
     }
 
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-        processNode(node->mChildren[i], scene, meshes);
+        processNode(node->mChildren[i], scene, model);
     }
 }
 

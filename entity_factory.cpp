@@ -5,26 +5,9 @@
 #include <utility>
 #include "entity_factory.h"
 #include "primitives.h"
-
-Entity EntityFactory::createCube(glm::vec3 pos, Material* mat)
-{
-    return createMesh(pos, mat, Primitives::getCubePrimitives());
-}
-
-Entity EntityFactory::createCubeMap(glm::vec3 pos, Material* mat)
-{
-    return createMesh(pos, mat, Primitives::getCubeMapPrimitives());
-}
-
-Entity EntityFactory::createQuad(glm::vec3 pos, Material* mat)
-{
-    return createMesh(pos, mat, Primitives::getQuadPrimitives());
-}
-
-Entity EntityFactory::createSphere(glm::vec3 pos, Material* mat)
-{
-    return createMesh(pos, mat, Primitives::getSpherePrimitives());
-}
+#include "components/mesh_renderer.h"
+#include "model.h"
+#include "log.h"
 
 Entity EntityFactory::createDirectionalLight(glm::vec3 rot, glm::vec3 color, float intensity)
 {
@@ -47,13 +30,16 @@ Entity EntityFactory::createMesh(glm::vec3 pos, Material *mat, std::pair<std::ve
     transform.position(pos);
     transform.updateModelMatrix();
 
-    Mesh mesh;
-    mesh.setPrimitives(primitives);
-    mesh.material = mat;
+    Mesh mesh(primitives);
+
+    MeshRenderer meshRenderer;
+    meshRenderer.mesh = &mesh;
+    meshRenderer.material = mat;
+    meshRenderer.initMesh();
 
     Entity e;
     e.addComponent(transform);
-    e.addComponent(mesh);
+    e.addComponent(meshRenderer);
 
     return e;
 }
@@ -88,17 +74,48 @@ Entity EntityFactory::createLight(LightType lightType, glm::vec3 pos, glm::vec3 
     return e;
 }
 
-Entity EntityFactory::createFromMesh(glm::vec3 pos, Material *mat, Mesh& mesh)
+Entity EntityFactory::createFromMesh(glm::vec3 pos, Material *mat, Mesh* mesh)
 {
     Transform transform;
     transform.position(pos);
     transform.updateModelMatrix();
 
-    mesh.material = mat;
+    MeshRenderer meshRenderer;
+    meshRenderer.mesh = mesh;
+    meshRenderer.material = mat;
+    meshRenderer.initMesh();
+
 
     Entity e;
     e.addComponent(transform);
-    e.addComponent(mesh);
+    e.addComponent(meshRenderer);
 
     return e;
+}
+
+std::vector<Entity> EntityFactory::createFromModel(glm::vec3 pos, Material* mat, Model* model)
+{
+    Transform transform;
+    transform.position(pos);
+    transform.updateModelMatrix();
+
+    Entity e;
+    e.addComponent(transform);
+
+    std::vector<Entity> entities;
+    entities.push_back(e);
+
+    for (auto mesh : model->m_meshes)
+    {
+        Entity newEntity = createFromMesh(pos, mat, mesh.second);
+        // TODO: remove this after add scene hierarchy
+        auto t = newEntity.getComponent<Transform>();
+        t->position(glm::vec3(0.0, -3.0, -5.0));
+        t->scale(glm::vec3(0.05, 0.05, 0.05));
+        t->eulerAngles(glm::vec3(-90, 0, 0));
+        t->updateModelMatrix();
+        entities.push_back(newEntity);
+    }
+
+    return entities;
 }

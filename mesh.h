@@ -9,8 +9,8 @@
 #include <glm/glm.hpp>
 #include <vector>
 
-#include "../material.h"
-#include "icomponent.h"
+#include "material.h"
+#include "components/icomponent.h"
 
 struct Vertex
 {
@@ -22,23 +22,17 @@ struct Vertex
 class Mesh : public IComponent
 {
 public:
-    Mesh();
+    Mesh(std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives);
     ~Mesh();
     void setPrimitives(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
     void setPrimitives(std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives);
 
-    unsigned int vao() const;
     int indicesSize() const;
 
-    Material* material;
-
-private:
-    unsigned int VBO, EBO, VAO;
 
     std::vector<Vertex> m_Vertices;
     std::vector<unsigned int> m_Indices;
 
-    void initMesh();
 };
 
 
