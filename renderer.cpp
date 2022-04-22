@@ -51,7 +51,7 @@ void Renderer::render(std::vector<Entity>& objects) {
         glBindTexture(GL_TEXTURE_2D, brdfLUT);
 
         material->setUniformData();
-        
+
         glBindVertexArray(mesh->vao());
         glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);

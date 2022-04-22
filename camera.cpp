@@ -3,6 +3,10 @@
 //
 
 #include "camera.h"
+#include "events/dispatcher.h"
+#include "log.h"
+
+#include <functional>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -10,6 +14,11 @@ Camera::Camera(glm::vec3 position) : front(glm::vec3(0.0f, 0.0f, -1.0f)), worldU
 {
     this->position = position;
     updateCameraVectors();
+
+    Dispatcher::instance().subscribe(MouseScrollEvent::descriptor,
+         std::bind(&Camera::onMouseScroll, this, std::placeholders::_1));
+    Dispatcher::instance().subscribe(MouseMoveEvent::descriptor,
+        std::bind(&Camera::onMouseMove, this, std::placeholders::_1));
 }
 
 glm::mat4 Camera::getViewMatrix()
@@ -30,13 +39,23 @@ void Camera::processKeyboard(Camera_Movement direction, float deltaTime)
         position += right * velocity;
 }
 
-void Camera::processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch)
+void Camera::onMouseMove(const Event& e)
 {
-    xoffset *= mouseSensitivity;
-    yoffset *= mouseSensitivity;
+    const auto& event = static_cast<const MouseMoveEvent&>(e);
 
-    yaw += xoffset;
-    pitch += yoffset;
+    float xOffset = event.xPos() - event.lastX();
+    float yOffset = event.lastY() - event.yPos();
+
+    processMouseMovement(xOffset, yOffset);
+}
+
+void Camera::processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch)
+{
+    xOffset *= mouseSensitivity;
+    yOffset *= mouseSensitivity;
+
+    yaw += xOffset;
+    pitch += yOffset;
 
     if (constrainPitch)
     {
@@ -49,9 +68,10 @@ void Camera::processMouseMovement(float xoffset, float yoffset, GLboolean constr
     updateCameraVectors();
 }
 
-void Camera::processMouseScroll(float yoffset)
+void Camera::onMouseScroll(const Event& e)
 {
-    zoom -= (float)yoffset;
+    const auto& event = static_cast<const MouseScrollEvent&>(e);
+    zoom -= (float)event.yOffset();
     if (zoom < 1.0f)
         zoom = 1.0f;
     if (zoom > 45.0f)

@@ -36,7 +36,7 @@ add_executable(InteractiveGraphics
         components/icomponent.h
         entity.cpp entity.h
         scene.cpp scene.h
-        samples/sample_scene.cpp samples/sample_scene.h log.h asset_library.cpp asset_library.h components/mesh_renderer.cpp components/mesh_renderer.h model.cpp model.h)
+        samples/sample_scene.cpp samples/sample_scene.h log.h asset_library.cpp asset_library.h components/mesh_renderer.cpp components/mesh_renderer.h model.cpp model.h events/event.h events/dispatcher.cpp events/dispatcher.h)
 
 find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(InteractiveGraphics PUBLIC glfw)

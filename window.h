@@ -34,7 +34,6 @@ private:
 
     static void frameBufferCallback(GLFWwindow* window, int width, int height);
     static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
-    static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 };
 
 #endif //INTERACTIVEGRAPHICS_WINDOW_H

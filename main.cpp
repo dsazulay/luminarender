@@ -5,8 +5,6 @@
 #include "window.h"
 #include "imgui_renderer.h"
 #include <glm/glm.hpp>
-#include "shader.h"
-#include "material.h"
 #include "camera.h"
 #include "uniform_buffer_object.h"
 #include "frame_buffer.h"
@@ -14,16 +12,11 @@
 #include "scene.h"
 #include "samples/sample_scene.h"
 
-
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-// camera
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
 int viewportWidth = 640;
 int viewportHeight = 400;
-
 
 // timing
 float deltaTime = 0.0f; // time between current frame and last frame
@@ -31,6 +24,8 @@ float lastFrame = 0.0f;
 
 
 int main() {
+    Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
     Window window{};
     window.init();
     window.createWindow(SCR_WIDTH, SCR_HEIGHT, "Interactive Graphics");

@@ -4,6 +4,8 @@
 
 #include <iostream>
 #include "window.h"
+#include "events/event.h"
+#include "events/dispatcher.h"
 
 void Window::init()
 {
@@ -33,11 +35,23 @@ void Window::createWindow(int width, int height, const char *name)
     }
     glfwMakeContextCurrent(m_window);
     glfwSetFramebufferSizeCallback(m_window, frameBufferCallback);
-    glfwSetCursorPosCallback(m_window, mouseCallback);
-    glfwSetScrollCallback(m_window, scrollCallback);
+    glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xPos, double yPos)
+    {
+        if (glfwGetKey(window, GLFW_KEY_LEFT_ALT))
+        {
+            MouseMoveEvent e(xPos, yPos, lastX, lastY);
+            Dispatcher::instance().post(e);
+        }
 
-    lastX = width / 2.0;
-    lastY = height / 2.0;
+        lastX = xPos;
+        lastY = yPos;
+    });
+
+    glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xOffset, double yOffset)
+    {
+        MouseScrollEvent e(xOffset, yOffset);
+        Dispatcher::instance().post(e);
+    });
 }
 
 bool Window::windowShouldClose() const
@@ -79,35 +93,12 @@ void Window::pollEvents()
     glfwPollEvents();
 }
 
-GLFWwindow *Window::glfwWindow() {
+GLFWwindow* Window::glfwWindow()
+{
     return m_window;
 }
 
 void Window::frameBufferCallback(GLFWwindow *window, int width, int height)
 {
     glViewport(0, 0, width, height);
-}
-
-void Window::mouseCallback(GLFWwindow *window, double xpos, double ypos)
-{
-    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT))
-    {
-        float xoffset = xpos - lastX;
-        float yoffset = lastY - ypos;
-
-        lastX = xpos;
-        lastY = ypos;
-
-        camera.processMouseMovement(xoffset, yoffset);
-    }
-    else
-    {
-        lastX = xpos;
-        lastY = ypos;
-    }
-}
-
-void Window::scrollCallback(GLFWwindow *window, double xoffset, double yoffset)
-{
-    camera.processMouseScroll(yoffset);
 }

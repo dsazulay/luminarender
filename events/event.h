@@ -1,0 +1,62 @@
+//
+// Created by Diego Azulay on 21/04/22.
+//
+
+#ifndef INTERACTIVEGRAPHICS_EVENT_H
+#define INTERACTIVEGRAPHICS_EVENT_H
+
+class Event
+{
+public:
+    Event() = default;
+    virtual const char* type() const = 0;
+};
+
+class WindowResizeEvent : public Event
+{
+public:
+    WindowResizeEvent(int width, int height) : m_width(width), m_height(height) {}
+    const char* type() const override { return descriptor; }
+    int width() const { return m_width; }
+    int height() const { return m_height; }
+
+    static constexpr char* descriptor = (char*) "WindowResizeEvent";
+private:
+    int m_width;
+    int m_height;
+};
+
+class MouseScrollEvent : public Event
+{
+public:
+    MouseScrollEvent(double xOffset, double yOffset) : m_xOffset(xOffset), m_yOffset(yOffset) {}
+    const char* type() const override { return descriptor; }
+    double xOffset() const { return m_xOffset; }
+    double yOffset() const { return m_yOffset; }
+
+    static constexpr char* descriptor = (char*) "MouseScrollEvent";
+private:
+    double m_xOffset;
+    double m_yOffset;
+};
+
+class MouseMoveEvent : public Event
+{
+public:
+    MouseMoveEvent(float xPos, float yPos, float lastX, float lastY ) :
+        m_xPos(xPos), m_yPos(yPos), m_lastX(lastX), m_lastY(lastY) {}
+    const char* type() const override { return descriptor; }
+    float xPos()  const { return m_xPos;  }
+    float yPos()  const { return m_yPos;  }
+    float lastX() const { return m_lastX; }
+    float lastY() const { return m_lastY; }
+
+    static constexpr char* descriptor = (char*) "MouseMoveEvent";
+private:
+    float m_xPos;
+    float m_yPos;
+    float m_lastX;
+    float m_lastY;
+};
+
+#endif //INTERACTIVEGRAPHICS_EVENT_H

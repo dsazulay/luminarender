@@ -7,6 +7,7 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include "events/event.h"
 
 enum Camera_Movement {
     FORWARD,
@@ -42,10 +43,12 @@ public:
     Camera(glm::vec3 position);
     glm::mat4 getViewMatrix();
     void processKeyboard(Camera_Movement direction, float deltaTime);
-    void processMouseMovement(float xoffset, float yoffset, GLboolean constrainPitch = true);
-    void processMouseScroll(float yoffset);
 
 private:
+    void onMouseScroll(const Event& e);
+    void onMouseMove(const Event& e);
+
+    void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
     void updateCameraVectors();
 };
 
