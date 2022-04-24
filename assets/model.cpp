@@ -3,7 +3,7 @@
 //
 
 #include "model.h"
-#include "log.h"
+#include "../log.h"
 
 Model::~Model()
 {

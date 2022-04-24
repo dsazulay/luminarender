@@ -6,9 +6,9 @@
 #define INTERACTIVEGRAPHICS_MESH_RENDERER_H
 
 
-#include "../material.h"
+#include "../assets/material.h"
 #include "icomponent.h"
-#include "../mesh.h"
+#include "../assets/mesh.h"
 
 class MeshRenderer : public IComponent
 {

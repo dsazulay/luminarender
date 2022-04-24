@@ -4,7 +4,6 @@
 
 #include "sample_scene.h"
 #include "../entity_factory.h"
-#include "../importer.h"
 #include "glad/glad.h"
 #include "../primitives.h"
 #include "../components/mesh_renderer.h"
@@ -222,8 +221,9 @@ void SampleScene::createIrradianceMaps()
     unsigned int irradianceMap;
     unsigned int prefilterMap;
     unsigned int brdfLUTTexture;
-    hdrTexture = generateCubeMapTexturesFromHDR(
-            Importer::loadHDRTextureFromFile("tiber_2.hdr", "Resources/Textures/skybox"),
+
+    Texture* texture = m_assetLibrary.loadHDRTexture("tiber", "tiber_2.hdr", "Resources/Textures/skybox");
+    hdrTexture = generateCubeMapTexturesFromHDR(texture->ID(),
             irradianceMap, prefilterMap, brdfLUTTexture);
 
     m_scene->irradianceMap = irradianceMap;
@@ -241,9 +241,10 @@ void SampleScene::createShaders()
 
 void SampleScene::createMaterials()
 {
+    m_assetLibrary.load2DTexture("container", "container.jpg", "resources/textures");
     Material* matRed = m_assetLibrary.createMaterial("red", m_assetLibrary.getShader("lambert"));
     matRed->setProperty("u_color", glm::vec4(0.2f, 0.8f, 1.0f, 1.0f));
-    matRed->setTexture("u_mainTex", Importer::loadTextureFromFile("container.jpg", "resources/textures"), 0);
+    matRed->setTexture("u_mainTex", m_assetLibrary.getTexture("container")->ID(), 0);
 
     Material* matBlue = m_assetLibrary.createMaterial("blue", m_assetLibrary.getShader("simple"));
     matBlue->setProperty("u_color", glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
@@ -258,13 +259,13 @@ void SampleScene::createMaterials()
 
     Material* matTexture = m_assetLibrary.createMaterial("tex", "lambert");
     matTexture->setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    unsigned int tex = Importer::loadTextureFromFile("container2.png", "resources/textures");
-    matTexture->setTexture("u_mainTex", tex, 0);
+    Texture* container2 = m_assetLibrary.load2DTexture("container2", "container2.png", "resources/textures");
+    matTexture->setTexture("u_mainTex", container2->ID(), 0);
 
     Material* backpackMat = m_assetLibrary.createMaterial("backpack", m_assetLibrary.getShader("lambert"));
     backpackMat->setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    unsigned int backpackTex = Importer::loadTextureFromFile("spitfire_d.png", "resources/textures/spitfire");
-    backpackMat->setTexture("u_mainTex", backpackTex, 0);
+    Texture* spitfire = m_assetLibrary.load2DTexture("spitfire", "spitfire_d.png", "resources/textures/spitfire");
+    backpackMat->setTexture("u_mainTex", spitfire->ID(), 0);
 
     Material* skyboxMat = m_assetLibrary.createMaterial(
             "skybox", m_assetLibrary.getShader("skybox"));
@@ -272,19 +273,19 @@ void SampleScene::createMaterials()
 
 //    std::vector<std::string> faces = { "right.jpg", "left.jpg", "top.jpg",
 //                                       "bottom.jpg", "front.jpg", "back.jpg" };
-//    skyboxMat.setTexture("u_mainTex", Importer::loadCubeMapFromFiles(faces, "Resources/Textures/skybox"), 0);
+//    Texture* skyboxTex = m_assetLibrary.loadCubeMapTexture("skyboxTex", faces, "Resources/Textures/skybox");
+//    skyboxMat->setTexture("u_mainTex", skyboxTex->ID(), 0);
 
 }
 
 void SampleScene::loadMeshes()
 {
-    m_assetLibrary.loadModel(AssetLibrary::BasicModel::Cube);
-    m_assetLibrary.loadModel(AssetLibrary::BasicModel::CubeMapModel);
-    m_assetLibrary.loadModel(AssetLibrary::BasicModel::Quad);
-    m_assetLibrary.loadModel(AssetLibrary::BasicModel::Sphere);
+    m_assetLibrary.loadMesh(AssetLibrary::BasicMesh::Cube);
+    m_assetLibrary.loadMesh(AssetLibrary::BasicMesh::CubeMapModel);
+    m_assetLibrary.loadMesh(AssetLibrary::BasicMesh::Quad);
+    m_assetLibrary.loadMesh(AssetLibrary::BasicMesh::Sphere);
 
     m_assetLibrary.loadModel("airplane", "resources/models/spitfire.FBX");
-    // Spitfire airplane
 }
 
 void SampleScene::addSceneObjects()

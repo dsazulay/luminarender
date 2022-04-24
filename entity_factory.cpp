@@ -6,7 +6,7 @@
 #include "entity_factory.h"
 #include "primitives.h"
 #include "components/mesh_renderer.h"
-#include "model.h"
+#include "assets/model.h"
 #include "log.h"
 
 Entity EntityFactory::createDirectionalLight(glm::vec3 rot, glm::vec3 color, float intensity)

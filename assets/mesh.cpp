@@ -3,7 +3,7 @@
 //
 
 #include "mesh.h"
-#include "log.h"
+#include "../log.h"
 
 Mesh::Mesh(std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives)
 {

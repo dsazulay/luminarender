@@ -9,9 +9,9 @@
 #include "components/transform.h"
 #include "components/light.h"
 #include "entity.h"
-#include "material.h"
-#include "mesh.h"
-#include "model.h"
+#include "assets/material.h"
+#include "assets/mesh.h"
+#include "assets/model.h"
 
 class EntityFactory {
 public:

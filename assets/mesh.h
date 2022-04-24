@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "material.h"
-#include "components/icomponent.h"
+#include "../components/icomponent.h"
 
 struct Vertex
 {

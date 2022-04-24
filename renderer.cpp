@@ -3,7 +3,7 @@
 //
 
 #include "renderer.h"
-#include "material.h"
+#include "assets/material.h"
 #include "components/light.h"
 #include "components/mesh_renderer.h"
 #include "log.h"

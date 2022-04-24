@@ -7,6 +7,35 @@
 #include "primitives.h"
 #include "importer.h"
 
+//AssetLibrary& AssetLibrary::instance()
+//{
+//    static AssetLibrary instance_;
+//    return instance_;
+//}
+
+AssetLibrary::~AssetLibrary()
+{
+    for (auto kv : m_shaders)
+    {
+        delete kv.second;
+    }
+
+    for (auto kv : m_materials)
+    {
+        delete kv.second;
+    }
+
+    for (auto kv : m_meshes)
+    {
+        delete kv.second;
+    }
+
+    for (auto kv : m_models)
+    {
+        delete kv.second;
+    }
+}
+
 Shader* AssetLibrary::loadShader(const char* name, const char* vertPath, const char* fragPath)
 {
     if (isShaderLoaded(name))
@@ -31,12 +60,6 @@ Shader* AssetLibrary::getShader(const char* name) {
 bool AssetLibrary::isShaderLoaded(const char* name) {
     return (m_shaders.find(name) != m_shaders.end());
 }
-
-//AssetLibrary& AssetLibrary::instance()
-//{
-//    static AssetLibrary instance_;
-//    return instance_;
-//}
 
 Material* AssetLibrary::createMaterial(const char* name, const char* shader)
 {
@@ -65,29 +88,6 @@ bool AssetLibrary::isMaterialCreated(const char* name)
     return (m_materials.find(name) != m_materials.end());
 }
 
-AssetLibrary::~AssetLibrary()
-{
-    for (auto kv : m_shaders)
-    {
-        delete kv.second;
-    }
-
-    for (auto kv : m_materials)
-    {
-        delete kv.second;
-    }
-
-    for (auto kv : m_meshes)
-    {
-        delete kv.second;
-    }
-
-    for (auto kv : m_models)
-    {
-        delete kv.second;
-    }
-}
-
 Model* AssetLibrary::loadModel(const char *name, const char *path)
 {
     if (isModelLoaded(name))
@@ -114,25 +114,30 @@ Model* AssetLibrary::getModel(const char* name)
     return nullptr;
 }
 
-Mesh* AssetLibrary::loadModel(AssetLibrary::BasicModel basicModel)
+bool AssetLibrary::isMeshLoaded(const char *name)
+{
+    return m_meshes.find(name) != m_meshes.end();
+}
+
+Mesh* AssetLibrary::loadMesh(AssetLibrary::BasicMesh basicModel)
 {
     Mesh* m;
     const char* name;
     switch (basicModel)
     {
-        case BasicModel::Cube:
+        case BasicMesh::Cube:
             m = new Mesh(Primitives::getCubePrimitives());
             name = "cube";
             break;
-        case BasicModel::CubeMapModel:
+        case BasicMesh::CubeMapModel:
             m = new Mesh(Primitives::getCubeMapPrimitives());
             name = "cubeMap";
             break;
-        case BasicModel::Quad:
+        case BasicMesh::Quad:
             m = new Mesh(Primitives::getQuadPrimitives());
             name = "quad";
             break;
-        case BasicModel::Sphere:
+        case BasicMesh::Sphere:
             m = new Mesh(Primitives::getSpherePrimitives());
             name = "sphere";
             break;
@@ -153,12 +158,58 @@ Mesh *AssetLibrary::getMesh(const char *name) {
     return nullptr;
 }
 
-bool AssetLibrary::isMeshLoaded(const char *name)
-{
-    return m_meshes.find(name) != m_meshes.end();
-}
-
 bool AssetLibrary::isModelLoaded(const char* name)
 {
     return m_models.find(name) != m_models.end();
+}
+
+Texture* AssetLibrary::load2DTexture(const char *name, const std::string &file, const std::string &directory)
+{
+    if (isTextureLoaded(name))
+    {
+        LOG_INFO("texture already loaded");
+        return m_textures[name];
+    }
+    Texture* texture = Importer::loadTextureFromFile(file, directory);
+    m_textures[name] = texture;
+    return texture;
+}
+
+Texture* AssetLibrary::loadHDRTexture(const char *name, const std::string &file, const std::string &directory)
+{
+    if (isTextureLoaded(name))
+    {
+        LOG_INFO("texture already loaded");
+        return m_textures[name];
+    }
+    Texture* texture = Importer::loadHDRTextureFromFile(file, directory);
+    m_textures[name] = texture;
+    return texture;
+}
+
+Texture *AssetLibrary::loadCubeMapTexture(const char *name, const std::vector<std::string> faces,
+                                          const std::string &directory)
+{
+    if (isTextureLoaded(name))
+    {
+        LOG_INFO("texture already loaded");
+        return m_textures[name];
+    }
+    Texture* texture = Importer::loadCubeMapFromFiles(faces, directory);
+    m_textures[name] = texture;
+    return texture;
+}
+
+Texture *AssetLibrary::getTexture(const char *name)
+{
+    if (isTextureLoaded(name))
+        return m_textures[name];
+
+    LOG_WARN("texture not loaded");
+    return nullptr;
+}
+
+bool AssetLibrary::isTextureLoaded(const char *name)
+{
+    return m_textures.find(name) != m_textures.end();
 }

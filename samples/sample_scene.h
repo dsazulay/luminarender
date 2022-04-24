@@ -8,8 +8,8 @@
 
 #include <unordered_map>
 #include "../scene.h"
-#include "../shader.h"
-#include "../material.h"
+#include "../assets/shader.h"
+#include "../assets/material.h"
 #include "../asset_library.h"
 
 class SampleScene
