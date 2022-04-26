@@ -59,4 +59,30 @@ private:
     float m_lastY;
 };
 
+class ViewportResizeEvent : public Event
+{
+public:
+    ViewportResizeEvent(float width, float height) : m_width(width), m_height(height) {}
+    const char* type() const override { return descriptor; }
+    float width() const { return m_width; }
+    float height() const { return m_height; }
+
+    static constexpr char* descriptor = (char*) "ViewportResizeEvent";
+private:
+    float m_width;
+    float m_height;
+};
+
+class KeyPressEvent : public Event
+{
+public:
+    KeyPressEvent(int keyCode) : m_keyCode(keyCode) {}
+    const char* type() const override { return descriptor; }
+    int keyCode() const { return m_keyCode; }
+
+    static constexpr char* descriptor = (char*) "KeyPressEvent";
+private:
+    int m_keyCode;
+};
+
 #endif //INTERACTIVEGRAPHICS_EVENT_H

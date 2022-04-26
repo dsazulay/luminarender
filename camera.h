@@ -19,7 +19,7 @@ enum Camera_Movement {
 // Default camera values
 const float YAW         = -90.0f;
 const float PITCH       =   0.0f;
-const float SPEED       =   2.5f;
+const float SPEED       =   5.0f;
 const float SENSITIVITY =   0.1f;
 const float ZOOM        =  45.0f;
 
@@ -42,11 +42,11 @@ public:
 
     Camera(glm::vec3 position);
     glm::mat4 getViewMatrix();
-    void processKeyboard(Camera_Movement direction, float deltaTime);
 
 private:
     void onMouseScroll(const Event& e);
     void onMouseMove(const Event& e);
+    void onKeyPress(const Event& e);
 
     void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
     void updateCameraVectors();

@@ -6,12 +6,14 @@
 #include "assets/material.h"
 #include "components/light.h"
 #include "components/mesh_renderer.h"
-#include "log.h"
+#include "events/dispatcher.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
-void Renderer::render(std::vector<Entity>& objects) {
+void Renderer::render(std::vector<Entity>& objects)
+{
     for (auto& entity : objects)
     {
         auto transform = entity.getComponent<Transform>();
@@ -101,7 +103,58 @@ void Renderer::setupLights(std::vector<Entity> &lights)
     }
 }
 
-Renderer::Renderer() : m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct)))
+void Renderer::updateTransformMatrices()
 {
+    glm::mat4 view = m_camera.getViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(m_camera.zoom),
+                                            (float) m_viewportWidth / (float) m_viewportHeight, 0.1f, 100.0f);
+
+    m_matricesUBO.setBufferData(0, sizeof(glm::mat4), glm::value_ptr(view));
+    m_matricesUBO.setBufferData(sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
+    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4), sizeof(glm::vec4), glm::value_ptr(m_camera.position));
+}
+
+Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos) :
+    m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
+    m_viewportFrameBuffer(m_viewportWidth, m_viewportHeight),
+    m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
+    m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
+    m_camera(cameraPos)
+{
+
+    m_matricesUBO.bindBufferToIndex(0);
     m_lightUBO.bindBufferToIndex(1);
+
+    Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
+     std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
+}
+
+void Renderer::bindFrameBuffer()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, m_viewportFrameBuffer.getID());
+}
+
+void Renderer::updateViewportDimensions()
+{
+    // TODO: verify if this is necessary
+    glViewport(0, 0, m_viewportWidth, m_viewportHeight);
+}
+
+void Renderer::clearFrameBuffer()
+{
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+unsigned int Renderer::getTexcolorBufferID()
+{
+    return m_viewportFrameBuffer.getTexcolorBufferID();
+}
+
+void Renderer::onViewportResize(const Event& e)
+{
+    const auto& event = static_cast<const ViewportResizeEvent&>(e);
+    m_viewportWidth = event.width();
+    m_viewportHeight = event.height();
+    m_viewportFrameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
 }

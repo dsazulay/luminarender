@@ -21,7 +21,8 @@ add_executable(InteractiveGraphics
         imgui/imgui_widgets.cpp
         window.cpp window.h
         imgui_renderer.cpp imgui_renderer.h
-        primitives.h camera.cpp camera.h
+        primitives.h
+        camera.cpp camera.h
         importer.cpp importer.h
         include/stb_image.h
         assets/shader.cpp assets/shader.h
@@ -36,7 +37,15 @@ add_executable(InteractiveGraphics
         components/icomponent.h
         entity.cpp entity.h
         scene.cpp scene.h
-        samples/sample_scene.cpp samples/sample_scene.h log.h asset_library.cpp asset_library.h components/mesh_renderer.cpp components/mesh_renderer.h assets/model.cpp assets/model.h events/event.h events/dispatcher.cpp events/dispatcher.h assets/texture.cpp assets/texture.h)
+        samples/sample_scene.cpp samples/sample_scene.h
+        log.h
+        asset_library.cpp asset_library.h
+        components/mesh_renderer.cpp components/mesh_renderer.h
+        assets/model.cpp assets/model.h
+        events/event.h
+        events/dispatcher.cpp events/dispatcher.h
+        assets/texture.cpp assets/texture.h
+        application.cpp application.h)
 
 find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(InteractiveGraphics PUBLIC glfw)

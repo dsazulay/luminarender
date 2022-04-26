@@ -15,7 +15,7 @@
 class SampleScene
 {
 public:
-    SampleScene(Scene* scene);
+    SampleScene(Scene* scene, AssetLibrary* assetLibrary);
 
 private:
     void createIrradianceMaps();
@@ -27,7 +27,7 @@ private:
     void addSkybox();
 
     Scene* m_scene;
-    AssetLibrary m_assetLibrary;
+    AssetLibrary* m_assetLibrary;
 
     glm::vec3 m_cubePositions[10] = {
         glm::vec3( 0.0f,  0.0f,  0.0f),

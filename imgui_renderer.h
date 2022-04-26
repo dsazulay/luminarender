@@ -13,12 +13,11 @@ class ImguiRenderer {
 public:
     void init();
     void terminate();
-    void update();
+    void update(unsigned int frameBufferTexcolorID);
     void setBackendImplementation(GLFWwindow* window);
 
     float viewportHeight;
     float viewportWidth;
-    FrameBuffer* frameBuffer;
 
 private:
 };

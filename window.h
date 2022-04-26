@@ -10,8 +10,6 @@
 #include <GLFW/glfw3.h>
 #include "camera.h"
 
-extern Camera camera;
-
 class Window
 {
 public:
@@ -21,10 +19,8 @@ public:
     bool windowShouldClose() const;
     void swapBuffers() const;
     void pollEvents();
-    void processInput(float deltaTime) const;
+    void processInput() const;
     GLFWwindow* glfwWindow();
-
-    Camera* m_camera;
 
 private:
     GLFWwindow* m_window;

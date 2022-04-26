@@ -6,6 +6,7 @@
 #include "window.h"
 #include "events/event.h"
 #include "events/dispatcher.h"
+#include "log.h"
 
 void Window::init()
 {
@@ -52,6 +53,16 @@ void Window::createWindow(int width, int height, const char *name)
         MouseScrollEvent e(xOffset, yOffset);
         Dispatcher::instance().post(e);
     });
+
+    glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        // TODO: make this work with multiple keys pressed
+//        if (action == GLFW_PRESS || action == GLFW_REPEAT)
+//        {
+//            KeyPressEvent e(key);
+//            Dispatcher::instance().post(e);
+//        }
+    });
 }
 
 bool Window::windowShouldClose() const
@@ -59,20 +70,31 @@ bool Window::windowShouldClose() const
     return glfwWindowShouldClose(m_window);
 }
 
-void Window::processInput(float deltaTime) const
+void Window::processInput() const
 {
     if(glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(m_window, true);
 
     if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
-        m_camera->processKeyboard(FORWARD, deltaTime);
-    if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
-        m_camera->processKeyboard(BACKWARD, deltaTime);
+    {
+        KeyPressEvent e(GLFW_KEY_W);
+        Dispatcher::instance().post(e);
+    }
+    else if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        KeyPressEvent e(GLFW_KEY_S);
+        Dispatcher::instance().post(e);
+    }
     if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
-        m_camera->processKeyboard(LEFT, deltaTime);
-    if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
-        m_camera->processKeyboard(RIGHT, deltaTime);
-
+    {
+        KeyPressEvent e(GLFW_KEY_A);
+        Dispatcher::instance().post(e);
+    }
+    else if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        KeyPressEvent e(GLFW_KEY_D);
+        Dispatcher::instance().post(e);
+    }
 //    if (glfwGetKey(m_Window, GLFW_KEY_Q) == GLFW_PRESS)
 //        m_GuizmoType = -1;
 //    if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)

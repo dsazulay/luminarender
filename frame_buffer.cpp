@@ -3,6 +3,7 @@
 //
 
 #include "frame_buffer.h"
+#include "log.h"
 
 #include <glad/glad.h>
 #include <iostream>

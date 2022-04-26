@@ -7,6 +7,9 @@
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
+#include "events/event.h"
+#include "events/dispatcher.h"
+#include "log.h"
 
 void ImguiRenderer::init() {
     IMGUI_CHECKVERSION();
@@ -37,7 +40,7 @@ void ImguiRenderer::terminate() {
     ImGui::DestroyContext();
 }
 
-void ImguiRenderer::update() {
+void ImguiRenderer::update(unsigned int frameBufferTexcolorID) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -49,13 +52,14 @@ void ImguiRenderer::update() {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
     ImGui::Begin("Viewport");
     ImVec2 viewPortSize = ImGui::GetContentRegionAvail();
-    ImGui::Image((void*)frameBuffer->getTexcolorBufferID(), ImVec2{(float)viewportWidth, (float)viewportHeight}, ImVec2{0, 1}, ImVec2{1, 0});
+    ImGui::Image((void*)(size_t)frameBufferTexcolorID, ImVec2{(float)viewportWidth, (float)viewportHeight}, ImVec2{0, 1}, ImVec2{1, 0});
 
     if (viewPortSize.x != viewportWidth || viewPortSize.y != viewportHeight)
     {
         viewportWidth = viewPortSize.x;
         viewportHeight = viewPortSize.y;
-        frameBuffer->resizeBuffer(viewportWidth, viewportHeight);
+        ViewportResizeEvent e(viewportWidth, viewportHeight);
+        Dispatcher::instance().post(e);
     }
     ImGui::PopStyleVar();
 

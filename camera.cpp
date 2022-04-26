@@ -5,6 +5,7 @@
 #include "camera.h"
 #include "events/dispatcher.h"
 #include "log.h"
+#include "application.h"
 
 #include <functional>
 
@@ -19,6 +20,8 @@ Camera::Camera(glm::vec3 position) : front(glm::vec3(0.0f, 0.0f, -1.0f)), worldU
          std::bind(&Camera::onMouseScroll, this, std::placeholders::_1));
     Dispatcher::instance().subscribe(MouseMoveEvent::descriptor,
         std::bind(&Camera::onMouseMove, this, std::placeholders::_1));
+    Dispatcher::instance().subscribe(KeyPressEvent::descriptor,
+             std::bind(&Camera::onKeyPress, this, std::placeholders::_1));
 }
 
 glm::mat4 Camera::getViewMatrix()
@@ -26,16 +29,18 @@ glm::mat4 Camera::getViewMatrix()
     return glm::lookAt(position, position + front, up);
 }
 
-void Camera::processKeyboard(Camera_Movement direction, float deltaTime)
+void Camera::onKeyPress(const Event& e)
 {
-    float velocity = movementSpeed * deltaTime;
-    if (direction == FORWARD)
+    const auto& event = static_cast<const KeyPressEvent&>(e);
+    int keyCode = event.keyCode();
+    float velocity = movementSpeed * Application::deltaTime;
+    if (keyCode == 87)
         position += front * velocity;
-    if (direction == BACKWARD)
+    else if (keyCode == 83)
         position -= front * velocity;
-    if (direction == LEFT)
+    else if (keyCode == 65)
         position -= right * velocity;
-    if (direction == RIGHT)
+    else if (keyCode == 68)
         position += right * velocity;
 }
 
