@@ -21,7 +21,7 @@ public:
     void clearFrameBuffer();
     void updateTransformMatrices();
     void setupLights(std::vector<Entity>& lights);
-    void render(std::vector<Entity>& objects);
+    void render(std::list<Entity>& objects);
     void renderSkybox(Entity& skybox);
 
     unsigned int getTexcolorBufferID();
@@ -42,6 +42,7 @@ private:
     Camera m_camera;
 
     void onViewportResize(const Event& e);
+    void renderEntity(Entity& entity);
 };
 
 

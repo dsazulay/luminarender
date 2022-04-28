@@ -293,12 +293,21 @@ void SampleScene::addSceneObjects()
     Mesh* cube = m_assetLibrary->getMesh("cube");
     Mesh* quad = m_assetLibrary->getMesh("quad");
     Mesh* sphere = m_assetLibrary->getMesh("sphere");
-    m_scene->addObject(EntityFactory::createFromMesh(
-            m_cubePositions[2], m_assetLibrary->getMaterial("red"),cube));
-    m_scene->addObject(EntityFactory::createFromMesh(
-            m_cubePositions[4], m_assetLibrary->getMaterial("red"), cube));
+    Entity cubeEntity = EntityFactory::createFromMesh(
+            m_cubePositions[2], m_assetLibrary->getMaterial("red"),cube);
 //    m_scene->addObject(EntityFactory::createFromMesh(
-//            m_cubePositions[6], m_assetLibrary.getMaterial("tex"), cube));
+//            m_cubePositions[4], m_assetLibrary->getMaterial("red"), cube));
+    m_scene->addObject(EntityFactory::createFromMesh(
+            m_cubePositions[6], m_assetLibrary->getMaterial("tex"), cube));
+
+    auto& entity = m_scene->objects().front();
+    entity.addChild(cubeEntity);
+    auto transform = entity.getComponent<Transform>();
+    transform->eulerAngles(glm::vec3(0.0, 0.0, 35.0));
+    transform->scale(glm::vec3(2, 2, 2));
+    transform->updateModelMatrix();
+//    entity.addChild(cubeEntity);
+    entity.updateSelfAndChild();
 //
 //    m_scene->addObject(EntityFactory::createFromMesh(
 //            m_cubePositions[7], m_assetLibrary.getMaterial("blue"), quad));

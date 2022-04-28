@@ -12,7 +12,7 @@ Mesh::Mesh(std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives)
 
 Mesh::~Mesh()
 {
-    LOG_INFO("mesh destructor");
+
 }
 
 void Mesh::setPrimitives(std::vector<Vertex> vertices, std::vector<unsigned int> indices)

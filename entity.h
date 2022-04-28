@@ -11,6 +11,7 @@
 #include "components/icomponent.h"
 #include <iostream>
 #include <memory>
+#include <list>
 
 
 class Entity
@@ -26,9 +27,18 @@ public:
     template <class T>
     void addComponent(T& component);
 
+    void addChild(Entity entity);
+    std::list<Entity>& getChildren();
+    void setParent(Entity* entity);
+
+    void updateSelfAndChild();
+
 private:
     unsigned int m_id;
     std::vector<std::shared_ptr<IComponent>> m_components;
+
+    Entity* m_parent = nullptr;
+    std::list<Entity> m_children;
 };
 
 template<class T>

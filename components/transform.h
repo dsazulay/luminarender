@@ -19,6 +19,7 @@ public:
     glm::vec3 getDirection() const;
 
     void updateModelMatrix();
+    void updateFromModelMatrix();
 
     glm::mat4 modelMatrix() const;
     void modelMatrix(glm::mat4 m);
@@ -29,10 +30,10 @@ public:
     glm::quat rotation();
     void rotation(glm::quat q);
 
-    glm::vec3* eulerAngles();
+    glm::vec3 eulerAngles();
     void eulerAngles(glm::vec3 r);
 
-    glm::vec3* scale();
+    glm::vec3 scale();
     void scale(glm::vec3 s);
 
 private:

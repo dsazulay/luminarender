@@ -16,7 +16,7 @@ public:
     void addSkybox(Entity entity);
 
     std::vector<Entity>& lights();
-    std::vector<Entity>& objects();
+    std::list<Entity>& objects();
     Entity& skybox();
 
     unsigned int irradianceMap;
@@ -25,7 +25,7 @@ public:
 
 private:
     std::vector<Entity> m_lights;
-    std::vector<Entity> m_objects;
+    std::list<Entity> m_objects;
     Entity m_skybox;
 };
 

@@ -12,7 +12,7 @@ void Scene::addLight(Entity entity)
 
 void Scene::addObject(Entity entity)
 {
-    m_objects.push_back(entity);
+    m_objects.emplace_back(entity);
 }
 
 void Scene::addSkybox(Entity entity)
@@ -25,7 +25,7 @@ std::vector<Entity>& Scene::lights()
     return m_lights;
 }
 
-std::vector<Entity>& Scene::objects()
+std::list<Entity>& Scene::objects()
 {
     return m_objects;
 }

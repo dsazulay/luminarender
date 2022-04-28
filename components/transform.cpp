@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "transform.h"
+#include <glm/gtx/matrix_decompose.hpp>
 
 Transform::Transform()
 {
@@ -65,9 +66,9 @@ void Transform::rotation(glm::quat q)
     m_Rotation = q;
 }
 
-glm::vec3* Transform::eulerAngles()
+glm::vec3 Transform::eulerAngles()
 {
-    return &m_EulerAngles;
+    return m_EulerAngles;
 }
 
 void Transform::eulerAngles(glm::vec3 r)
@@ -75,14 +76,29 @@ void Transform::eulerAngles(glm::vec3 r)
     m_EulerAngles = r;
 }
 
-glm::vec3* Transform::scale()
+glm::vec3 Transform::scale()
 {
-    return &m_Scale;
+    return m_Scale;
 }
 
 void Transform::scale(glm::vec3 s)
 {
     m_Scale = s;
+}
+
+void Transform::updateFromModelMatrix()
+{
+    glm::vec3 skew;
+    glm::vec4 persp;
+    glm::decompose(m_ModelMatrix, m_Scale, m_Rotation, m_Position, skew, persp);
+//    m_Position = m_ModelMatrix[3];
+//    m_EulerAngles = glm::eulerAngles(glm::quat(m_ModelMatrix));
+//    for (int i = 0; i < 3; i++)
+//    {
+//        m_Scale[i] = glm::length(m_ModelMatrix[i]);
+////        mat[i]
+//    }
+    eulerAngles(glm::eulerAngles(m_Rotation));
 }
 
 

@@ -12,51 +12,16 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-void Renderer::render(std::vector<Entity>& objects)
+void Renderer::render(std::list<Entity>& objects)
 {
     for (auto& entity : objects)
     {
-        auto transform = entity.getComponent<Transform>();
-        auto mesh = entity.getComponent<MeshRenderer>();
-        if (mesh == nullptr)
-            continue;
-        Material* material = mesh->material;
+        renderEntity(entity);
 
-
-        material->shader->use();
-
-        // set object uniforms (e.g. transform)
-        material->shader->setMat4("u_model", transform->modelMatrix());
-        material->shader->setMat3("u_normalMatrix", glm::transpose(glm::inverse(glm::mat3(transform->modelMatrix()))));
-
-        // set material uniforms (e.g. color, textures)
-        int texCount = 0;
-        for (const auto& texture : material->textures)
+        for (auto& childEntity : entity.getChildren())
         {
-            material->shader->setInt(texture.first, texCount);
-            glActiveTexture(GL_TEXTURE0 + texCount);
-            glBindTexture(GL_TEXTURE_2D, texture.second);
-            texCount++;
+            renderEntity(childEntity);
         }
-
-        // bind global illumination textures
-        material->shader->setInt("u_irradianceTex", 10);
-        glActiveTexture(GL_TEXTURE10);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-
-        material->shader->setInt("u_prefilterMap", 11);
-        glActiveTexture(GL_TEXTURE11);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
-
-        material->shader->setInt("u_brdfLUT", 12);
-        glActiveTexture(GL_TEXTURE12);
-        glBindTexture(GL_TEXTURE_2D, brdfLUT);
-
-        material->setUniformData();
-
-        glBindVertexArray(mesh->vao());
-        glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
     }
 }
 
@@ -157,4 +122,49 @@ void Renderer::onViewportResize(const Event& e)
     m_viewportWidth = event.width();
     m_viewportHeight = event.height();
     m_viewportFrameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
+}
+
+void Renderer::renderEntity(Entity &entity)
+{
+    auto transform = entity.getComponent<Transform>();
+    auto mesh = entity.getComponent<MeshRenderer>();
+    if (mesh == nullptr)
+        return;
+    Material* material = mesh->material;
+
+
+    material->shader->use();
+
+    // set object uniforms (e.g. transform)
+    material->shader->setMat4("u_model", transform->modelMatrix());
+    material->shader->setMat3("u_normalMatrix", glm::transpose(glm::inverse(glm::mat3(transform->modelMatrix()))));
+
+    // set material uniforms (e.g. color, textures)
+    int texCount = 0;
+    for (const auto& texture : material->textures)
+    {
+        material->shader->setInt(texture.first, texCount);
+        glActiveTexture(GL_TEXTURE0 + texCount);
+        glBindTexture(GL_TEXTURE_2D, texture.second);
+        texCount++;
+    }
+
+    // bind global illumination textures
+    material->shader->setInt("u_irradianceTex", 10);
+    glActiveTexture(GL_TEXTURE10);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
+
+    material->shader->setInt("u_prefilterMap", 11);
+    glActiveTexture(GL_TEXTURE11);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
+
+    material->shader->setInt("u_brdfLUT", 12);
+    glActiveTexture(GL_TEXTURE12);
+    glBindTexture(GL_TEXTURE_2D, brdfLUT);
+
+    material->setUniformData();
+
+    glBindVertexArray(mesh->vao());
+    glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
 }
