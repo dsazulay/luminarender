@@ -93,7 +93,7 @@ Entity EntityFactory::createFromMesh(glm::vec3 pos, Material *mat, Mesh* mesh)
     return e;
 }
 
-std::vector<Entity> EntityFactory::createFromModel(glm::vec3 pos, Material* mat, Model* model)
+Entity EntityFactory::createFromModel(glm::vec3 pos, Material* mat, Model* model)
 {
     Transform transform;
     transform.position(pos);
@@ -102,20 +102,11 @@ std::vector<Entity> EntityFactory::createFromModel(glm::vec3 pos, Material* mat,
     Entity e;
     e.addComponent(transform);
 
-    std::vector<Entity> entities;
-    entities.push_back(e);
-
     for (auto mesh : model->m_meshes)
     {
-        Entity newEntity = createFromMesh(pos, mat, mesh.second);
-        // TODO: remove this after add scene hierarchy
-        auto t = newEntity.getComponent<Transform>();
-        t->position(glm::vec3(0.0, -3.0, -5.0));
-        t->scale(glm::vec3(0.05, 0.05, 0.05));
-        t->eulerAngles(glm::vec3(-90, 0, 0));
-        t->updateModelMatrix();
-        entities.push_back(newEntity);
+        e.addChild(createFromMesh(pos, mat, mesh.second));
     }
 
-    return entities;
+    e.updateSelfAndChild();
+    return e;
 }

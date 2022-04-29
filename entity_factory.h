@@ -16,7 +16,7 @@
 class EntityFactory {
 public:
     static Entity createFromMesh(glm::vec3 pos, Material* mat, Mesh* mesh);
-    static std::vector<Entity> createFromModel(glm::vec3 pos, Material* mat, Model* model);
+    static Entity createFromModel(glm::vec3 pos, Material* mat, Model* model);
 
     static Entity createDirectionalLight(glm::vec3 rot, glm::vec3 color, float intensity);
     static Entity createPointLight(glm::vec3 pos, glm::vec3 color, float intensity);

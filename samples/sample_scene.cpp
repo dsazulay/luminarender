@@ -306,7 +306,6 @@ void SampleScene::addSceneObjects()
     transform->eulerAngles(glm::vec3(0.0, 0.0, 35.0));
     transform->scale(glm::vec3(2, 2, 2));
     transform->updateModelMatrix();
-//    entity.addChild(cubeEntity);
     entity.updateSelfAndChild();
 //
 //    m_scene->addObject(EntityFactory::createFromMesh(
@@ -317,14 +316,18 @@ void SampleScene::addSceneObjects()
 //    m_scene->addObject(EntityFactory::createFromMesh(
 //            m_cubePositions[9], m_assetLibrary.getMaterial("new"), sphere));
 
-    std::vector<Entity> entities = EntityFactory::createFromModel(
+    Entity e = EntityFactory::createFromModel(
             m_cubePositions[0], m_assetLibrary->getMaterial("backpack"),
             m_assetLibrary->getModel("airplane"));
 
-    for (auto e : entities)
-    {
-        m_scene->addObject(e);
-    }
+    auto t = e.getComponent<Transform>();
+    t->position(glm::vec3(0.0, -3.0, -5.0));
+    t->scale(glm::vec3(0.05, 0.05, 0.05));
+    t->eulerAngles(glm::vec3(-90, 0, 0));
+    t->updateModelMatrix();
+    e.updateSelfAndChild();
+
+    m_scene->addObject(e);
 }
 
 void SampleScene::addLights()

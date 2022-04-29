@@ -20,7 +20,7 @@ Entity::Entity()
 
 Entity::~Entity()
 {
-
+    LOG_INFO("entity destructor");
 }
 
 void Entity::deleteComponents()
