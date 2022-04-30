@@ -20,6 +20,8 @@ public:
     Shader(const char* vertexPath, const char* fragPath);
     ~Shader();
 
+    void addGeometryShader(const char* vertexPath);
+
     void use() const;
     std::string preprocess(std::stringstream& input, int level);
 

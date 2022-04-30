@@ -25,6 +25,19 @@ void Renderer::render(std::list<Entity>& objects)
     }
 }
 
+void Renderer::renderNormalVector(std::list<Entity>& objects)
+{
+    for (auto& entity : objects)
+    {
+        renderNormalVectorOfEntity(entity);
+
+        for (auto& childEntity : entity.getChildren())
+        {
+            renderNormalVectorOfEntity(childEntity);
+        }
+    }
+}
+
 void Renderer::renderSkybox(Entity &skybox)
 {
     auto mesh = skybox.getComponent<MeshRenderer>();
@@ -167,4 +180,112 @@ void Renderer::renderEntity(Entity &entity)
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
+}
+
+std::vector<glm::vec4> Renderer::getFrustumCornersWorldSpace(const glm::mat4 &proj, const glm::mat4 &view)
+{
+    const auto inv = glm::inverse(proj * view);
+
+    std::vector<glm::vec4> frustumCorners;
+    for (unsigned int x = 0; x < 2; ++x)
+    {
+        for (unsigned int y = 0; y < 2; ++y)
+        {
+            for (unsigned int z = 0; z < 2; ++z)
+            {
+                const glm::vec4 pt =
+                        inv * glm::vec4(
+                                2.0f * x - 1.0f,
+                                2.0f * y - 1.0f,
+                                2.0f * z - 1.0f,
+                                1.0f);
+                frustumCorners.push_back(pt / pt.w);
+            }
+        }
+    }
+
+    return frustumCorners;
+}
+
+void Renderer::renderNormalVectorOfEntity(Entity &entity)
+{
+    auto transform = entity.getComponent<Transform>();
+    auto mesh = entity.getComponent<MeshRenderer>();
+    if (mesh == nullptr)
+        return;
+    Material* material = mat;
+
+    material->shader->use();
+
+    // set object uniforms (e.g. transform)
+    material->shader->setMat4("u_model", transform->modelMatrix());
+    material->shader->setMat3("u_normalMatrix", glm::transpose(glm::inverse(glm::mat3(m_camera.getViewMatrix() * transform->modelMatrix()))));
+
+    material->setUniformData();
+
+    glBindVertexArray(mesh->vao());
+    glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+}
+
+glm::mat4 Renderer::cascadeShadows(glm::vec3 lightDir)
+{
+    glm::mat4 view = m_camera.getViewMatrix();
+    glm::mat4 projection = glm::perspective(glm::radians(m_camera.zoom),
+                                            (float) m_viewportWidth / (float) m_viewportHeight, 0.1f, 100.0f);
+
+    auto corners = getFrustumCornersWorldSpace(projection, view);
+
+    glm::vec3 center = glm::vec3(0, 0, 0);
+    for (const auto& v : corners)
+    {
+        center += glm::vec3(v);
+    }
+    center /= corners.size();
+
+    const auto lightView = glm::lookAt(
+            center + lightDir,
+            center,
+            glm::vec3(0.0f, 1.0f, 0.0f)
+    );
+
+    float minX = std::numeric_limits<float>::max();
+    float maxX = std::numeric_limits<float>::min();
+    float minY = std::numeric_limits<float>::max();
+    float maxY = std::numeric_limits<float>::min();
+    float minZ = std::numeric_limits<float>::max();
+    float maxZ = std::numeric_limits<float>::min();
+    for (const auto& v : corners)
+    {
+        const auto trf = lightView * v;
+        minX = std::min(minX, trf.x);
+        maxX = std::max(maxX, trf.x);
+        minY = std::min(minY, trf.y);
+        maxY = std::max(maxY, trf.y);
+        minZ = std::min(minZ, trf.z);
+        maxZ = std::max(maxZ, trf.z);
+    }
+
+    // Tune this parameter according to the scene
+    constexpr float zMult = 10.0f;
+    if (minZ < 0)
+    {
+        minZ *= zMult;
+    }
+    else
+    {
+        minZ /= zMult;
+    }
+    if (maxZ < 0)
+    {
+        maxZ /= zMult;
+    }
+    else
+    {
+        maxZ *= zMult;
+    }
+
+    const glm::mat4 lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+
+    return lightProjection * lightView;
 }

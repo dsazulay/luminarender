@@ -23,8 +23,14 @@ public:
     void setupLights(std::vector<Entity>& lights);
     void render(std::list<Entity>& objects);
     void renderSkybox(Entity& skybox);
+    void renderNormalVector(std::list<Entity>& objects);
+
+    glm::mat4 cascadeShadows(glm::vec3 lightDir);
+    std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
 
     unsigned int getTexcolorBufferID();
+
+    Material* mat;
 
     unsigned int irradianceMap;
     unsigned int prefilterMap;
@@ -43,6 +49,7 @@ private:
 
     void onViewportResize(const Event& e);
     void renderEntity(Entity& entity);
+    void renderNormalVectorOfEntity(Entity &entity);
 };
 
 

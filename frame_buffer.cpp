@@ -7,6 +7,7 @@
 
 #include <glad/glad.h>
 #include <iostream>
+#include <vector>
 
 void FrameBuffer::createBuffer()
 {
@@ -70,4 +71,49 @@ void FrameBuffer::deleteBuffer()
 FrameBuffer::~FrameBuffer()
 {
 
+}
+
+void FrameBuffer::create3Dbuffer()
+{
+    // TODO: change 100 to the camera farplane value
+    std::vector<float> shadowCascadeLevels{ 100 / 50.0f, 100 / 25.0f, 100 / 10.0f, 100 / 2.0f };
+    const unsigned int SHADOW_WIDTH = 512, SHADOW_HEIGHT = 512;
+
+    glGenFramebuffers(1, &m_FrameBuffer);
+
+    glGenTextures(1, &m_lightDepthMaps);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
+    glTexImage3D(
+            GL_TEXTURE_2D_ARRAY,
+            0,
+            GL_DEPTH_COMPONENT32F,
+            SHADOW_WIDTH,
+            SHADOW_HEIGHT,
+            int(shadowCascadeLevels.size()) + 1,
+            0,
+            GL_DEPTH_COMPONENT,
+            GL_FLOAT,
+            nullptr);
+
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+
+    constexpr float bordercolor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_lightDepthMaps, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
+        throw 0;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

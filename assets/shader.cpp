@@ -176,3 +176,42 @@ void Shader::setMat4(const std::string &name, const glm::mat4 &mat) const
 {
     glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
+
+void Shader::addGeometryShader(const char* vertexPath)
+{
+    std::string vertexCode;
+    std::stringstream vertexStream;
+
+    vertexStream = getStreamFromFile(vertexPath);
+
+    vertexCode = preprocess(vertexStream, 0);
+
+    const char* vShaderCode = vertexCode.c_str();
+
+    unsigned int vertex;
+    int success;
+    char infoLog[512];
+
+    vertex = glCreateShader(GL_GEOMETRY_SHADER);
+    glShaderSource(vertex, 1, &vShaderCode, nullptr);
+    glCompileShader(vertex);
+
+    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
+    if (!success)
+    {
+        glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
+        std::cout << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n" << infoLog << std::endl;
+    }
+
+    glAttachShader(ID, vertex);
+    glLinkProgram(ID);
+
+    glGetProgramiv(ID, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(ID, 512, nullptr, infoLog);
+        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+    }
+
+    glDeleteShader(vertex);
+}

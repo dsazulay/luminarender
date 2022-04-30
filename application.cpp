@@ -39,6 +39,13 @@ Application::Application(struct AppConfig config)
     m_renderer->irradianceMap = m_scene.irradianceMap;
     m_renderer->prefilterMap = m_scene.prefilterMap;
     m_renderer->brdfLUT = m_scene.brdfLUT;
+
+    Shader* s = m_assetLibrary.loadShader("normalVector", "resources/shaders/normal_vector_vert.glsl",
+                              "resources/shaders/normal_vector_frag.glsl");
+    s->addGeometryShader("resources/shaders/normal_vector_geo.glsl");
+    Material* m = m_assetLibrary.createMaterial("normalVector", s);
+    m_renderer->mat = m;
+
 }
 
 void Application::mainloop()
@@ -57,6 +64,7 @@ void Application::mainloop()
         m_renderer->updateTransformMatrices();
         m_renderer->setupLights(m_scene.lights());
         m_renderer->render(m_scene.objects());
+        m_renderer->renderNormalVector(m_scene.objects());
         m_renderer->renderSkybox(m_scene.skybox());
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
