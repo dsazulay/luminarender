@@ -1,14 +1,8 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
-
+#include "pch.h"
 #include "importer.h"
-#include "log.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-#include <iostream>
-#include <vector>
 
 Texture* Importer::loadTextureFromFile(const std::string& file, const std::string &directory) {
     std::string filename = directory + '/' + file;

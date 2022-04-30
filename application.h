@@ -1,10 +1,4 @@
-//
-// Created by Diego Azulay on 24/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_APPLICATION_H
-#define INTERACTIVEGRAPHICS_APPLICATION_H
-
+#pragma once
 
 #include "window.h"
 #include "renderer.h"
@@ -12,7 +6,6 @@
 #include "imgui_renderer.h"
 #include "asset_library.h"
 #include <glm/glm.hpp>
-
 
 class Application
 {
@@ -48,6 +41,3 @@ struct AppConfig
     int viewportWidth;
     int viewportHeight;
 };
-
-
-#endif //INTERACTIVEGRAPHICS_APPLICATION_H

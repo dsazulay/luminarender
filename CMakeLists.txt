@@ -45,10 +45,13 @@ add_executable(InteractiveGraphics
         events/event.h
         events/dispatcher.cpp events/dispatcher.h
         assets/texture.cpp assets/texture.h
-        application.cpp application.h)
+        application.cpp application.h
+        pch.h)
 
 find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(InteractiveGraphics PUBLIC glfw)
 
 target_link_directories(InteractiveGraphics PUBLIC lib/assimp)
 target_link_libraries(InteractiveGraphics PUBLIC assimp)
+
+#target_precompile_headers(InteractiveGraphics PRIVATE pch.h)

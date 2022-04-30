@@ -1,15 +1,10 @@
-//
-// Created by Diego Azulay on 12/04/22.
-//
-
+#include "pch.h"
 #include "imgui_renderer.h"
-
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "events/event.h"
 #include "events/dispatcher.h"
-#include "log.h"
 
 void ImguiRenderer::init() {
     IMGUI_CHECKVERSION();

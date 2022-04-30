@@ -1,17 +1,7 @@
-//
-// Created by Diego Azulay on 15/04/22.
-//
+#pragma once
 
-#ifndef INTERACTIVEGRAPHICS_ENTITY_H
-#define INTERACTIVEGRAPHICS_ENTITY_H
-
-
-#include <vector>
-#include <typeinfo>
+#include "pch.h"
 #include "components/icomponent.h"
-#include <iostream>
-#include <memory>
-#include <list>
 
 
 class Entity
@@ -61,5 +51,3 @@ std::shared_ptr<T> Entity::getComponent()
 
     return nullptr;
 }
-
-#endif //INTERACTIVEGRAPHICS_ENTITY_H

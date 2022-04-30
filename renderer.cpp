@@ -1,11 +1,7 @@
-//
-// Created by Diego Azulay on 14/04/22.
-//
-
 #include "renderer.h"
-#include "assets/material.h"
 #include "components/light.h"
 #include "components/mesh_renderer.h"
+#include "components/transform.h"
 #include "events/dispatcher.h"
 
 #include <glad/glad.h>

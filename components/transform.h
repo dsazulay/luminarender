@@ -1,10 +1,4 @@
-//
-// Created by Diego Azulay on 14/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_TRANSFORM_H
-#define INTERACTIVEGRAPHICS_TRANSFORM_H
-
+#pragma once
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -43,6 +37,3 @@ private:
     glm::vec3 m_EulerAngles;
     glm::vec3 m_Scale;
 };
-
-
-#endif //INTERACTIVEGRAPHICS_TRANSFORM_H

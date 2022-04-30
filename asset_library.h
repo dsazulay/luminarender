@@ -1,12 +1,6 @@
-//
-// Created by Diego Azulay on 18/04/22.
-//
+#pragma once
 
-#ifndef INTERACTIVEGRAPHICS_ASSET_LIBRARY_H
-#define INTERACTIVEGRAPHICS_ASSET_LIBRARY_H
-
-
-#include <unordered_map>
+#include "pch.h"
 #include "assets/shader.h"
 #include "assets/material.h"
 #include "assets/mesh.h"
@@ -59,5 +53,3 @@ private:
     std::unordered_map<std::string, Model*> m_models;
     std::unordered_map<std::string, Texture*> m_textures;
 };
-
-#endif //INTERACTIVEGRAPHICS_ASSET_LIBRARY_H

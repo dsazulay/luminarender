@@ -1,13 +1,7 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
-
+#include "pch.h"
 #include "frame_buffer.h"
-#include "log.h"
 
 #include <glad/glad.h>
-#include <iostream>
-#include <vector>
 
 void FrameBuffer::createBuffer()
 {

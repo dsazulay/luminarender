@@ -1,14 +1,5 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
-
 #include "shader.h"
-
 #include "glad/glad.h"
-
-#include <fstream>
-#include <iostream>
-#include <regex>
 
 Shader::Shader(const char* vertexPath, const char* fragPath)
 {

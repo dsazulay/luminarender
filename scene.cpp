@@ -1,9 +1,4 @@
-//
-// Created by Diego Azulay on 15/04/22.
-//
-
 #include "scene.h"
-#include "components/transform.h"
 
 void Scene::addLight(Entity entity)
 {

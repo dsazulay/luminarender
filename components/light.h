@@ -1,10 +1,4 @@
-//
-// Created by Diego Azulay on 15/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_LIGHT_H
-#define INTERACTIVEGRAPHICS_LIGHT_H
-
+#pragma once
 
 #include <glm/glm.hpp>
 #include "icomponent.h"
@@ -34,5 +28,3 @@ struct Light : public IComponent
     float outerCutoff;
     LightUniformStruct uniformStruct;
 };
-
-#endif //INTERACTIVEGRAPHICS_LIGHT_H

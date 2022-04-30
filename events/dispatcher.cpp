@@ -1,7 +1,3 @@
-//
-// Created by Diego Azulay on 21/04/22.
-//
-
 #include "dispatcher.h"
 
 void Dispatcher::subscribe(const char* descriptor, std::function<void(const Event &)>&& callback)

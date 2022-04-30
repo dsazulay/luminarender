@@ -1,10 +1,4 @@
-//
-// Created by Diego Azulay on 15/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_SCENE_H
-#define INTERACTIVEGRAPHICS_SCENE_H
-
+#pragma once
 
 #include "entity.h"
 
@@ -28,6 +22,3 @@ private:
     std::list<Entity> m_objects;
     Entity m_skybox;
 };
-
-
-#endif //INTERACTIVEGRAPHICS_SCENE_H

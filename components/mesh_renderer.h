@@ -1,10 +1,4 @@
-//
-// Created by Diego Azulay on 19/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_MESH_RENDERER_H
-#define INTERACTIVEGRAPHICS_MESH_RENDERER_H
-
+#pragma once
 
 #include "../assets/material.h"
 #include "icomponent.h"
@@ -23,6 +17,3 @@ private:
     unsigned int VBO, EBO, VAO;
 
 };
-
-
-#endif //INTERACTIVEGRAPHICS_MESH_RENDERER_H

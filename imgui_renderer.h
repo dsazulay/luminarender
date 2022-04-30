@@ -1,10 +1,4 @@
-//
-// Created by Diego Azulay on 12/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_IMGUI_RENDERER_H
-#define INTERACTIVEGRAPHICS_IMGUI_RENDERER_H
-
+#pragma once
 
 #include <GLFW/glfw3.h>
 #include "frame_buffer.h"
@@ -21,6 +15,3 @@ public:
 
 private:
 };
-
-
-#endif //INTERACTIVEGRAPHICS_IMGUI_RENDERER_H

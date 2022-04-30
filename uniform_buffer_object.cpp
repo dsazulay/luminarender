@@ -1,10 +1,4 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
-
 #include "uniform_buffer_object.h"
-#include "log.h"
-
 #include <glad/glad.h>
 #include <glm/ext/matrix_float4x4.hpp>
 

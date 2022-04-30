@@ -1,15 +1,6 @@
-//
-// Created by Diego Azulay on 21/04/22.
-//
+#pragma once
 
-#ifndef INTERACTIVEGRAPHICS_DISPATCHER_H
-#define INTERACTIVEGRAPHICS_DISPATCHER_H
-
-
-#include <functional>
-#include <unordered_map>
-#include <string>
-#include <vector>
+#include "../pch.h"
 #include "event.h"
 
 class Dispatcher
@@ -28,7 +19,3 @@ private:
 
     std::unordered_map<std::string, std::vector<std::function<void(const Event&)>>> m_observers;
 };
-
-
-
-#endif //INTERACTIVEGRAPHICS_DISPATCHER_H

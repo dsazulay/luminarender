@@ -1,14 +1,7 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
+#pragma once
 
-#ifndef INTERACTIVEGRAPHICS_PRIMITIVES_H
-#define INTERACTIVEGRAPHICS_PRIMITIVES_H
-
-#include <vector>
+#include "pch.h"
 #include <glm/glm.hpp>
-#include "assets/mesh.h"
-
 
 class Primitives
 {
@@ -267,5 +260,3 @@ private:
         return std::make_pair(outVertices, outIndices);
     }
 };
-
-#endif //INTERACTIVEGRAPHICS_PRIMITIVES_H

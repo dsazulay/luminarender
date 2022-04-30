@@ -1,9 +1,4 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_CAMERA_H
-#define INTERACTIVEGRAPHICS_CAMERA_H
+#pragma once
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -51,6 +46,3 @@ private:
     void processMouseMovement(float xOffset, float yOffset, GLboolean constrainPitch = true);
     void updateCameraVectors();
 };
-
-
-#endif //INTERACTIVEGRAPHICS_CAMERA_H

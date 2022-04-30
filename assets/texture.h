@@ -1,11 +1,6 @@
-//
-// Created by Diego Azulay on 23/04/22.
-//
+#pragma once
 
-#ifndef INTERACTIVEGRAPHICS_TEXTURE_H
-#define INTERACTIVEGRAPHICS_TEXTURE_H
-
-#include <vector>
+#include "../pch.h"
 
 enum TextureType
 {
@@ -27,6 +22,3 @@ private:
     unsigned int m_ID;
     TextureType m_type;
 };
-
-
-#endif //INTERACTIVEGRAPHICS_TEXTURE_H

@@ -1,12 +1,7 @@
-//
-// Created by Diego Azulay on 12/04/22.
-//
-
-#include <iostream>
+#include "pch.h"
 #include "window.h"
 #include "events/event.h"
 #include "events/dispatcher.h"
-#include "log.h"
 
 void Window::init()
 {
@@ -30,7 +25,7 @@ void Window::createWindow(int width, int height, const char *name)
     m_window = glfwCreateWindow(width, height, name, nullptr, nullptr);
     if (m_window == nullptr)
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        LOG_ERROR("Failed to create GLFW window");
         glfwTerminate();
         return;
     }

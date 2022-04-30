@@ -1,7 +1,3 @@
-//
-// Created by Diego Azulay on 23/04/22.
-//
-
 #include "texture.h"
 #include <glad/glad.h>
 

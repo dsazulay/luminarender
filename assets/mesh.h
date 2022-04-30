@@ -1,14 +1,7 @@
-//
-// Created by Diego Azulay on 14/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_MESH_H
-#define INTERACTIVEGRAPHICS_MESH_H
-
+#pragma once
 
 #include <glm/glm.hpp>
-#include <vector>
-
+#include "../pch.h"
 #include "material.h"
 #include "../components/icomponent.h"
 
@@ -34,6 +27,3 @@ public:
     std::vector<unsigned int> m_Indices;
 
 };
-
-
-#endif //INTERACTIVEGRAPHICS_MESH_H

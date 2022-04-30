@@ -1,13 +1,7 @@
-//
-// Created by Diego Azulay on 14/04/22.
-//
+#pragma once
 
-#ifndef INTERACTIVEGRAPHICS_RENDERER_H
-#define INTERACTIVEGRAPHICS_RENDERER_H
-
-#include <vector>
-#include "components/transform.h"
-#include "assets/mesh.h"
+#include "pch.h"
+#include "assets/material.h"
 #include "entity.h"
 #include "uniform_buffer_object.h"
 #include "camera.h"
@@ -51,6 +45,3 @@ private:
     void renderEntity(Entity& entity);
     void renderNormalVectorOfEntity(Entity &entity);
 };
-
-
-#endif //INTERACTIVEGRAPHICS_RENDERER_H

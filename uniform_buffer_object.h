@@ -1,11 +1,6 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
+#pragma once
 
-#ifndef INTERACTIVEGRAPHICS_UNIFORM_BUFFER_OBJECT_H
-#define INTERACTIVEGRAPHICS_UNIFORM_BUFFER_OBJECT_H
-
-#include <cstddef>
+#include "pch.h"
 
 class UniformBufferObject
 {
@@ -20,6 +15,3 @@ private:
     unsigned int UBO;
     std::size_t bufferSize;
 };
-
-
-#endif //INTERACTIVEGRAPHICS_UNIFORM_BUFFER_OBJECT_H

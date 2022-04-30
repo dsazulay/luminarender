@@ -1,10 +1,6 @@
-//
-// Created by Diego Azulay on 24/04/22.
-//
-
+#include "pch.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "application.h"
-#include "log.h"
 #include "samples/sample_scene.h"
 #include <glad/glad.h>
 

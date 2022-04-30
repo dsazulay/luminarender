@@ -1,13 +1,10 @@
-//
-// Created by Diego Azulay on 16/04/22.
-//
-
+#include <glm/glm.hpp>
 #include "sample_scene.h"
 #include "../entity_factory.h"
 #include "glad/glad.h"
 #include "../primitives.h"
 #include "../components/mesh_renderer.h"
-#include "../log.h"
+#include "../components/transform.h"
 
 unsigned int generateCubeMapTexturesFromHDR(unsigned int hdrTexture, unsigned int &irradianceMap, unsigned int &prefilterMap, unsigned int &brdfLUTTexture)
 {
@@ -347,5 +344,3 @@ void SampleScene::addSkybox()
     m_scene->addSkybox(EntityFactory::createFromMesh(
             m_cubePositions[0], m_assetLibrary->getMaterial("skybox"), cubeMap));
 }
-
-

@@ -1,9 +1,4 @@
-//
-// Created by Diego Azulay on 21/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_EVENT_H
-#define INTERACTIVEGRAPHICS_EVENT_H
+#pragma once
 
 class Event
 {
@@ -84,5 +79,3 @@ public:
 private:
     int m_keyCode;
 };
-
-#endif //INTERACTIVEGRAPHICS_EVENT_H

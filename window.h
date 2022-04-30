@@ -1,14 +1,7 @@
-//
-// Created by Diego Azulay on 12/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_WINDOW_H
-#define INTERACTIVEGRAPHICS_WINDOW_H
-
+#pragma once
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include "camera.h"
 
 class Window
 {
@@ -31,5 +24,3 @@ private:
     static void frameBufferCallback(GLFWwindow* window, int width, int height);
     static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 };
-
-#endif //INTERACTIVEGRAPHICS_WINDOW_H

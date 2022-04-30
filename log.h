@@ -1,9 +1,4 @@
-//
-// Created by Diego Azulay on 18/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_LOG_H
-#define INTERACTIVEGRAPHICS_LOG_H
+#pragma once
 
 #include <iostream>
 
@@ -37,5 +32,3 @@
 #else
 #define ASSERT(exp, msg)
 #endif
-
-#endif //INTERACTIVEGRAPHICS_LOG_H

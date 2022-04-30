@@ -1,7 +1,3 @@
-//
-// Created by Diego Azulay on 19/04/22.
-//
-
 #include "mesh_renderer.h"
 #include <glad/glad.h>
 

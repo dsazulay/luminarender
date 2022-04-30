@@ -1,11 +1,4 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
-
 #include "material.h"
-#include "../log.h"
-
-#include <typeindex>
 
 void Material::setProperty(const std::string &name, const std::any& value)
 {

@@ -1,8 +1,3 @@
-//
-// Created by Diego Azulay on 14/04/22.
-//
-
-#include <iostream>
 #include "transform.h"
 #include <glm/gtx/matrix_decompose.hpp>
 

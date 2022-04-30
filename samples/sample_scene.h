@@ -1,12 +1,6 @@
-//
-// Created by Diego Azulay on 16/04/22.
-//
+#pragma once
 
-#ifndef INTERACTIVEGRAPHICS_SAMPLE_SCENE_H
-#define INTERACTIVEGRAPHICS_SAMPLE_SCENE_H
-
-
-#include <unordered_map>
+#include "../pch.h"
 #include "../scene.h"
 #include "../assets/shader.h"
 #include "../assets/material.h"
@@ -44,6 +38,3 @@ private:
 
     unsigned int hdrTexture;
 };
-
-
-#endif //INTERACTIVEGRAPHICS_SAMPLE_SCENE_H

@@ -1,9 +1,4 @@
-//
-// Created by Diego Azulay on 14/04/22.
-//
-
 #include "mesh.h"
-#include "../log.h"
 
 Mesh::Mesh(std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives)
 {
@@ -30,4 +25,3 @@ int Mesh::indicesSize() const
 {
     return (int)m_Indices.size();
 }
-

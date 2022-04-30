@@ -1,12 +1,6 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
+#pragma once
 
-#ifndef INTERACTIVEGRAPHICS_SHADER_H
-#define INTERACTIVEGRAPHICS_SHADER_H
-
-#include <string>
-#include <sstream>
+#include "../pch.h"
 #include <glm/glm.hpp>
 
 class Shader
@@ -38,5 +32,3 @@ private:
     static std::stringstream getStreamFromFile(const std::string& path);
 
 };
-
-#endif //INTERACTIVEGRAPHICS_SHADER_H

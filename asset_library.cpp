@@ -1,9 +1,4 @@
-//
-// Created by Diego Azulay on 18/04/22.
-//
-
 #include "asset_library.h"
-#include "log.h"
 #include "primitives.h"
 #include "importer.h"
 

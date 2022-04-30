@@ -1,10 +1,4 @@
-//
-// Created by Diego Azulay on 13/04/22.
-//
-
-#ifndef INTERACTIVEGRAPHICS_FRAME_BUFFER_H
-#define INTERACTIVEGRAPHICS_FRAME_BUFFER_H
-
+#pragma once
 
 class FrameBuffer
 {
@@ -28,7 +22,3 @@ private:
     void create3Dbuffer();
     void deleteBuffer();
 };
-
-
-
-#endif //INTERACTIVEGRAPHICS_FRAME_BUFFER_H

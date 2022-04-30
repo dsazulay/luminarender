@@ -1,12 +1,7 @@
-//
-// Created by Diego Azulay on 15/04/22.
-//
-
-#include <iostream>
+#include "pch.h"
 #include <glm/gtx/matrix_decompose.hpp>
 #include "entity.h"
 #include "components/transform.h"
-#include "log.h"
 
 unsigned int Entity::id() const
 {
@@ -67,7 +62,3 @@ std::list<Entity>& Entity::getChildren()
 {
     return m_children;
 }
-
-
-
-
