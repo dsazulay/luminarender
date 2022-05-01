@@ -1,3 +1,6 @@
+// Comments above this
+
+#shader vertex
 #version 410 core
 
 layout (location = 0) in vec3 a_position;
@@ -19,4 +22,21 @@ void main()
 {
     v_uv = a_uv;
     gl_Position = u_projection * u_view * u_model * vec4(a_position, 1.0);
+}
+
+#shader fragment
+#version 410 core
+
+#include "lighting.glsl"
+
+in vec2 v_uv;
+
+out vec4 fragColor;
+
+uniform vec4 u_color;
+uniform sampler2D u_mainTex;
+
+void main()
+{
+    fragColor = texture(u_mainTex, v_uv);
 }

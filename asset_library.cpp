@@ -31,7 +31,7 @@ AssetLibrary::~AssetLibrary()
     }
 }
 
-Shader* AssetLibrary::loadShader(const char* name, const char* vertPath, const char* fragPath)
+Shader* AssetLibrary::loadShader(const char* name, const char* shaderPath)
 {
     if (isShaderLoaded(name))
     {
@@ -39,7 +39,7 @@ Shader* AssetLibrary::loadShader(const char* name, const char* vertPath, const c
         return m_shaders[name];
     }
 
-    m_shaders[name] = new Shader(vertPath, fragPath);
+    m_shaders[name] = new Shader(shaderPath);
 
     return m_shaders[name];
 }

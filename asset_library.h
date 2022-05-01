@@ -21,7 +21,7 @@ public:
 //    static AssetLibrary& instance();
     ~AssetLibrary();
 
-    Shader* loadShader(const char* name, const char* vertPath, const char* fragPath);
+    Shader* loadShader(const char* name, const char* shaderPath);
     Material* createMaterial(const char* name, const char* shader);
     Material* createMaterial(const char* name, Shader*);
     Model* loadModel(const char* name, const char* path);

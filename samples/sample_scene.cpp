@@ -8,10 +8,10 @@
 
 unsigned int generateCubeMapTexturesFromHDR(unsigned int hdrTexture, unsigned int &irradianceMap, unsigned int &prefilterMap, unsigned int &brdfLUTTexture)
 {
-    Shader equirectangularToCubemapShader("resources/shaders/skybox_equirectangular_vert.glsl", "resources/shaders/skybox_equirectangular_frag.glsl");
-    Shader irradianceShader("resources/shaders/skybox_equirectangular_vert.glsl", "resources/shaders/skybox_irradiance_frag.glsl");
-    Shader prefilterShader("resources/shaders/skybox_equirectangular_vert.glsl", "resources/shaders/prefilter_frag.glsl");
-    Shader brdfShader("resources/shaders/brdf_vert.glsl", "resources/shaders/brdf_frag.glsl");
+    Shader equirectangularToCubemapShader("resources/shaders/skybox_equirectangular.glsl");
+    Shader irradianceShader("resources/shaders/skybox_irradiance.glsl");
+    Shader prefilterShader("resources/shaders/prefilter.glsl");
+    Shader brdfShader("resources/shaders/brdf.glsl");
 
     unsigned int captureFBO;
     unsigned int captureRBO;
@@ -230,10 +230,10 @@ void SampleScene::createIrradianceMaps()
 
 void SampleScene::createShaders()
 {
-    m_assetLibrary->loadShader("simple", "resources/shaders/unlit.vsh", "resources/shaders/unlit.fsh");
-    m_assetLibrary->loadShader("lambert", "resources/shaders/lambert.vsh", "resources/shaders/lambert.fsh");
-    m_assetLibrary->loadShader("skybox", "resources/shaders/skybox_vert.glsl", "resources/shaders/skybox_frag.glsl");
-    m_assetLibrary->loadShader("pbr", "resources/shaders/cook-torrance_vert.glsl", "resources/shaders/cook-torrance_frag.glsl");
+    m_assetLibrary->loadShader("simple", "resources/shaders/unlit.glsl");
+    m_assetLibrary->loadShader("lambert", "resources/shaders/lambert.glsl");
+    m_assetLibrary->loadShader("skybox", "resources/shaders/skybox.glsl");
+    m_assetLibrary->loadShader("pbr", "resources/shaders/cook_torrance.glsl");
 }
 
 void SampleScene::createMaterials()
@@ -244,7 +244,7 @@ void SampleScene::createMaterials()
     matRed->setTexture("u_mainTex", m_assetLibrary->getTexture("container")->ID(), 0);
 
     Material* matBlue = m_assetLibrary->createMaterial("blue", m_assetLibrary->getShader("simple"));
-    matBlue->setProperty("u_color", glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
+//    matBlue->setProperty("u_color", glm::vec4(1.0f, 1.0, 0.0f, 1.0f));
 //    matBlue.setTexture("u_mainTex", Importer::loadTextureFromFile("container.jpg", "resources/textures"), 0);
     matBlue->setTexture("u_mainTex", m_scene->brdfLUT, 0);
 
@@ -253,12 +253,12 @@ void SampleScene::createMaterials()
     newMat->setProperty("u_roughness", 0.5f);
     newMat->setProperty("u_metallic", 0.1f);
     newMat->setProperty("u_ao", 1.0f);
-
+//
     Material* matTexture = m_assetLibrary->createMaterial("tex", "lambert");
     matTexture->setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     Texture* container2 = m_assetLibrary->load2DTexture("container2", "container2.png", "resources/textures");
     matTexture->setTexture("u_mainTex", container2->ID(), 0);
-
+//
     Material* backpackMat = m_assetLibrary->createMaterial("backpack", m_assetLibrary->getShader("lambert"));
     backpackMat->setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     Texture* spitfire = m_assetLibrary->load2DTexture("spitfire", "spitfire_d.png", "resources/textures/spitfire");
@@ -292,8 +292,7 @@ void SampleScene::addSceneObjects()
     Mesh* sphere = m_assetLibrary->getMesh("sphere");
     Entity cubeEntity = EntityFactory::createFromMesh(
             m_cubePositions[2], m_assetLibrary->getMaterial("red"),cube);
-//    m_scene->addObject(EntityFactory::createFromMesh(
-//            m_cubePositions[4], m_assetLibrary->getMaterial("red"), cube));
+
     m_scene->addObject(EntityFactory::createFromMesh(
             m_cubePositions[6], m_assetLibrary->getMaterial("tex"), cube));
 
@@ -304,14 +303,17 @@ void SampleScene::addSceneObjects()
     transform->scale(glm::vec3(2, 2, 2));
     transform->updateModelMatrix();
     entity.updateSelfAndChild();
-//
-//    m_scene->addObject(EntityFactory::createFromMesh(
-//            m_cubePositions[7], m_assetLibrary.getMaterial("blue"), quad));
-//
-//    m_scene->addObject(EntityFactory::createFromMesh(
-//            m_cubePositions[0], m_assetLibrary.getMaterial("new"), sphere));
-//    m_scene->addObject(EntityFactory::createFromMesh(
-//            m_cubePositions[9], m_assetLibrary.getMaterial("new"), sphere));
+
+    m_scene->addObject(EntityFactory::createFromMesh(
+            m_cubePositions[4], m_assetLibrary->getMaterial("red"), cube));
+
+    m_scene->addObject(EntityFactory::createFromMesh(
+            m_cubePositions[7], m_assetLibrary->getMaterial("blue"), quad));
+
+    m_scene->addObject(EntityFactory::createFromMesh(
+            m_cubePositions[0], m_assetLibrary->getMaterial("new"), sphere));
+    m_scene->addObject(EntityFactory::createFromMesh(
+            m_cubePositions[9], m_assetLibrary->getMaterial("new"), sphere));
 
     Entity e = EntityFactory::createFromModel(
             m_cubePositions[0], m_assetLibrary->getMaterial("backpack"),

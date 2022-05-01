@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../pch.h"
+#include "glad/glad.h"
 #include <glm/glm.hpp>
 
 class Shader
@@ -10,16 +11,11 @@ public:
     unsigned int matricesUniformBlockIndex;
     unsigned int lightsUniformBlockIndex;
 
-    Shader() = default;
-    Shader(const char* vertexPath, const char* fragPath);
-    ~Shader();
+    Shader(const char* shaderPath);
 
     void addGeometryShader(const char* vertexPath);
 
     void use() const;
-    std::string preprocess(std::stringstream& input, int level);
-
-
     void setBool(const std::string &name, bool value) const;
     void setInt(const std::string &name, int value) const;
     void setFloat(const std::string &name, float value) const;
@@ -29,6 +25,10 @@ public:
     void setMat4(const std::string &name, const glm::mat4 &mat) const;
 
 private:
-    static std::stringstream getStreamFromFile(const std::string& path);
+    std::unordered_map<GLenum, std::string> preprocess(std::stringstream& input);
+    std::string preprocessIncludes(std::stringstream& input, int level);
+    void compile(std::unordered_map<GLenum, std::string>& shaderSources);
 
+    static std::stringstream getStreamFromFile(const std::string& path);
+    static GLenum getShaderTypeFromString(const std::string& type);
 };

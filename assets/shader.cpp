@@ -1,80 +1,50 @@
 #include "shader.h"
-#include "glad/glad.h"
 
-Shader::Shader(const char* vertexPath, const char* fragPath)
+Shader::Shader(const char* shaderPath)
 {
-    std::string vertexCode;
-    std::string fragCode;
-    std::stringstream vertexStream;
-    std::stringstream fragStream;
-
-    vertexStream = getStreamFromFile(vertexPath);
-    fragStream = getStreamFromFile(fragPath);
-
-    vertexCode = preprocess(vertexStream, 0);
-    fragCode = preprocess(fragStream, 0);
-
-    const char* vShaderCode = vertexCode.c_str();
-    const char* fShaderCode = fragCode.c_str();
-
-    unsigned int vertex, frag;
-    int success;
-    char infoLog[512];
-
-    vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vShaderCode, nullptr);
-    glCompileShader(vertex);
-
-    glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    frag = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(frag, 1, &fShaderCode, nullptr);
-    glCompileShader(frag);
-
-    glGetShaderiv(frag, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(frag, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    ID = glCreateProgram();
-    glAttachShader(ID, vertex);
-    glAttachShader(ID, frag);
-    glLinkProgram(ID);
-
-    glGetProgramiv(ID, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(ID, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-
-    glDeleteShader(vertex);
-    glDeleteShader(frag);
-
-    // TODO: separate on another method
-    matricesUniformBlockIndex = glGetUniformBlockIndex(ID, "Matrices");
-    glUniformBlockBinding(ID, matricesUniformBlockIndex, 0);
-
-    lightsUniformBlockIndex = glGetUniformBlockIndex(ID, "Lights");
-    glUniformBlockBinding(ID, lightsUniformBlockIndex, 1);
+    std::stringstream shaderStream = getStreamFromFile(shaderPath);
+    auto shaderSources = preprocess(shaderStream);
+    
+    compile(shaderSources);
 }
 
-std::string Shader::preprocess(std::stringstream& input, int level)
+std::unordered_map<GLenum, std::string> Shader::preprocess(std::stringstream& input) {
+    std::string line;
+    std::stringstream outTest;
+    GLenum type = -1;
+    std::unordered_map<GLenum, std::string> shaders;
+
+    const char* typeToken = "#shader";
+    std::size_t typeTokenLength = strnlen(typeToken, 16);
+
+    while (std::getline(input, line))
+    {
+        if (line.find(typeToken) != std::string::npos)
+        {
+            if (type != -1)
+            {
+                shaders[type] = preprocessIncludes(outTest, 0);
+                outTest.str(std::string());
+                outTest.clear();
+            }
+
+            type = getShaderTypeFromString(line.substr(typeTokenLength + 1));
+        }
+        else
+        {
+            outTest << line << std::endl;
+        }
+    }
+    shaders[type] = preprocessIncludes(outTest, 0);
+    return shaders;
+}
+
+std::string Shader::preprocessIncludes(std::stringstream& input, int level)
 {
     std::regex re("^[ ]*#[ ]*include[ ]+[\"<](.*)[\">].*");
     std::smatch matches;
 
-    if(level > 32)
-    {
-        std::cout << "header inclusion depth limit reached, might be caused by cyclic header inclusion" << std::endl;
-    }
+    ASSERT(level < 8, "Header inclusion depth limit reached, might be caused by cyclic header inclusion");
 
     std::stringstream output;
     size_t line_number = 1;
@@ -87,9 +57,9 @@ std::string Shader::preprocess(std::stringstream& input, int level)
             std::string include_file = matches[1];
             std::stringstream include_string;
 
-            include_string = Shader::getStreamFromFile("Resources/Shaders/" + include_file);
+            include_string = Shader::getStreamFromFile("resources/shaders/" + include_file);
 
-            output << preprocess(include_string, level + 1) << std::endl;
+            output << preprocessIncludes(include_string, level + 1) << std::endl;
         }
         else
         {
@@ -98,11 +68,6 @@ std::string Shader::preprocess(std::stringstream& input, int level)
         ++line_number;
     }
     return output.str();
-}
-
-Shader::~Shader()
-{
-
 }
 
 std::stringstream Shader::getStreamFromFile(const std::string& path)
@@ -122,7 +87,7 @@ std::stringstream Shader::getStreamFromFile(const std::string& path)
     }
     catch (std::ifstream::failure& e)
     {
-        std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ" << std::endl;
+        LOG_ERROR("Shader file not successfully read!");
     }
 
     return shaderStream;
@@ -175,7 +140,7 @@ void Shader::addGeometryShader(const char* vertexPath)
 
     vertexStream = getStreamFromFile(vertexPath);
 
-    vertexCode = preprocess(vertexStream, 0);
+    vertexCode = preprocessIncludes(vertexStream, 0);
 
     const char* vShaderCode = vertexCode.c_str();
 
@@ -191,7 +156,7 @@ void Shader::addGeometryShader(const char* vertexPath)
     if (!success)
     {
         glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::GEOMETRY::COMPILATION_FAILED\n" << infoLog << std::endl;
+        LOG_ERROR("Shader compilation failed: " << infoLog);
     }
 
     glAttachShader(ID, vertex);
@@ -201,8 +166,66 @@ void Shader::addGeometryShader(const char* vertexPath)
     if (!success)
     {
         glGetProgramInfoLog(ID, 512, nullptr, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        LOG_ERROR("Shader program linking failed: " << infoLog);
     }
 
     glDeleteShader(vertex);
+}
+
+GLenum Shader::getShaderTypeFromString(const std::string& type)
+{
+    if (type == "vertex")
+        return GL_VERTEX_SHADER;
+    else if (type == "fragment")
+        return GL_FRAGMENT_SHADER;
+    else if (type == "geometry")
+        return GL_GEOMETRY_SHADER;
+
+    LOG_ERROR("Invalid shader type: " << type);
+    return -1;
+}
+
+void Shader::compile(std::unordered_map<GLenum, std::string>& shaderSources)
+{
+    ID = glCreateProgram();
+    for (auto& kv : shaderSources)
+    {
+        const char* shaderCode = kv.second.c_str();
+
+        unsigned int shaderID;
+        int success;
+        char infoLog[512];
+
+        shaderID = glCreateShader(kv.first);
+        glShaderSource(shaderID, 1, &shaderCode, nullptr);
+        glCompileShader(shaderID);
+
+        glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(shaderID, 512, nullptr, infoLog);
+            LOG_ERROR("Shader compilation failed: " << infoLog);
+        }
+
+        glAttachShader(ID, shaderID);
+        glDeleteShader(shaderID);
+    }
+
+    glLinkProgram(ID);
+
+    int success;
+    char infoLog[512];
+    glGetProgramiv(ID, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(ID, 512, nullptr, infoLog);
+        LOG_ERROR("Shader program linking failed: " << infoLog);
+    }
+
+    // TODO: separate on another method
+    matricesUniformBlockIndex = glGetUniformBlockIndex(ID, "Matrices");
+    glUniformBlockBinding(ID, matricesUniformBlockIndex, 0);
+
+    lightsUniformBlockIndex = glGetUniformBlockIndex(ID, "Lights");
+    glUniformBlockBinding(ID, lightsUniformBlockIndex, 1);
 }
