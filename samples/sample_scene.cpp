@@ -256,7 +256,7 @@ void SampleScene::createMaterials()
 //
     Material* matTexture = m_assetLibrary->createMaterial("tex", "lambert");
     matTexture->setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-    Texture* container2 = m_assetLibrary->load2DTexture("container2", "container2.png", "resources/textures");
+    Texture* container2 = m_assetLibrary->load2DTexture("container2", "wood_box.png", "resources/textures");
     matTexture->setTexture("u_mainTex", container2->ID(), 0);
 //
     Material* backpackMat = m_assetLibrary->createMaterial("backpack", m_assetLibrary->getShader("lambert"));

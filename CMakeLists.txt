@@ -46,7 +46,7 @@ add_executable(InteractiveGraphics
         events/dispatcher.cpp events/dispatcher.h
         assets/texture.cpp assets/texture.h
         application.cpp application.h
-        pch.h)
+        pch.h samples/sample_resources.h samples/unlit_scene.cpp samples/unlit_scene.h)
 
 find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(InteractiveGraphics PUBLIC glfw)

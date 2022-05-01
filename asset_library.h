@@ -10,7 +10,7 @@
 class AssetLibrary
 {
 public:
-    enum BasicMesh
+    enum class BasicMesh
     {
         Cube,
         CubeMapModel,

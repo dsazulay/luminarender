@@ -13,6 +13,7 @@ void Scene::addObject(Entity entity)
 void Scene::addSkybox(Entity entity)
 {
     m_skybox = entity;
+    m_hasSkybox = true;
 }
 
 std::vector<Entity>& Scene::lights()
@@ -28,4 +29,9 @@ std::list<Entity>& Scene::objects()
 Entity& Scene::skybox()
 {
     return m_skybox;
+}
+
+bool Scene::hasSkybox()
+{
+    return m_hasSkybox;
 }

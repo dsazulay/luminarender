@@ -4,7 +4,7 @@ Shader::Shader(const char* shaderPath)
 {
     std::stringstream shaderStream = getStreamFromFile(shaderPath);
     auto shaderSources = preprocess(shaderStream);
-    
+
     compile(shaderSources);
 }
 

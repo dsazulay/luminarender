@@ -7,11 +7,11 @@
 class Shader
 {
 public:
-    unsigned int ID;
-    unsigned int matricesUniformBlockIndex;
-    unsigned int lightsUniformBlockIndex;
+    unsigned int ID{};
+    unsigned int matricesUniformBlockIndex{};
+    unsigned int lightsUniformBlockIndex{};
 
-    Shader(const char* shaderPath);
+    explicit Shader(const char* shaderPath);
 
     void addGeometryShader(const char* vertexPath);
 

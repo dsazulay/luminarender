@@ -12,6 +12,7 @@ public:
     std::vector<Entity>& lights();
     std::list<Entity>& objects();
     Entity& skybox();
+    bool hasSkybox();
 
     unsigned int irradianceMap;
     unsigned int prefilterMap;
@@ -21,4 +22,5 @@ private:
     std::vector<Entity> m_lights;
     std::list<Entity> m_objects;
     Entity m_skybox;
+    bool m_hasSkybox{};
 };
