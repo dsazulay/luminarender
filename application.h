@@ -34,7 +34,6 @@ private:
     Renderer* m_renderer;
     ImguiRenderer m_imguiRenderer{};
     Scene m_scene;
-    AssetLibrary m_assetLibrary;
 
     int m_windowWidth{};
     int m_windowHeight{};

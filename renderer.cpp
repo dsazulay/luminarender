@@ -150,9 +150,6 @@ void Renderer::renderEntity(Entity &entity)
 
     // set material uniforms (e.g. color, textures)
     int texCount = 0;
-    if (material->textures.empty())
-        glBindTexture(GL_TEXTURE_2D, 0);
-
     for (const auto& texture : material->textures)
     {
         material->shader->setInt(texture.first, texCount);

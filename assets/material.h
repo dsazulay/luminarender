@@ -20,6 +20,8 @@ public:
 private:
     std::unordered_map<std::string, std::any> uniforms;
 
+    void setDefaultValues();
+
     void castAndSetUniform(const std::string &name, std::any value);
     void setUniform(const std::string &name, bool value) const;
     void setUniform(const std::string &name, int value) const;

@@ -32,14 +32,14 @@ Application::Application(const AppConfig& config)
 
     // create shaders, materials, and objects and add them to the scene
 //    SampleScene sampleScene(&m_scene, &m_assetLibrary);
-    UnlitScene::loadScene(m_scene, m_assetLibrary);
+    UnlitScene::loadScene(m_scene, AssetLibrary::instance());
 
     m_renderer->irradianceMap = m_scene.irradianceMap;
     m_renderer->prefilterMap = m_scene.prefilterMap;
     m_renderer->brdfLUT = m_scene.brdfLUT;
 
-    Shader* s = m_assetLibrary.loadShader("normalVector", "resources/shaders/normal_vector.glsl");
-    Material* m = m_assetLibrary.createMaterial("normalVector", s);
+    Shader* s = AssetLibrary::instance().loadShader("normalVector", "resources/shaders/normal_vector.glsl");
+    Material* m = AssetLibrary::instance().createMaterial("normalVector", s);
     m_renderer->mat = m;
 
 }

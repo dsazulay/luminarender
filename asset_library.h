@@ -18,8 +18,16 @@ public:
         Sphere
     };
 
-//    static AssetLibrary& instance();
+    struct DefaultResources
+    {
+        static constexpr char* texWhite = (char*) "defaultWhite";
+    };
+
+    AssetLibrary(const AssetLibrary& other) = delete;
+    void operator=(const AssetLibrary& other) = delete;
     ~AssetLibrary();
+
+    static AssetLibrary& instance();
 
     Shader* loadShader(const char* name, const char* shaderPath);
     Material* createMaterial(const char* name, const char* shader);
@@ -37,9 +45,7 @@ public:
     Texture* getTexture(const char* name);
 
 private:
-//    AssetLibrary() = default;
-//    AssetLibrary(const AssetLibrary& other) = delete;
-//    void operator=(const AssetLibrary& other) = delete;
+    AssetLibrary();
 
     bool isShaderLoaded(const char* name);
     bool isMaterialCreated(const char* name);
@@ -52,4 +58,7 @@ private:
     std::unordered_map<std::string, Mesh*> m_meshes;
     std::unordered_map<std::string, Model*> m_models;
     std::unordered_map<std::string, Texture*> m_textures;
+
+    static constexpr char* texture_defaultWhite = (char*) "default_white.png";
+    static constexpr char* texture_dir = (char*) "resources/textures";
 };

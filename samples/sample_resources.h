@@ -11,7 +11,6 @@ public:
     static constexpr char* shader_skybox = (char*) "resources/shaders/skybox.glsl";
 
     static constexpr char* texture_dir = (char*) "resources/textures";
-    static constexpr char* texture_defaultWhite = (char*) "default_white.png";
     static constexpr char* texture_container = (char*) "container.jpg";
     static constexpr char* texture_woodBox = (char*) "wood_box.png";
 

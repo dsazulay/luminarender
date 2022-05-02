@@ -19,7 +19,6 @@ void UnlitScene::loadShaders(AssetLibrary &assetLibrary)
 
 void UnlitScene::loadTextures(AssetLibrary& assetLibrary)
 {
-    assetLibrary.load2DTexture("defaultWhite", SampleResources::texture_defaultWhite, SampleResources::texture_dir);
     assetLibrary.load2DTexture("container", SampleResources::texture_container, SampleResources::texture_dir);
     assetLibrary.load2DTexture("woodBox", SampleResources::texture_woodBox, SampleResources::texture_dir);
 }
@@ -28,18 +27,14 @@ void UnlitScene::loadMaterials(AssetLibrary &assetLibrary)
 {
     Material* blueMat = assetLibrary.createMaterial("blueMat", "unlit");
     blueMat->setProperty("u_color", glm::vec4(0.2f, 0.2f, 1.0f, 1.0f));
-    blueMat->setTexture("u_mainTex", assetLibrary.getTexture("defaultWhite")->ID(), 0);
 
     Material* greyMat = assetLibrary.createMaterial("greyMat", "unlit");
     greyMat->setProperty("u_color", glm::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-    greyMat->setTexture("u_mainTex", assetLibrary.getTexture("defaultWhite")->ID(), 0);
 
     Material* containerMat = assetLibrary.createMaterial("containerMat", "unlit");
-    containerMat->setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     containerMat->setTexture("u_mainTex", assetLibrary.getTexture("container")->ID(), 0);
 
     Material* woodBoxMat = assetLibrary.createMaterial("woodBoxMat", "unlit");
-    woodBoxMat->setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     woodBoxMat->setTexture("u_mainTex", assetLibrary.getTexture("woodBox")->ID(), 0);
 }
 

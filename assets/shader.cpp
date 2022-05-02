@@ -8,7 +8,8 @@ Shader::Shader(const char* shaderPath)
     compile(shaderSources);
 }
 
-std::unordered_map<GLenum, std::string> Shader::preprocess(std::stringstream& input) {
+std::unordered_map<GLenum, std::string> Shader::preprocess(std::stringstream& input)
+{
     std::string line;
     std::stringstream outTest;
     GLenum type = -1;
@@ -16,6 +17,11 @@ std::unordered_map<GLenum, std::string> Shader::preprocess(std::stringstream& in
 
     const char* typeToken = "#shader";
     std::size_t typeTokenLength = strnlen(typeToken, 16);
+
+    const char* propertiesToken = "#properties";
+    const char* endPropertiesToken = "#endproperties";
+    bool shouldReadProperties = false;
+    std::stringstream propertiesStream;
 
     while (std::getline(input, line))
     {
@@ -29,6 +35,19 @@ std::unordered_map<GLenum, std::string> Shader::preprocess(std::stringstream& in
             }
 
             type = getShaderTypeFromString(line.substr(typeTokenLength + 1));
+        }
+        else if (line.find(propertiesToken) != std::string::npos)
+        {
+            shouldReadProperties = true;
+        }
+        else if ((line.find(endPropertiesToken) != std::string::npos))
+        {
+            shouldReadProperties = false;
+            preprocessProperties(propertiesStream);
+        }
+        else if (shouldReadProperties)
+        {
+            propertiesStream << line << std::endl;
         }
         else
         {
@@ -68,6 +87,32 @@ std::string Shader::preprocessIncludes(std::stringstream& input, int level)
         ++line_number;
     }
     return output.str();
+}
+
+void Shader::preprocessProperties(std::stringstream& input)
+{
+    std::regex re("^[ ]*(.*?)[ ]+(.*?)[ ]*=[ ]*(.*)");
+    std::smatch matches;
+
+    std::string line;
+    while(std::getline(input,line))
+    {
+        if (std::regex_search(line, matches, re))
+        {
+            if (matches[1] == "Color")
+            {
+                m_uniformDefaultValues.push_back({ matches[2], matches[3] });
+            }
+            else if (matches[1] == "2D")
+            {
+                m_texDefaultValues.push_back({ matches[2], matches[3] });
+            }
+        }
+        else
+        {
+            LOG_ERROR("Could not parse properties!");
+        }
+    }
 }
 
 std::stringstream Shader::getStreamFromFile(const std::string& path)
@@ -228,4 +273,14 @@ void Shader::compile(std::unordered_map<GLenum, std::string>& shaderSources)
 
     lightsUniformBlockIndex = glGetUniformBlockIndex(ID, "Lights");
     glUniformBlockBinding(ID, lightsUniformBlockIndex, 1);
+}
+
+std::vector<PropertyTuple> Shader::uniformDefaultValues()
+{
+    return m_uniformDefaultValues;
+}
+
+std::vector<PropertyTuple> Shader::texDefaultValues()
+{
+    return m_texDefaultValues;
 }

@@ -2,11 +2,11 @@
 #include "primitives.h"
 #include "importer.h"
 
-//AssetLibrary& AssetLibrary::instance()
-//{
-//    static AssetLibrary instance_;
-//    return instance_;
-//}
+AssetLibrary& AssetLibrary::instance()
+{
+    static AssetLibrary instance_;
+    return instance_;
+}
 
 AssetLibrary::~AssetLibrary()
 {
@@ -207,4 +207,9 @@ Texture *AssetLibrary::getTexture(const char *name)
 bool AssetLibrary::isTextureLoaded(const char *name)
 {
     return m_textures.find(name) != m_textures.end();
+}
+
+AssetLibrary::AssetLibrary()
+{
+    load2DTexture(DefaultResources::texWhite, texture_defaultWhite, texture_dir);
 }

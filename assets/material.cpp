@@ -1,8 +1,9 @@
 #include "material.h"
+#include "../asset_library.h"
 
 void Material::setProperty(const std::string &name, const std::any& value)
 {
-    uniforms.insert({name, value});
+    uniforms[name] = value;
 }
 
 void Material::setUniformData()
@@ -102,4 +103,29 @@ Material::~Material()
 Material::Material(Shader* s)
 {
     shader = s;
+    setDefaultValues();
+}
+
+void Material::setDefaultValues()
+{
+    for (const auto& uniform : shader->uniformDefaultValues())
+    {
+        float values[4];
+        std::istringstream tokenStream(uniform.value);
+        std::string token;
+        int index = 0;
+        while (std::getline(tokenStream, token, ','))
+        {
+            values[index++] = std::stof(token);
+        }
+        setProperty(uniform.name, glm::vec4(values[0], values[1], values[2], values[3]));
+    }
+
+    for (const auto& tex : shader->texDefaultValues())
+    {
+        if (tex.value == "white") {
+            setTexture(tex.name, AssetLibrary::instance().getTexture(
+                    AssetLibrary::DefaultResources::texWhite)->ID(), 0);
+        }
+    }
 }
