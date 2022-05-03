@@ -1,3 +1,8 @@
+#properties
+Color u_color = 1,1,1,1
+2D u_mainTex = white
+#endproperties
+
 #shader vertex
 #version 410 core
 
