@@ -15,7 +15,7 @@ public:
     void setTexture(const std::string& name, unsigned int texID, int texUnit);
     void setUniformData();
     std::unordered_map<std::string, std::any>& getUniformData();
-    std::list<std::pair<std::string, unsigned int>> textures;
+    std::unordered_map<std::string, unsigned int> textures;
 
 private:
     std::unordered_map<std::string, std::any> uniforms;

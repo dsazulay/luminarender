@@ -1,7 +1,5 @@
 #pragma once
 
-#include "log.h"
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -18,3 +16,5 @@
 #include <vector>
 #include <list>
 #include <unordered_map>
+
+#include "log.h"

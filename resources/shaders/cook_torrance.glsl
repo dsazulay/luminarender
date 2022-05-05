@@ -1,3 +1,13 @@
+#properties
+Color u_albedo = 1,1,1,1
+Float u_metallic = 0.1
+Float u_roughness = 0.5
+2D u_albedoTex = white
+2D u_metallicTex = white
+2D u_roughnessTex = white
+2D u_aoTex = white
+#endproperties
+
 #shader vertex
 #version 410 core
 
@@ -44,7 +54,12 @@ const float PI = 3.14159265359;
 uniform vec4 u_albedo;
 uniform float u_metallic;
 uniform float u_roughness;
-uniform float u_ao;
+
+uniform sampler2D u_albedoTex;
+uniform sampler2D u_metallicTex;
+uniform sampler2D u_roughnessTex;
+uniform sampler2D u_aoTex;
+
 
 uniform samplerCube u_irradianceTex;
 uniform samplerCube u_prefilterMap;
@@ -114,8 +129,12 @@ vec3 cookTorrance(vec3 albedo, vec3 lightDir, vec3 normal, vec3 viewDir, vec3 f0
 
 void main()
 {
+    vec3 albedo = pow(texture(u_albedoTex, v_uv).rgb, vec3(2.2)) * u_albedo.rgb;
+    float metallic = texture(u_metallicTex, v_uv).r * u_metallic;
+    float roughness = texture(u_roughnessTex, v_uv).r * u_roughness;
+
     vec3 f0 = vec3(0.04);
-    f0 = mix(f0, u_albedo.rgb, u_metallic);
+    f0 = mix(f0, albedo, metallic);
 
     fragColor = vec4(0, 0, 0, 1);
     vec3 normal = normalize(v_normal);
@@ -125,24 +144,24 @@ void main()
     for (int i = 0; i < getLightCount(); i++)
     {
         Light l = getLight(i, v_worldPos);
-        vec3 radiance = cookTorrance(u_albedo.rgb, l.direction, normal, viewDir, f0, u_roughness, u_metallic);
+        vec3 radiance = cookTorrance(albedo, l.direction, normal, viewDir, f0, roughness, metallic);
 
         float NdotL = max(dot(normal, l.direction), 0.0);
         fragColor += vec4(radiance * l.color * l.attenuation * NdotL, 0.0);
     }
 
-    vec3 F = fresnelSchlickRoughness(max(dot(normal, viewDir), 0.0), f0, u_roughness);
-    vec3 kD = (1 - u_metallic) * (1 - F);
+    vec3 F = fresnelSchlickRoughness(max(dot(normal, viewDir), 0.0), f0, roughness);
+    vec3 kD = (1 - metallic) * (1 - F);
 
     vec3 irradiance = texture(u_irradianceTex, normal).rgb;
 
     // sample both the pre-filter map and the BRDF lut and combine them together as per the Split-Sum approximation to get the IBL specular part.
     const float MAX_REFLECTION_LOD = 4.0;
-    vec3 prefilteredColor = textureLod(u_prefilterMap, reflection,  u_roughness * MAX_REFLECTION_LOD).rgb;
-    vec2 brdf  = texture(u_brdfLUT, vec2(max(dot(normal, viewDir), 0.0), u_roughness)).rg;
+    vec3 prefilteredColor = textureLod(u_prefilterMap, reflection,  roughness * MAX_REFLECTION_LOD).rgb;
+    vec2 brdf  = texture(u_brdfLUT, vec2(max(dot(normal, viewDir), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * irradiance * u_albedo.rgb + specular) * u_ao;
+    vec3 ambient = (kD * irradiance * albedo + specular) * texture(u_aoTex, v_uv).r;
 
     fragColor += vec4(ambient, 0.0);
 

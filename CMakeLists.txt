@@ -49,7 +49,7 @@ add_executable(InteractiveGraphics
         pch.h
         samples/sample_resources.h
         samples/unlit_scene.cpp samples/unlit_scene.h
-        samples/lighting_skybox_scene.cpp samples/lighting_skybox_scene.h)
+        samples/lighting_skybox_scene.cpp samples/lighting_skybox_scene.h samples/pbr_scene.cpp samples/pbr_scene.h irradiance_map_factory.cpp irradiance_map_factory.h)
 
 find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(InteractiveGraphics PUBLIC glfw)
@@ -57,4 +57,4 @@ target_link_libraries(InteractiveGraphics PUBLIC glfw)
 target_link_directories(InteractiveGraphics PUBLIC lib/assimp)
 target_link_libraries(InteractiveGraphics PUBLIC assimp)
 
-#target_precompile_headers(InteractiveGraphics PRIVATE pch.h)
+#target_precompile_headers(InteractiveGraphics PUBLIC pch.h)

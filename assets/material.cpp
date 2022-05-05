@@ -89,7 +89,7 @@ void Material::setUniform(const std::string &name, const glm::mat4 &mat) const
 
 void Material::setTexture(const std::string &name, unsigned int texID, int texUnit)
 {
-    textures.insert(textures.end(), {name, texID});
+    textures[name] = texID;
 }
 
 std::unordered_map<std::string, std::any>& Material::getUniformData() {
@@ -110,6 +110,13 @@ void Material::setDefaultValues()
 {
     for (const auto& uniform : shader->uniformDefaultValues())
     {
+        if (uniform.type == "Float")
+        {
+            setProperty(uniform.name, std::stof(uniform.value));
+            continue;
+        }
+
+        // else if a Color type
         float values[4];
         std::istringstream tokenStream(uniform.value);
         std::string token;

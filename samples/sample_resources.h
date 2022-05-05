@@ -9,6 +9,10 @@ public:
     static constexpr char* shader_lambert = (char*) "resources/shaders/lambert.glsl";
     static constexpr char* shader_pbr = (char*) "resources/shaders/cook_torrance.glsl";
     static constexpr char* shader_skybox = (char*) "resources/shaders/skybox.glsl";
+    static constexpr char* shader_skybox_equirectangular = (char*) "resources/shaders/skybox_equirectangular.glsl";
+    static constexpr char* shader_skybox_irradiance = (char*) "resources/shaders/skybox_irradiance.glsl";
+    static constexpr char* shader_prefilter = (char*) "resources/shaders/prefilter.glsl";
+    static constexpr char* shader_brdf = (char*) "resources/shaders/brdf.glsl";
 
     static constexpr char* texture_dir = (char*) "resources/textures";
     static constexpr char* texture_skybox_dir = (char*) "resources/textures/skybox";
@@ -16,6 +20,11 @@ public:
     static constexpr char* texture_container = (char*) "container.jpg";
     static constexpr char* texture_woodBox = (char*) "wood_box.png";
     static constexpr char* texture_spitfire = (char*) "spitfire_d.png";
+    static constexpr char* texture_spitfire_metallic = (char*) "spitfire_m.png";
+    static constexpr char* texture_spitfire_roughness = (char*) "spitfire_r.png";
+    static constexpr char* texture_spitfire_ao = (char*) "spitfire_ao.png";
+    static constexpr char* texture_spitfire_normal = (char*) "spitfire_n.png";
+    static constexpr char* texture_tiber = (char*) "tiber_2.hdr";
 
 
     static constexpr char* faces[] =

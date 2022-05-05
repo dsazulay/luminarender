@@ -99,13 +99,13 @@ void Shader::preprocessProperties(std::stringstream& input)
     {
         if (std::regex_search(line, matches, re))
         {
-            if (matches[1] == "Color")
+            if (matches[1] == "Color" || matches[1] == "Float")
             {
-                m_uniformDefaultValues.push_back({ matches[2], matches[3] });
+                m_uniformDefaultValues.push_back({ matches[1], matches[2], matches[3] });
             }
             else if (matches[1] == "2D")
             {
-                m_texDefaultValues.push_back({ matches[2], matches[3] });
+                m_texDefaultValues.push_back({ matches[1], matches[2], matches[3] });
             }
         }
         else

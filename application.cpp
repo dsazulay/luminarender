@@ -4,6 +4,7 @@
 #include "samples/sample_scene.h"
 #include "samples/unlit_scene.h"
 #include "samples/lighting_skybox_scene.h"
+#include "samples/pbr_scene.h"
 #include <glad/glad.h>
 
 float Application::deltaTime;
@@ -32,9 +33,9 @@ Application::Application(const AppConfig& config)
     m_imguiRenderer.viewportHeight = (float) config.viewportHeight;
 
     // create shaders, materials, and objects and add them to the scene
-//    SampleScene sampleScene(&m_scene, &AssetLibrary::instance());
 //    UnlitScene::loadScene(m_scene, AssetLibrary::instance());
-    LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance());
+//    LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance());
+    PbrScene::loadScene(m_scene, AssetLibrary::instance());
 
     m_renderer->irradianceMap = m_scene.irradianceMap;
     m_renderer->prefilterMap = m_scene.prefilterMap;

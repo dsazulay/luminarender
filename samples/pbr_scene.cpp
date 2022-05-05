@@ -1,57 +1,80 @@
-#include "lighting_skybox_scene.h"
+#include "pbr_scene.h"
 #include "sample_resources.h"
 #include "../entity_factory.h"
 #include "../components/transform.h"
+#include "../irradiance_map_factory.h"
 
-void LightingSkyboxScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
+void PbrScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
 {
+    unsigned int skyboxTex;
+
     loadShaders(assetLibrary);
     loadTextures(assetLibrary);
-    loadMaterials(assetLibrary);
+    loadIrradianceTextures(scene, assetLibrary, skyboxTex);
+    loadMaterials(assetLibrary, skyboxTex);
     loadModels(assetLibrary);
     loadLights(scene);
     loadSkybox(scene, assetLibrary);
     loadObjects(scene, assetLibrary);
 }
 
-void LightingSkyboxScene::loadShaders(AssetLibrary &assetLibrary)
+void PbrScene::loadShaders(AssetLibrary &assetLibrary)
 {
     assetLibrary.loadShader("lambert", SampleResources::shader_lambert);
+    assetLibrary.loadShader("pbr", SampleResources::shader_pbr);
     assetLibrary.loadShader("skybox", SampleResources::shader_skybox);
 }
 
-void LightingSkyboxScene::loadTextures(AssetLibrary& assetLibrary)
+void PbrScene::loadTextures(AssetLibrary& assetLibrary)
 {
-    std::vector<std::string> faces =
-    {
-        SampleResources::faces[0], SampleResources::faces[1], SampleResources::faces[2],
-        SampleResources::faces[3], SampleResources::faces[4], SampleResources::faces[5],
-    };
-
     assetLibrary.load2DTexture("spitfire", SampleResources::texture_spitfire, SampleResources::texture_spitfire_dir);
+    assetLibrary.load2DTexture("spitfire_m", SampleResources::texture_spitfire_metallic, SampleResources::texture_spitfire_dir);
+    assetLibrary.load2DTexture("spitfire_r", SampleResources::texture_spitfire_roughness, SampleResources::texture_spitfire_dir);
+    assetLibrary.load2DTexture("spitfire_ao", SampleResources::texture_spitfire_ao, SampleResources::texture_spitfire_dir);
     assetLibrary.load2DTexture("woodBox", SampleResources::texture_woodBox, SampleResources::texture_dir);
-    assetLibrary.loadCubeMapTexture("glaciers", faces, SampleResources::texture_skybox_dir);
+    assetLibrary.loadHDRTexture("tiber", SampleResources::texture_tiber, SampleResources::texture_skybox_dir);
 }
 
-void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary)
+void PbrScene::loadIrradianceTextures(Scene& scene, AssetLibrary& assetLibrary, unsigned int& skyboxTex)
 {
-    Material* blueMat = assetLibrary.createMaterial("blueMat", "lambert");
-    blueMat->setProperty("u_color", glm::vec4(0.2f, 0.2f, 1.0f, 1.0f));
+
+    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(assetLibrary.getTexture("tiber")->ID());
+
+    scene.irradianceMap = maps.irradianceMap;
+    scene.prefilterMap = maps.prefilterMap;
+    scene.brdfLUT = maps.brdfLUTMap;
+    skyboxTex = maps.cubeMap;
+}
+
+void PbrScene::loadMaterials(AssetLibrary &assetLibrary, unsigned int& skyboxTex)
+{
+    Material* blueMat = assetLibrary.createMaterial("blueMat", "pbr");
+    blueMat->setProperty("u_albedo", glm::vec4(0.2f, 0.2f, 1.0f, 1.0f));
+    blueMat->setProperty("u_metallic", 1.0f);
+    blueMat->setProperty("u_roughness", 0.2f);
+
 
     Material* greyMat = assetLibrary.createMaterial("greyMat", "lambert");
     greyMat->setProperty("u_color", glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
 
-    Material* spitfireMat = assetLibrary.createMaterial("spitfireMat", "lambert");
-    spitfireMat->setTexture("u_mainTex", assetLibrary.getTexture("spitfire")->ID(), 0);
+    Material* spitfireMat = assetLibrary.createMaterial("spitfireMat", "pbr");
+    spitfireMat->setTexture("u_albedoTex", assetLibrary.getTexture("spitfire")->ID(), 0);
+    spitfireMat->setTexture("u_metallicTex", assetLibrary.getTexture("spitfire_m")->ID(), 0);
+    spitfireMat->setTexture("u_roughnessTex", assetLibrary.getTexture("spitfire_r")->ID(), 0);
+    spitfireMat->setTexture("u_aoTex", assetLibrary.getTexture("spitfire_ao")->ID(), 0);
+    spitfireMat->setProperty("u_metallic", 1.0f);
+    spitfireMat->setProperty("u_roughness", 1.0f);
 
-    Material* woodBoxMat = assetLibrary.createMaterial("woodBoxMat", "lambert");
-    woodBoxMat->setTexture("u_mainTex", assetLibrary.getTexture("woodBox")->ID(), 0);
+
+    Material* woodBoxMat = assetLibrary.createMaterial("woodBoxMat", "pbr");
+    woodBoxMat->setTexture("u_albedoTex", assetLibrary.getTexture("woodBox")->ID(), 0);
+    woodBoxMat->setProperty("u_roughness", 1.0f);
 
     Material* skyboxMat = assetLibrary.createMaterial("skyboxMat", "skybox");
-    skyboxMat->setTexture("u_mainTex", assetLibrary.getTexture("glaciers")->ID(), 0);
+    skyboxMat->setTexture("u_mainTex", skyboxTex, 0);
 }
 
-void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
+void PbrScene::loadModels(AssetLibrary &assetLibrary)
 {
     assetLibrary.loadMesh(AssetLibrary::BasicMesh::Cube);
     assetLibrary.loadMesh(AssetLibrary::BasicMesh::Quad);
@@ -61,14 +84,12 @@ void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
     assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
 }
 
-void LightingSkyboxScene::loadLights(Scene& scene)
+void PbrScene::loadLights(Scene& scene)
 {
     scene.addLight(EntityFactory::createDirectionalLight(glm::vec3(-45.0f, 0.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.8f), 1.0f));
-//    scene.addLight(EntityFactory::createPointLight(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.7f, 0.8f, 0.5f), 1.0f));
-//    scene.addLight(EntityFactory::createSpotLight(glm::vec3(-1.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.8f, 0.5f, 0.2f), 1.0f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f))));
 }
 
-void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
+void PbrScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
 {
     Mesh* cubeMap = assetLibrary.getMesh("cubeMap");
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
@@ -77,7 +98,7 @@ void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
             glm::vec3(0.0, 0.0, 0.0), skyboxMat, cubeMap));
 }
 
-void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
+void PbrScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
 {
     Mesh* cube = assetLibrary.getMesh("cube");
     Mesh* quad = assetLibrary.getMesh("quad");
@@ -116,5 +137,3 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
 
     scene.addObject(spitfireEntity);
 }
-
-
