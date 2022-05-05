@@ -37,7 +37,6 @@ add_executable(InteractiveGraphics
         components/icomponent.h
         entity.cpp entity.h
         scene.cpp scene.h
-        samples/sample_scene.cpp samples/sample_scene.h
         log.h
         asset_library.cpp asset_library.h
         components/mesh_renderer.cpp components/mesh_renderer.h

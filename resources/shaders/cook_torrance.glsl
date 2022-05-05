@@ -1,7 +1,7 @@
 #properties
 Color u_albedo = 1,1,1,1
-Float u_metallic = 0.1
-Float u_roughness = 0.5
+Float u_metallic = 1.0
+Float u_roughness = 1.0
 2D u_albedoTex = white
 2D u_metallicTex = white
 2D u_roughnessTex = white

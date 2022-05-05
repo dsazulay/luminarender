@@ -17,6 +17,8 @@ public:
     static constexpr char* texture_dir = (char*) "resources/textures";
     static constexpr char* texture_skybox_dir = (char*) "resources/textures/skybox";
     static constexpr char* texture_spitfire_dir = (char*) "resources/textures/spitfire";
+    static constexpr char* texture_metalbox_dir = (char*) "resources/textures/metalbox";
+    static constexpr char* texture_cerberus_dir = (char*) "resources/textures/cerberus";
     static constexpr char* texture_container = (char*) "container.jpg";
     static constexpr char* texture_woodBox = (char*) "wood_box.png";
     static constexpr char* texture_spitfire = (char*) "spitfire_d.png";
@@ -24,7 +26,18 @@ public:
     static constexpr char* texture_spitfire_roughness = (char*) "spitfire_r.png";
     static constexpr char* texture_spitfire_ao = (char*) "spitfire_ao.png";
     static constexpr char* texture_spitfire_normal = (char*) "spitfire_n.png";
+    static constexpr char* texture_metalbox = (char*) "metalbox_a.png";
+    static constexpr char* texture_metalbox_roughness = (char*) "metalbox_r.png";
+    static constexpr char* texture_metalbox_ao = (char*) "metalbox_ao.png";
+    static constexpr char* texture_metalbox_normal = (char*) "metalbox_normal.png";
+    static constexpr char* texture_cerberus = (char*) "cerberus_a.png";
+    static constexpr char* texture_cerberus_metallic = (char*) "cerberus_m.png";
+    static constexpr char* texture_cerberus_roughness = (char*) "cerberus_r.png";
+
+
     static constexpr char* texture_tiber = (char*) "tiber_2.hdr";
+    static constexpr char* texture_green_park = (char*) "green_point_park.hdr";
+    static constexpr char* texture_tank_farm = (char*) "tank_farm.hdr";
 
 
     static constexpr char* faces[] =
@@ -34,6 +47,7 @@ public:
     };
 
     static constexpr char* model_spitfire = (char*) "resources/models/spitfire.FBX";
+    static constexpr char* model_cerberus = (char*) "resources/models/cerberus.FBX";
 
     static constexpr glm::vec3 object_positions[10] =
     {

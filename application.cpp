@@ -1,7 +1,6 @@
 #include "pch.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "application.h"
-#include "samples/sample_scene.h"
 #include "samples/unlit_scene.h"
 #include "samples/lighting_skybox_scene.h"
 #include "samples/pbr_scene.h"
