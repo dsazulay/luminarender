@@ -18,6 +18,9 @@ public:
     void render(std::list<Entity>& objects);
     void renderSkybox(Entity& skybox);
     void renderNormalVector(std::list<Entity>& objects);
+    void shadowSetup();
+    void RecreateShadowMap(std::list<Entity> &objects, Entity &light);
+    void createShadowMap(Entity& objects);
 
     glm::mat4 cascadeShadows(glm::vec3 lightDir);
     std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
@@ -25,6 +28,7 @@ public:
     unsigned int getTexcolorBufferID();
 
     Material* mat;
+    Material* shadowMat;
 
     unsigned int irradianceMap;
     unsigned int prefilterMap;
@@ -38,6 +42,10 @@ private:
     float m_viewportHeight;
 
     FrameBuffer m_viewportFrameBuffer;
+    unsigned int depthMapFBO;
+    unsigned int depthMap;
+    glm::mat4 lightSpaceMatrix;
+
 
     Camera m_camera;
 

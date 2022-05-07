@@ -34,6 +34,37 @@ void Renderer::renderNormalVector(std::list<Entity>& objects)
     }
 }
 
+void Renderer::RecreateShadowMap(std::list<Entity> &objects, Entity &light)
+{
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    auto t = light.getComponent<Transform>();
+
+    glm::mat4 lightProjection, lightView;
+    float near_plane = 0.1f, far_plane = 40.0f;
+    //lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
+    lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
+    // light vectors used for test
+    lightView = glm::lookAt(t->getDirection() * -10.f, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+    lightSpaceMatrix = lightProjection * lightView;
+
+    // render scene from light's point of view
+    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glClear(GL_DEPTH_BUFFER_BIT);
+
+    for (auto& entity : objects)
+    {
+        createShadowMap(entity);
+
+        for (auto& childEntity : entity.getChildren())
+        {
+            createShadowMap(childEntity);
+        }
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void Renderer::renderSkybox(Entity &skybox)
 {
     auto mesh = skybox.getComponent<MeshRenderer>();
@@ -101,6 +132,8 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
 
     Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
      std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
+
+    shadowSetup();
 }
 
 void Renderer::bindFrameBuffer()
@@ -148,6 +181,10 @@ void Renderer::renderEntity(Entity &entity)
     material->shader->setMat4("u_model", transform->modelMatrix());
     material->shader->setMat3("u_normalMatrix", glm::transpose(glm::inverse(glm::mat3(transform->modelMatrix()))));
 
+    // shadow
+    material->shader->setVec3("u_lightPos", glm::vec3(-2.0f, 4.0f, -1.0f));
+    material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
+
     // set material uniforms (e.g. color, textures)
     int texCount = 0;
     for (const auto& texture : material->textures)
@@ -176,6 +213,28 @@ void Renderer::renderEntity(Entity &entity)
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
+}
+
+void Renderer::shadowSetup()
+{
+    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+    glGenFramebuffers(1, &depthMapFBO);
+    // create depth texture
+    glGenTextures(1, &depthMap);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    // attach depth texture as FBO's depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 std::vector<glm::vec4> Renderer::getFrustumCornersWorldSpace(const glm::mat4 &proj, const glm::mat4 &view)
@@ -221,6 +280,30 @@ void Renderer::renderNormalVectorOfEntity(Entity &entity)
 
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+}
+
+void Renderer::createShadowMap(Entity& entity)
+{
+    auto transform = entity.getComponent<Transform>();
+    auto mesh = entity.getComponent<MeshRenderer>();
+    if (mesh == nullptr)
+        return;
+    Material *material = shadowMat;
+    Material *originalMat = mesh->material;
+
+//    originalMat->setTexture("u_mainTex", depthMap, 0);
+    originalMat->setTexture("u_shadowMap", depthMap, 0);
+    material->shader->use();
+
+    // set object uniforms (e.g. transform)
+    material->shader->setMat4("u_model", transform->modelMatrix());
+    material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
+
+    material->setUniformData();
+
+    glBindVertexArray(mesh->vao());
+    glDrawElements(GL_TRIANGLES, (int) mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }
 

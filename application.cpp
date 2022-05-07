@@ -33,8 +33,8 @@ Application::Application(const AppConfig& config)
 
     // create shaders, materials, and objects and add them to the scene
 //    UnlitScene::loadScene(m_scene, AssetLibrary::instance());
-//    LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance());
-    PbrScene::loadScene(m_scene, AssetLibrary::instance());
+    LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance());
+//    PbrScene::loadScene(m_scene, AssetLibrary::instance());
 
     m_renderer->irradianceMap = m_scene.irradianceMap;
     m_renderer->prefilterMap = m_scene.prefilterMap;
@@ -43,6 +43,10 @@ Application::Application(const AppConfig& config)
     Shader* s = AssetLibrary::instance().loadShader("normalVector", "resources/shaders/normal_vector.glsl");
     Material* m = AssetLibrary::instance().createMaterial("normalVector", s);
     m_renderer->mat = m;
+
+    s = AssetLibrary::instance().loadShader("simpleShadowMap", "resources/shaders/simple_shadow_depth.glsl");
+    m = AssetLibrary::instance().createMaterial("shadowMat", s);
+    m_renderer->shadowMat = m;
 
 }
 
@@ -57,12 +61,15 @@ void Application::mainloop()
 
         m_window.processInput();
 
-        m_renderer->bindFrameBuffer();
-        m_renderer->updateViewportDimensions();
-        m_renderer->clearFrameBuffer();
         m_renderer->updateTransformMatrices();
         if (!m_scene.lights().empty())
             m_renderer->setupLights(m_scene.lights());
+
+        m_renderer->RecreateShadowMap(m_scene.objects(), m_scene.lights().front());
+
+        m_renderer->bindFrameBuffer();
+        m_renderer->updateViewportDimensions();
+        m_renderer->clearFrameBuffer();
         if (!m_scene.objects().empty())
         {
             m_renderer->render(m_scene.objects());
