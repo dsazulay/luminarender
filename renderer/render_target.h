@@ -2,14 +2,17 @@
 
 #include "../frame_buffer.h"
 
-class RenderSystem
+class RenderTarget
 {
 public:
-    RenderSystem(int width, int height, FrameBuffer::Type type);
+    RenderTarget(int width, int height, FrameBuffer::Type type);
     void resizeFrameBuffer(int width, int height);
     unsigned int getTextureID();
+    void setAsTarget();
+    void unsetAsTarget();
+    void clearMask(int mask);
 
-protected:
+private:
     void updateViewportDimensions();
     void bindFrameBuffer();
     void unbindFrameBuffer();
@@ -18,4 +21,5 @@ protected:
     FrameBuffer m_frameBuffer;
     int m_viewportWidth;
     int m_viewportHeight;
+    int m_clearMask;
 };

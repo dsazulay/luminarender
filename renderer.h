@@ -22,6 +22,7 @@ public:
     std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
 
     unsigned int getTexcolorBufferID();
+    unsigned int getShadowMapTextureID();
 
     void setShadowMaterialAndLight(Entity* light);
 
@@ -39,9 +40,10 @@ private:
     float m_viewportWidth;
     float m_viewportHeight;
 
-    FrameBuffer m_viewportFrameBuffer;
     glm::mat4 lightSpaceMatrix;
 
+    RenderTarget m_shadowRenderTarget;
+    RenderTarget m_mainRenderTarget;
     ShadowPass m_shadowRenderPass;
     ForwardPass m_forwardPass;
 

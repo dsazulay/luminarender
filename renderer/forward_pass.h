@@ -1,14 +1,12 @@
 #pragma once
 
 #include "irenderable.h"
-#include "render_system.h"
+#include "render_target.h"
 #include <glm/glm.hpp>
 
-class ForwardPass : public RenderSystem, IRenderable
+class ForwardPass : public IRenderable
 {
 public:
-    ForwardPass(int width, int height, FrameBuffer::Type type);
-
     void render(std::list<Entity>& objects) override;
 
     glm::mat4 lightSpaceMatrix;
@@ -17,6 +15,7 @@ public:
     unsigned int irradianceMap;
     unsigned int prefilterMap;
     unsigned int brdfLUT;
+    unsigned int shadowMap;
 
 
 private:

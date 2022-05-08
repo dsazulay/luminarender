@@ -6,9 +6,6 @@
 void ShadowPass::render(std::list<Entity>& objects)
 {
     updateLightMatrices();
-    updateViewportDimensions();
-    bindFrameBuffer();
-    clearFrameBuffer();
 
     for (auto& entity : objects)
     {
@@ -19,13 +16,6 @@ void ShadowPass::render(std::list<Entity>& objects)
             renderEntity(childEntity);
         }
     }
-
-    unbindFrameBuffer();
-}
-
-void ShadowPass::clearFrameBuffer()
-{
-    glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void ShadowPass::updateLightMatrices()
@@ -45,11 +35,6 @@ void ShadowPass::renderEntity(Entity &entity)
     if (mesh == nullptr)
         return;
     Material *material = m_shadowMat;
-    Material *originalMat = mesh->material;
-
-    // TODO: use the same system as textures for global illumination (HDR textures)
-//    originalMat->setTexture("u_mainTex", m_frameBuffer.getTexcolorBufferID(), 0);
-    originalMat->setTexture("u_shadowMap", m_frameBuffer.getTexcolorBufferID(), 0);
     material->shader->use();
 
     // set object uniforms (e.g. transform)
@@ -61,16 +46,6 @@ void ShadowPass::renderEntity(Entity &entity)
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int) mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
-}
-
-void ShadowPass::init()
-{
-
-}
-
-ShadowPass::ShadowPass(int width, int height, FrameBuffer::Type type) : RenderSystem(width, height, type)
-{
-
 }
 
 void ShadowPass::shadowMaterial(Material *mat)

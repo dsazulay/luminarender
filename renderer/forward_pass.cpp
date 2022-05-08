@@ -5,10 +5,6 @@
 
 void ForwardPass::render(std::list<Entity> &objects)
 {
-    updateViewportDimensions();
-    bindFrameBuffer();
-    clearFrameBuffer();
-
     for (auto& entity : objects)
     {
         renderEntity(entity);
@@ -18,8 +14,6 @@ void ForwardPass::render(std::list<Entity> &objects)
             renderEntity(childEntity);
         }
     }
-
-    unbindFrameBuffer();
 }
 
 void ForwardPass::renderEntity(Entity &entity)
@@ -65,14 +59,13 @@ void ForwardPass::renderEntity(Entity &entity)
     glActiveTexture(GL_TEXTURE12);
     glBindTexture(GL_TEXTURE_2D, brdfLUT);
 
+    material->shader->setInt("u_shadowMap", 13);
+    glActiveTexture(GL_TEXTURE13);
+    glBindTexture(GL_TEXTURE_2D, shadowMap);
+
     material->setUniformData();
 
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
-}
-
-ForwardPass::ForwardPass(int width, int height, FrameBuffer::Type type) : RenderSystem(width, height, type)
-{
-
 }

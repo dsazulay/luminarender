@@ -10,9 +10,15 @@
 
 void Renderer::render(std::list<Entity>& objects)
 {
+    m_shadowRenderTarget.setAsTarget();
     m_shadowRenderPass.render(objects);
+    m_shadowRenderTarget.unsetAsTarget();
+
     m_forwardPass.lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
+    m_mainRenderTarget.setAsTarget();
     m_forwardPass.render(objects);
+    // render skybox + render other passes
+    m_mainRenderTarget.unsetAsTarget();
 }
 
 void Renderer::renderNormalVector(std::list<Entity>& objects)
@@ -84,8 +90,8 @@ void Renderer::updateTransformMatrices()
 
 Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
-    m_shadowRenderPass(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Shadow),
-    m_forwardPass(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Color),
+    m_shadowRenderTarget(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Shadow),
+    m_mainRenderTarget(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Color),
     m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
     m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
     m_camera(cameraPos)
@@ -97,12 +103,14 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
     Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
      std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
 
-    m_shadowRenderPass.resizeFrameBuffer(1024, 1024);
+    m_shadowRenderTarget.resizeFrameBuffer(1024, 1024);
+    m_mainRenderTarget.clearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    m_shadowRenderTarget.clearMask(GL_DEPTH_BUFFER_BIT);
 }
 
 unsigned int Renderer::getTexcolorBufferID()
 {
-    return m_forwardPass.getTextureID();
+    return m_mainRenderTarget.getTextureID();
 }
 
 void Renderer::onViewportResize(const Event& e)
@@ -110,9 +118,9 @@ void Renderer::onViewportResize(const Event& e)
     const auto& event = static_cast<const ViewportResizeEvent&>(e);
     m_viewportWidth = event.width();
     m_viewportHeight = event.height();
-    m_forwardPass.resizeFrameBuffer(m_viewportWidth, m_viewportHeight);
+    m_mainRenderTarget.resizeFrameBuffer(m_viewportWidth, m_viewportHeight);
 
-    m_shadowRenderPass.resizeFrameBuffer(m_viewportWidth * 2, m_viewportHeight * 2);
+    m_shadowRenderTarget.resizeFrameBuffer(m_viewportWidth * 2, m_viewportHeight * 2);
 }
 
 void Renderer::setShadowMaterialAndLight(Entity *light)
@@ -124,6 +132,7 @@ void Renderer::setShadowMaterialAndLight(Entity *light)
     m_forwardPass.irradianceMap = irradianceMap;
     m_forwardPass.prefilterMap = prefilterMap;
     m_forwardPass.brdfLUT = brdfLUT;
+    m_forwardPass.shadowMap = getShadowMapTextureID();
 }
 
 void Renderer::renderNormalVectorOfEntity(Entity &entity)
@@ -145,6 +154,11 @@ void Renderer::renderNormalVectorOfEntity(Entity &entity)
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
+}
+
+unsigned int Renderer::getShadowMapTextureID()
+{
+    return m_shadowRenderTarget.getTextureID();
 }
 
 //std::vector<glm::vec4> Renderer::getFrustumCornersWorldSpace(const glm::mat4 &proj, const glm::mat4 &view)
