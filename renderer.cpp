@@ -10,6 +10,14 @@
 
 void Renderer::render(std::list<Entity>& objects)
 {
+    m_shadowRenderPass.render(objects);
+    lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
+//    RecreateShadowMap(objects, m_light);
+
+    bindFrameBuffer();
+    updateViewportDimensions();
+    clearFrameBuffer();
+
     for (auto& entity : objects)
     {
         renderEntity(entity);
@@ -34,10 +42,10 @@ void Renderer::renderNormalVector(std::list<Entity>& objects)
     }
 }
 
-void Renderer::RecreateShadowMap(std::list<Entity> &objects, Entity &light)
+void Renderer::RecreateShadowMap(std::list<Entity> &objects, Entity* light)
 {
     const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-    auto t = light.getComponent<Transform>();
+    auto t = light->getComponent<Transform>();
 
     glm::mat4 lightProjection, lightView;
     float near_plane = 0.1f, far_plane = 40.0f;
@@ -121,7 +129,8 @@ void Renderer::updateTransformMatrices()
 
 Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
-    m_viewportFrameBuffer(m_viewportWidth, m_viewportHeight),
+    m_viewportFrameBuffer(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Color),
+    m_shadowRenderPass(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Shadow),
     m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
     m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
     m_camera(cameraPos)
@@ -133,7 +142,8 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
     Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
      std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
 
-    shadowSetup();
+//    shadowSetup();
+    m_shadowRenderPass.resizeFrameBuffer(1024, 1024);
 }
 
 void Renderer::bindFrameBuffer()
@@ -164,6 +174,8 @@ void Renderer::onViewportResize(const Event& e)
     m_viewportWidth = event.width();
     m_viewportHeight = event.height();
     m_viewportFrameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
+
+    m_shadowRenderPass.resizeFrameBuffer(m_viewportWidth * 2, m_viewportHeight * 2);
 }
 
 void Renderer::renderEntity(Entity &entity)
@@ -182,7 +194,8 @@ void Renderer::renderEntity(Entity &entity)
     material->shader->setMat3("u_normalMatrix", glm::transpose(glm::inverse(glm::mat3(transform->modelMatrix()))));
 
     // shadow
-    material->shader->setVec3("u_lightPos", glm::vec3(-2.0f, 4.0f, -1.0f));
+    auto t = m_light->getComponent<Transform>();
+    material->shader->setVec3("u_lightPos", t->getDirection() * -10.0f);
     material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
 
     // set material uniforms (e.g. color, textures)
@@ -367,4 +380,11 @@ glm::mat4 Renderer::cascadeShadows(glm::vec3 lightDir)
     const glm::mat4 lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
 
     return lightProjection * lightView;
+}
+
+void Renderer::setShadowMaterialAndLight(Entity *light)
+{
+    m_shadowRenderPass.shadowMaterial(shadowMat);
+    m_shadowRenderPass.mainLight(light);
+    m_light = light;
 }

@@ -6,6 +6,7 @@
 #include "uniform_buffer_object.h"
 #include "camera.h"
 #include "frame_buffer.h"
+#include "renderer/shadow_pass.h"
 
 class Renderer {
 public:
@@ -19,7 +20,7 @@ public:
     void renderSkybox(Entity& skybox);
     void renderNormalVector(std::list<Entity>& objects);
     void shadowSetup();
-    void RecreateShadowMap(std::list<Entity> &objects, Entity &light);
+    void RecreateShadowMap(std::list<Entity> &objects, Entity* light);
     void createShadowMap(Entity& objects);
 
     glm::mat4 cascadeShadows(glm::vec3 lightDir);
@@ -27,8 +28,11 @@ public:
 
     unsigned int getTexcolorBufferID();
 
+    void setShadowMaterialAndLight(Entity* light);
+
     Material* mat;
     Material* shadowMat;
+    Entity* m_light;
 
     unsigned int irradianceMap;
     unsigned int prefilterMap;
@@ -46,6 +50,7 @@ private:
     unsigned int depthMap;
     glm::mat4 lightSpaceMatrix;
 
+    ShadowPass m_shadowRenderPass;
 
     Camera m_camera;
 

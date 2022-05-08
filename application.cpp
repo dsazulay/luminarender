@@ -48,6 +48,8 @@ Application::Application(const AppConfig& config)
     m = AssetLibrary::instance().createMaterial("shadowMat", s);
     m_renderer->shadowMat = m;
 
+    m_renderer->setShadowMaterialAndLight(&m_scene.lights().front());
+
 }
 
 void Application::mainloop()
@@ -65,11 +67,9 @@ void Application::mainloop()
         if (!m_scene.lights().empty())
             m_renderer->setupLights(m_scene.lights());
 
-        m_renderer->RecreateShadowMap(m_scene.objects(), m_scene.lights().front());
+//        m_renderer->RecreateShadowMap(m_scene.objects(), &m_scene.lights().front());
 
-        m_renderer->bindFrameBuffer();
-        m_renderer->updateViewportDimensions();
-        m_renderer->clearFrameBuffer();
+
         if (!m_scene.objects().empty())
         {
             m_renderer->render(m_scene.objects());

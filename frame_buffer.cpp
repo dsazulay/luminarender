@@ -38,7 +38,10 @@ void FrameBuffer::resizeBuffer(int width, int height)
     m_Width = width;
     m_Height = height;
 
-    createBuffer();
+    if (m_type == Type::Shadow)
+        createShadowBuffer();
+    else
+        createBuffer();
 }
 
 unsigned int FrameBuffer::getID()
@@ -51,10 +54,11 @@ unsigned int FrameBuffer::getTexcolorBufferID()
     return m_TexcolorBuffer;
 }
 
-FrameBuffer::FrameBuffer(int width, int height)
+FrameBuffer::FrameBuffer(int width, int height, Type type)
 {
     m_Width = width;
     m_Height = height;
+    m_type = type;
 }
 
 void FrameBuffer::deleteBuffer()
@@ -75,8 +79,8 @@ void FrameBuffer::create3Dbuffer()
 
     glGenFramebuffers(1, &m_FrameBuffer);
 
-    glGenTextures(1, &m_lightDepthMaps);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, m_lightDepthMaps);
+    glGenTextures(1, &m_TexcolorBuffer);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, m_TexcolorBuffer);
     glTexImage3D(
             GL_TEXTURE_2D_ARRAY,
             0,
@@ -98,7 +102,39 @@ void FrameBuffer::create3Dbuffer()
     glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, bordercolor);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_lightDepthMaps, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_TexcolorBuffer, 0);
+    glDrawBuffer(GL_NONE);
+    glReadBuffer(GL_NONE);
+
+    int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
+        throw 0;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void FrameBuffer::createShadowBuffer()
+{
+    glGenFramebuffers(1, &m_FrameBuffer);
+
+    // create depth texture
+    glGenTextures(1, &m_TexcolorBuffer);
+    glBindTexture(GL_TEXTURE_2D, m_TexcolorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_Width, m_Height, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
+                 NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+    // attach depth texture as FBO's depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, m_FrameBuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_TexcolorBuffer, 0);
     glDrawBuffer(GL_NONE);
     glReadBuffer(GL_NONE);
 
