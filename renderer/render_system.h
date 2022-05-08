@@ -6,6 +6,9 @@ class RenderSystem
 {
 public:
     RenderSystem(int width, int height, FrameBuffer::Type type);
+    void resizeFrameBuffer(int width, int height);
+    unsigned int getTextureID();
+
 protected:
     void updateViewportDimensions();
     void bindFrameBuffer();
@@ -13,6 +16,6 @@ protected:
     virtual void clearFrameBuffer();
 
     FrameBuffer m_frameBuffer;
-    float m_viewportWidth;
-    float m_viewportHeight;
+    int m_viewportWidth;
+    int m_viewportHeight;
 };

@@ -75,8 +75,8 @@ void Application::mainloop()
             m_renderer->render(m_scene.objects());
 //            m_renderer->renderNormalVector(m_scene.objects());
         }
-        if (m_scene.hasSkybox())
-            m_renderer->renderSkybox(m_scene.skybox());
+//        if (m_scene.hasSkybox())
+//            m_renderer->renderSkybox(m_scene.skybox());
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, m_windowWidth, m_windowHeight);

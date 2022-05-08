@@ -68,13 +68,6 @@ void ShadowPass::init()
 
 }
 
-void ShadowPass::resizeFrameBuffer(int width, int height)
-{
-    m_viewportWidth = width;
-    m_viewportHeight = height;
-    m_frameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
-}
-
 ShadowPass::ShadowPass(int width, int height, FrameBuffer::Type type) : RenderSystem(width, height, type)
 {
 

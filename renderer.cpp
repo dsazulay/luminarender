@@ -11,22 +11,8 @@
 void Renderer::render(std::list<Entity>& objects)
 {
     m_shadowRenderPass.render(objects);
-    lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
-//    RecreateShadowMap(objects, m_light);
-
-    bindFrameBuffer();
-    updateViewportDimensions();
-    clearFrameBuffer();
-
-    for (auto& entity : objects)
-    {
-        renderEntity(entity);
-
-        for (auto& childEntity : entity.getChildren())
-        {
-            renderEntity(childEntity);
-        }
-    }
+    m_forwardPass.lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
+    m_forwardPass.render(objects);
 }
 
 void Renderer::renderNormalVector(std::list<Entity>& objects)
@@ -40,37 +26,6 @@ void Renderer::renderNormalVector(std::list<Entity>& objects)
             renderNormalVectorOfEntity(childEntity);
         }
     }
-}
-
-void Renderer::RecreateShadowMap(std::list<Entity> &objects, Entity* light)
-{
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-    auto t = light->getComponent<Transform>();
-
-    glm::mat4 lightProjection, lightView;
-    float near_plane = 0.1f, far_plane = 40.0f;
-    //lightProjection = glm::perspective(glm::radians(45.0f), (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT, near_plane, far_plane); // note that if you use a perspective projection matrix you'll have to change the light position as the current light position isn't enough to reflect the whole scene
-    lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
-    // light vectors used for test
-    lightView = glm::lookAt(t->getDirection() * -10.f, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
-    lightSpaceMatrix = lightProjection * lightView;
-
-    // render scene from light's point of view
-    glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glClear(GL_DEPTH_BUFFER_BIT);
-
-    for (auto& entity : objects)
-    {
-        createShadowMap(entity);
-
-        for (auto& childEntity : entity.getChildren())
-        {
-            createShadowMap(childEntity);
-        }
-    }
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void Renderer::renderSkybox(Entity &skybox)
@@ -129,8 +84,8 @@ void Renderer::updateTransformMatrices()
 
 Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
-    m_viewportFrameBuffer(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Color),
     m_shadowRenderPass(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Shadow),
+    m_forwardPass(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Color),
     m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
     m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
     m_camera(cameraPos)
@@ -142,30 +97,12 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
     Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
      std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
 
-//    shadowSetup();
     m_shadowRenderPass.resizeFrameBuffer(1024, 1024);
-}
-
-void Renderer::bindFrameBuffer()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, m_viewportFrameBuffer.getID());
-}
-
-void Renderer::updateViewportDimensions()
-{
-    // TODO: verify if this is necessary
-    glViewport(0, 0, m_viewportWidth, m_viewportHeight);
-}
-
-void Renderer::clearFrameBuffer()
-{
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 unsigned int Renderer::getTexcolorBufferID()
 {
-    return m_viewportFrameBuffer.getTexcolorBufferID();
+    return m_forwardPass.getTextureID();
 }
 
 void Renderer::onViewportResize(const Event& e)
@@ -173,106 +110,20 @@ void Renderer::onViewportResize(const Event& e)
     const auto& event = static_cast<const ViewportResizeEvent&>(e);
     m_viewportWidth = event.width();
     m_viewportHeight = event.height();
-    m_viewportFrameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
+    m_forwardPass.resizeFrameBuffer(m_viewportWidth, m_viewportHeight);
 
     m_shadowRenderPass.resizeFrameBuffer(m_viewportWidth * 2, m_viewportHeight * 2);
 }
 
-void Renderer::renderEntity(Entity &entity)
+void Renderer::setShadowMaterialAndLight(Entity *light)
 {
-    auto transform = entity.getComponent<Transform>();
-    auto mesh = entity.getComponent<MeshRenderer>();
-    if (mesh == nullptr)
-        return;
-    Material* material = mesh->material;
+    m_shadowRenderPass.shadowMaterial(shadowMat);
+    m_shadowRenderPass.mainLight(light);
 
-
-    material->shader->use();
-
-    // set object uniforms (e.g. transform)
-    material->shader->setMat4("u_model", transform->modelMatrix());
-    material->shader->setMat3("u_normalMatrix", glm::transpose(glm::inverse(glm::mat3(transform->modelMatrix()))));
-
-    // shadow
-    auto t = m_light->getComponent<Transform>();
-    material->shader->setVec3("u_lightPos", t->getDirection() * -10.0f);
-    material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
-
-    // set material uniforms (e.g. color, textures)
-    int texCount = 0;
-    for (const auto& texture : material->textures)
-    {
-        material->shader->setInt(texture.first, texCount);
-        glActiveTexture(GL_TEXTURE0 + texCount);
-        glBindTexture(GL_TEXTURE_2D, texture.second);
-        texCount++;
-    }
-
-    // bind global illumination textures
-    material->shader->setInt("u_irradianceTex", 10);
-    glActiveTexture(GL_TEXTURE10);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, irradianceMap);
-
-    material->shader->setInt("u_prefilterMap", 11);
-    glActiveTexture(GL_TEXTURE11);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, prefilterMap);
-
-    material->shader->setInt("u_brdfLUT", 12);
-    glActiveTexture(GL_TEXTURE12);
-    glBindTexture(GL_TEXTURE_2D, brdfLUT);
-
-    material->setUniformData();
-
-    glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
-}
-
-void Renderer::shadowSetup()
-{
-    const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
-    glGenFramebuffers(1, &depthMapFBO);
-    // create depth texture
-    glGenTextures(1, &depthMap);
-    glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    // attach depth texture as FBO's depth buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-std::vector<glm::vec4> Renderer::getFrustumCornersWorldSpace(const glm::mat4 &proj, const glm::mat4 &view)
-{
-    const auto inv = glm::inverse(proj * view);
-
-    std::vector<glm::vec4> frustumCorners;
-    for (unsigned int x = 0; x < 2; ++x)
-    {
-        for (unsigned int y = 0; y < 2; ++y)
-        {
-            for (unsigned int z = 0; z < 2; ++z)
-            {
-                const glm::vec4 pt =
-                        inv * glm::vec4(
-                                2.0f * x - 1.0f,
-                                2.0f * y - 1.0f,
-                                2.0f * z - 1.0f,
-                                1.0f);
-                frustumCorners.push_back(pt / pt.w);
-            }
-        }
-    }
-
-    return frustumCorners;
+    m_forwardPass.m_light = light;
+    m_forwardPass.irradianceMap = irradianceMap;
+    m_forwardPass.prefilterMap = prefilterMap;
+    m_forwardPass.brdfLUT = brdfLUT;
 }
 
 void Renderer::renderNormalVectorOfEntity(Entity &entity)
@@ -296,95 +147,89 @@ void Renderer::renderNormalVectorOfEntity(Entity &entity)
     glBindVertexArray(0);
 }
 
-void Renderer::createShadowMap(Entity& entity)
-{
-    auto transform = entity.getComponent<Transform>();
-    auto mesh = entity.getComponent<MeshRenderer>();
-    if (mesh == nullptr)
-        return;
-    Material *material = shadowMat;
-    Material *originalMat = mesh->material;
+//std::vector<glm::vec4> Renderer::getFrustumCornersWorldSpace(const glm::mat4 &proj, const glm::mat4 &view)
+//{
+//    const auto inv = glm::inverse(proj * view);
+//
+//    std::vector<glm::vec4> frustumCorners;
+//    for (unsigned int x = 0; x < 2; ++x)
+//    {
+//        for (unsigned int y = 0; y < 2; ++y)
+//        {
+//            for (unsigned int z = 0; z < 2; ++z)
+//            {
+//                const glm::vec4 pt =
+//                        inv * glm::vec4(
+//                                2.0f * x - 1.0f,
+//                                2.0f * y - 1.0f,
+//                                2.0f * z - 1.0f,
+//                                1.0f);
+//                frustumCorners.push_back(pt / pt.w);
+//            }
+//        }
+//    }
+//
+//    return frustumCorners;
+//}
 
-//    originalMat->setTexture("u_mainTex", depthMap, 0);
-    originalMat->setTexture("u_shadowMap", depthMap, 0);
-    material->shader->use();
-
-    // set object uniforms (e.g. transform)
-    material->shader->setMat4("u_model", transform->modelMatrix());
-    material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
-
-    material->setUniformData();
-
-    glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int) mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
-}
-
-glm::mat4 Renderer::cascadeShadows(glm::vec3 lightDir)
-{
-    glm::mat4 view = m_camera.getViewMatrix();
-    glm::mat4 projection = glm::perspective(glm::radians(m_camera.zoom),
-                                            (float) m_viewportWidth / (float) m_viewportHeight, 0.1f, 100.0f);
-
-    auto corners = getFrustumCornersWorldSpace(projection, view);
-
-    glm::vec3 center = glm::vec3(0, 0, 0);
-    for (const auto& v : corners)
-    {
-        center += glm::vec3(v);
-    }
-    center /= corners.size();
-
-    const auto lightView = glm::lookAt(
-            center + lightDir,
-            center,
-            glm::vec3(0.0f, 1.0f, 0.0f)
-    );
-
-    float minX = std::numeric_limits<float>::max();
-    float maxX = std::numeric_limits<float>::min();
-    float minY = std::numeric_limits<float>::max();
-    float maxY = std::numeric_limits<float>::min();
-    float minZ = std::numeric_limits<float>::max();
-    float maxZ = std::numeric_limits<float>::min();
-    for (const auto& v : corners)
-    {
-        const auto trf = lightView * v;
-        minX = std::min(minX, trf.x);
-        maxX = std::max(maxX, trf.x);
-        minY = std::min(minY, trf.y);
-        maxY = std::max(maxY, trf.y);
-        minZ = std::min(minZ, trf.z);
-        maxZ = std::max(maxZ, trf.z);
-    }
-
-    // Tune this parameter according to the scene
-    constexpr float zMult = 10.0f;
-    if (minZ < 0)
-    {
-        minZ *= zMult;
-    }
-    else
-    {
-        minZ /= zMult;
-    }
-    if (maxZ < 0)
-    {
-        maxZ /= zMult;
-    }
-    else
-    {
-        maxZ *= zMult;
-    }
-
-    const glm::mat4 lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
-
-    return lightProjection * lightView;
-}
-
-void Renderer::setShadowMaterialAndLight(Entity *light)
-{
-    m_shadowRenderPass.shadowMaterial(shadowMat);
-    m_shadowRenderPass.mainLight(light);
-    m_light = light;
-}
+//glm::mat4 Renderer::cascadeShadows(glm::vec3 lightDir)
+//{
+//    glm::mat4 view = m_camera.getViewMatrix();
+//    glm::mat4 projection = glm::perspective(glm::radians(m_camera.zoom),
+//                                            (float) m_viewportWidth / (float) m_viewportHeight, 0.1f, 100.0f);
+//
+//    auto corners = getFrustumCornersWorldSpace(projection, view);
+//
+//    glm::vec3 center = glm::vec3(0, 0, 0);
+//    for (const auto& v : corners)
+//    {
+//        center += glm::vec3(v);
+//    }
+//    center /= corners.size();
+//
+//    const auto lightView = glm::lookAt(
+//            center + lightDir,
+//            center,
+//            glm::vec3(0.0f, 1.0f, 0.0f)
+//    );
+//
+//    float minX = std::numeric_limits<float>::max();
+//    float maxX = std::numeric_limits<float>::min();
+//    float minY = std::numeric_limits<float>::max();
+//    float maxY = std::numeric_limits<float>::min();
+//    float minZ = std::numeric_limits<float>::max();
+//    float maxZ = std::numeric_limits<float>::min();
+//    for (const auto& v : corners)
+//    {
+//        const auto trf = lightView * v;
+//        minX = std::min(minX, trf.x);
+//        maxX = std::max(maxX, trf.x);
+//        minY = std::min(minY, trf.y);
+//        maxY = std::max(maxY, trf.y);
+//        minZ = std::min(minZ, trf.z);
+//        maxZ = std::max(maxZ, trf.z);
+//    }
+//
+//    // Tune this parameter according to the scene
+//    constexpr float zMult = 10.0f;
+//    if (minZ < 0)
+//    {
+//        minZ *= zMult;
+//    }
+//    else
+//    {
+//        minZ /= zMult;
+//    }
+//    if (maxZ < 0)
+//    {
+//        maxZ /= zMult;
+//    }
+//    else
+//    {
+//        maxZ *= zMult;
+//    }
+//
+//    const glm::mat4 lightProjection = glm::ortho(minX, maxX, minY, maxY, minZ, maxZ);
+//
+//    return lightProjection * lightView;
+//}

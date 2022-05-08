@@ -17,6 +17,13 @@ void RenderSystem::unbindFrameBuffer()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void RenderSystem::resizeFrameBuffer(int width, int height)
+{
+    m_viewportWidth = width;
+    m_viewportHeight = height;
+    m_frameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
+}
+
 void RenderSystem::clearFrameBuffer()
 {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -26,4 +33,9 @@ void RenderSystem::clearFrameBuffer()
 RenderSystem::RenderSystem(int width, int height, FrameBuffer::Type type) : m_frameBuffer(width, height, type)
 {
 
+}
+
+unsigned int RenderSystem::getTextureID()
+{
+    return m_frameBuffer.getTexcolorBufferID();
 }

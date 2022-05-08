@@ -10,7 +10,6 @@ class ShadowPass : public RenderSystem, IRenderable
 public:
     ShadowPass(int width, int height, FrameBuffer::Type type);
     void render(std::list<Entity>& objects) override;
-    void resizeFrameBuffer(int width, int height);
     void init();
     void shadowMaterial(Material* mat);
     void mainLight(Entity* entity);
