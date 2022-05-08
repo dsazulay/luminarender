@@ -48,7 +48,14 @@ add_executable(InteractiveGraphics
         pch.h
         samples/sample_resources.h
         samples/unlit_scene.cpp samples/unlit_scene.h
-        samples/lighting_skybox_scene.cpp samples/lighting_skybox_scene.h samples/pbr_scene.cpp samples/pbr_scene.h irradiance_map_factory.cpp irradiance_map_factory.h renderer/irenderable.h renderer/shadow_pass.cpp renderer/shadow_pass.h renderer/render_target.cpp renderer/render_target.h renderer/forward_pass.cpp renderer/forward_pass.h)
+        samples/lighting_skybox_scene.cpp samples/lighting_skybox_scene.h
+        samples/pbr_scene.cpp samples/pbr_scene.h
+        irradiance_map_factory.cpp irradiance_map_factory.h
+        renderer/irenderable.h
+        renderer/shadow_pass.cpp renderer/shadow_pass.h
+        renderer/render_target.cpp renderer/render_target.h
+        renderer/forward_pass.cpp renderer/forward_pass.h
+        renderer/normal_visualizer_pass.cpp renderer/normal_visualizer_pass.h)
 
 find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(InteractiveGraphics PUBLIC glfw)

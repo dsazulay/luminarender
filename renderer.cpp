@@ -8,50 +8,17 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-void Renderer::render(std::list<Entity>& objects)
+void Renderer::render(Scene& scene)
 {
     m_shadowRenderTarget.setAsTarget();
-    m_shadowRenderPass.render(objects);
+    m_shadowRenderPass.render(scene);
     m_shadowRenderTarget.unsetAsTarget();
 
     m_forwardPass.lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
     m_mainRenderTarget.setAsTarget();
-    m_forwardPass.render(objects);
-    // render skybox + render other passes
+    m_forwardPass.render(scene);
+    m_normalVisualizerPass.render(scene);
     m_mainRenderTarget.unsetAsTarget();
-}
-
-void Renderer::renderNormalVector(std::list<Entity>& objects)
-{
-    for (auto& entity : objects)
-    {
-        renderNormalVectorOfEntity(entity);
-
-        for (auto& childEntity : entity.getChildren())
-        {
-            renderNormalVectorOfEntity(childEntity);
-        }
-    }
-}
-
-void Renderer::renderSkybox(Entity &skybox)
-{
-    auto mesh = skybox.getComponent<MeshRenderer>();
-    Material* material = mesh->material;
-
-    material->shader->use();
-
-    int texCount = 0;
-    for (const auto& texture : material->textures)
-    {
-        material->shader->setInt(texture.first, texCount);
-        glActiveTexture(GL_TEXTURE0 + texCount);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, texture.second);
-    }
-
-    glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
 }
 
 void Renderer::setupLights(std::vector<Entity> &lights)
@@ -106,6 +73,7 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
     m_shadowRenderTarget.resizeFrameBuffer(1024, 1024);
     m_mainRenderTarget.clearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_shadowRenderTarget.clearMask(GL_DEPTH_BUFFER_BIT);
+    m_normalVisualizerPass.camera(&m_camera);
 }
 
 unsigned int Renderer::getTexcolorBufferID()
@@ -126,34 +94,13 @@ void Renderer::onViewportResize(const Event& e)
 void Renderer::setShadowMaterialAndLight(Entity *light)
 {
     m_shadowRenderPass.shadowMaterial(shadowMat);
-    m_shadowRenderPass.mainLight(light);
 
-    m_forwardPass.m_light = light;
     m_forwardPass.irradianceMap = irradianceMap;
     m_forwardPass.prefilterMap = prefilterMap;
     m_forwardPass.brdfLUT = brdfLUT;
     m_forwardPass.shadowMap = getShadowMapTextureID();
-}
 
-void Renderer::renderNormalVectorOfEntity(Entity &entity)
-{
-    auto transform = entity.getComponent<Transform>();
-    auto mesh = entity.getComponent<MeshRenderer>();
-    if (mesh == nullptr)
-        return;
-    Material* material = mat;
-
-    material->shader->use();
-
-    // set object uniforms (e.g. transform)
-    material->shader->setMat4("u_model", transform->modelMatrix());
-    material->shader->setMat3("u_normalMatrix", glm::transpose(glm::inverse(glm::mat3(m_camera.getViewMatrix() * transform->modelMatrix()))));
-
-    material->setUniformData();
-
-    glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+    m_normalVisualizerPass.m_material = mat;
 }
 
 unsigned int Renderer::getShadowMapTextureID()

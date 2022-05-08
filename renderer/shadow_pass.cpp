@@ -3,11 +3,11 @@
 #include "../components/mesh_renderer.h"
 #include <glad/glad.h>
 
-void ShadowPass::render(std::list<Entity>& objects)
+void ShadowPass::render(Scene& scene)
 {
-    updateLightMatrices();
+    updateLightMatrices(scene.mainLight());
 
-    for (auto& entity : objects)
+    for (auto& entity : scene.objects())
     {
         renderEntity(entity);
 
@@ -18,9 +18,9 @@ void ShadowPass::render(std::list<Entity>& objects)
     }
 }
 
-void ShadowPass::updateLightMatrices()
+void ShadowPass::updateLightMatrices(Entity* mainLight)
 {
-    auto t = m_mainLight->getComponent<Transform>();
+    auto t = mainLight->getComponent<Transform>();
 
     float near_plane = 0.1f, far_plane = 40.0f;
     glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
@@ -51,9 +51,4 @@ void ShadowPass::renderEntity(Entity &entity)
 void ShadowPass::shadowMaterial(Material *mat)
 {
     m_shadowMat = mat;
-}
-
-void ShadowPass::mainLight(Entity *entity)
-{
-    m_mainLight = entity;
 }

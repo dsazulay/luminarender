@@ -66,6 +66,7 @@ void LightingSkyboxScene::loadLights(Scene& scene)
     scene.addLight(EntityFactory::createDirectionalLight(glm::vec3(-45.0f, 20.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.8f), 1.0f));
 //    scene.addLight(EntityFactory::createPointLight(glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.7f, 0.8f, 0.5f), 1.0f));
 //    scene.addLight(EntityFactory::createSpotLight(glm::vec3(-1.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.8f, 0.5f, 0.2f), 1.0f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f))));
+    scene.mainLight(&scene.lights().front());
 }
 
 void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)

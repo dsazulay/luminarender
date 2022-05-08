@@ -12,6 +12,8 @@ public:
     std::vector<Entity>& lights();
     std::list<Entity>& objects();
     Entity& skybox();
+    Entity* mainLight() const;
+    void mainLight(Entity* light);
     bool hasSkybox();
 
     unsigned int irradianceMap;
@@ -23,4 +25,5 @@ private:
     std::list<Entity> m_objects;
     Entity m_skybox;
     bool m_hasSkybox{};
+    Entity* m_mainLight;
 };

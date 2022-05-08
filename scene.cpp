@@ -35,3 +35,13 @@ bool Scene::hasSkybox()
 {
     return m_hasSkybox;
 }
+
+Entity* Scene::mainLight() const
+{
+    return m_mainLight;
+}
+
+void Scene::mainLight(Entity *light)
+{
+    m_mainLight = light;
+}

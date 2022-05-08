@@ -8,15 +8,14 @@
 #include "frame_buffer.h"
 #include "renderer/shadow_pass.h"
 #include "renderer/forward_pass.h"
+#include "renderer/normal_visualizer_pass.h"
 
 class Renderer {
 public:
     Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos);
     void updateTransformMatrices();
     void setupLights(std::vector<Entity>& lights);
-    void render(std::list<Entity>& objects);
-    void renderSkybox(Entity& skybox);
-    void renderNormalVector(std::list<Entity>& objects);
+    void render(Scene& scene);
 
     glm::mat4 cascadeShadows(glm::vec3 lightDir);
     std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
@@ -46,9 +45,9 @@ private:
     RenderTarget m_mainRenderTarget;
     ShadowPass m_shadowRenderPass;
     ForwardPass m_forwardPass;
+    NormalVisualizerPass m_normalVisualizerPass;
 
     Camera m_camera;
 
     void onViewportResize(const Event& e);
-    void renderNormalVectorOfEntity(Entity &entity);
 };

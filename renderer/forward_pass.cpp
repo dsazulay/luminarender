@@ -3,20 +3,23 @@
 #include "../components/mesh_renderer.h"
 #include <glad/glad.h>
 
-void ForwardPass::render(std::list<Entity> &objects)
+void ForwardPass::render(Scene& scene)
 {
-    for (auto& entity : objects)
+    for (auto& entity : scene.objects())
     {
-        renderEntity(entity);
+        renderEntity(entity, scene.mainLight());
 
         for (auto& childEntity : entity.getChildren())
         {
-            renderEntity(childEntity);
+            renderEntity(childEntity, scene.mainLight());
         }
     }
+
+    if (scene.hasSkybox())
+        renderSkybox(scene.skybox());
 }
 
-void ForwardPass::renderEntity(Entity &entity)
+void ForwardPass::renderEntity(Entity& entity, Entity* mainLight)
 {
     auto transform = entity.getComponent<Transform>();
     auto mesh = entity.getComponent<MeshRenderer>();
@@ -32,7 +35,7 @@ void ForwardPass::renderEntity(Entity &entity)
     material->shader->setMat3("u_normalMatrix", glm::transpose(glm::inverse(glm::mat3(transform->modelMatrix()))));
 
     // shadow
-    auto t = m_light->getComponent<Transform>();
+    auto t = mainLight->getComponent<Transform>();
     material->shader->setVec3("u_lightPos", t->getDirection() * -10.0f);
     material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
 
@@ -64,6 +67,26 @@ void ForwardPass::renderEntity(Entity &entity)
     glBindTexture(GL_TEXTURE_2D, shadowMap);
 
     material->setUniformData();
+
+    glBindVertexArray(mesh->vao());
+    glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+}
+
+void ForwardPass::renderSkybox(Entity &skybox)
+{
+    auto mesh = skybox.getComponent<MeshRenderer>();
+    Material* material = mesh->material;
+
+    material->shader->use();
+
+    int texCount = 0;
+    for (const auto& texture : material->textures)
+    {
+        material->shader->setInt(texture.first, texCount);
+        glActiveTexture(GL_TEXTURE0 + texCount);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, texture.second);
+    }
 
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);

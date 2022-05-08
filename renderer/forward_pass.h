@@ -7,10 +7,9 @@
 class ForwardPass : public IRenderable
 {
 public:
-    void render(std::list<Entity>& objects) override;
+    void render(Scene& scene) override;
 
     glm::mat4 lightSpaceMatrix;
-    Entity* m_light;
 
     unsigned int irradianceMap;
     unsigned int prefilterMap;
@@ -19,5 +18,6 @@ public:
 
 
 private:
-    void renderEntity(Entity& entity);
+    void renderEntity(Entity& entity, Entity* mainLight);
+    void renderSkybox(Entity& skybox);
 };

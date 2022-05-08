@@ -72,7 +72,7 @@ void Application::mainloop()
 
         if (!m_scene.objects().empty())
         {
-            m_renderer->render(m_scene.objects());
+            m_renderer->render(m_scene);
 //            m_renderer->renderNormalVector(m_scene.objects());
         }
 //        if (m_scene.hasSkybox())
