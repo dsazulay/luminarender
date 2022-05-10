@@ -17,7 +17,7 @@ void Renderer::render(Scene& scene)
     m_forwardPass.lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
     m_mainRenderTarget.setAsTarget();
     m_forwardPass.render(scene);
-    m_normalVisualizerPass.render(scene);
+//    m_normalVisualizerPass.render(scene);
     m_mainRenderTarget.unsetAsTarget();
 }
 
@@ -91,16 +91,12 @@ void Renderer::onViewportResize(const Event& e)
     m_shadowRenderTarget.resizeFrameBuffer(m_viewportWidth * 2, m_viewportHeight * 2);
 }
 
-void Renderer::setShadowMaterialAndLight(Entity *light)
+void Renderer::setGlobalTextures(Scene& scene)
 {
-    m_shadowRenderPass.shadowMaterial(shadowMat);
-
-    m_forwardPass.irradianceMap = irradianceMap;
-    m_forwardPass.prefilterMap = prefilterMap;
-    m_forwardPass.brdfLUT = brdfLUT;
+    m_forwardPass.irradianceMap = scene.irradianceMap;
+    m_forwardPass.prefilterMap = scene.prefilterMap;
+    m_forwardPass.brdfLUT = scene.brdfLUT;
     m_forwardPass.shadowMap = getShadowMapTextureID();
-
-    m_normalVisualizerPass.m_material = mat;
 }
 
 unsigned int Renderer::getShadowMapTextureID()

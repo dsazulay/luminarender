@@ -36,20 +36,7 @@ Application::Application(const AppConfig& config)
     LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance());
 //    PbrScene::loadScene(m_scene, AssetLibrary::instance());
 
-    m_renderer->irradianceMap = m_scene.irradianceMap;
-    m_renderer->prefilterMap = m_scene.prefilterMap;
-    m_renderer->brdfLUT = m_scene.brdfLUT;
-
-    Shader* s = AssetLibrary::instance().loadShader("normalVector", "resources/shaders/normal_vector.glsl");
-    Material* m = AssetLibrary::instance().createMaterial("normalVector", s);
-    m_renderer->mat = m;
-
-    s = AssetLibrary::instance().loadShader("simpleShadowMap", "resources/shaders/simple_shadow_depth.glsl");
-    m = AssetLibrary::instance().createMaterial("shadowMat", s);
-    m_renderer->shadowMat = m;
-
-    m_renderer->setShadowMaterialAndLight(&m_scene.lights().front());
-
+    m_renderer->setGlobalTextures(m_scene);
 }
 
 void Application::mainloop()
@@ -67,16 +54,8 @@ void Application::mainloop()
         if (!m_scene.lights().empty())
             m_renderer->setupLights(m_scene.lights());
 
-//        m_renderer->RecreateShadowMap(m_scene.objects(), &m_scene.lights().front());
-
-
         if (!m_scene.objects().empty())
-        {
             m_renderer->render(m_scene);
-//            m_renderer->renderNormalVector(m_scene.objects());
-        }
-//        if (m_scene.hasSkybox())
-//            m_renderer->renderSkybox(m_scene.skybox());
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, m_windowWidth, m_windowHeight);

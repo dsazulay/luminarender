@@ -23,14 +23,7 @@ public:
     unsigned int getTexcolorBufferID();
     unsigned int getShadowMapTextureID();
 
-    void setShadowMaterialAndLight(Entity* light);
-
-    Material* mat;
-    Material* shadowMat;
-
-    unsigned int irradianceMap;
-    unsigned int prefilterMap;
-    unsigned int brdfLUT;
+    void setGlobalTextures(Scene& scene);
 
 private:
     UniformBufferObject m_matricesUBO;
@@ -43,6 +36,7 @@ private:
 
     RenderTarget m_shadowRenderTarget;
     RenderTarget m_mainRenderTarget;
+
     ShadowPass m_shadowRenderPass;
     ForwardPass m_forwardPass;
     NormalVisualizerPass m_normalVisualizerPass;

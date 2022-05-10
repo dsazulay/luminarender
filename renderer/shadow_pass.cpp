@@ -1,7 +1,14 @@
 #include "shadow_pass.h"
 #include "../components/transform.h"
 #include "../components/mesh_renderer.h"
+#include "../asset_library.h"
 #include <glad/glad.h>
+
+ShadowPass::ShadowPass()
+{
+    Shader* s = AssetLibrary::instance().loadShader("simpleShadowMap", "resources/shaders/simple_shadow_depth.glsl");
+    m_shadowMat = AssetLibrary::instance().createMaterial("shadowMat", s);
+}
 
 void ShadowPass::render(Scene& scene)
 {
@@ -46,9 +53,4 @@ void ShadowPass::renderEntity(Entity &entity)
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int) mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
-}
-
-void ShadowPass::shadowMaterial(Material *mat)
-{
-    m_shadowMat = mat;
 }

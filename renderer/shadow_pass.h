@@ -7,9 +7,10 @@
 class ShadowPass : public IRenderable
 {
 public:
+    ShadowPass();
     void render(Scene& scene) override;
-    void shadowMaterial(Material* mat);
-    glm::mat4 lightSpaceMatrix;
+
+    glm::mat4 lightSpaceMatrix{};
 
 private:
     void updateLightMatrices(Entity* mainLight);

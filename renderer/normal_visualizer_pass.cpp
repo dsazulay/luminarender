@@ -1,6 +1,7 @@
 #include "normal_visualizer_pass.h"
 #include "../components/transform.h"
 #include "../components/mesh_renderer.h"
+#include "../asset_library.h"
 
 void NormalVisualizerPass::render(Scene &scene)
 {
@@ -39,4 +40,10 @@ void NormalVisualizerPass::renderNormalVectorOfEntity(Entity &entity)
 void NormalVisualizerPass::camera(Camera *camera)
 {
     m_camera = camera;
+}
+
+NormalVisualizerPass::NormalVisualizerPass()
+{
+    Shader* s = AssetLibrary::instance().loadShader("normalVector", "resources/shaders/normal_vector.glsl");
+    m_material = AssetLibrary::instance().createMaterial("normalVector", s);
 }
