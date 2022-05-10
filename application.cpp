@@ -33,8 +33,8 @@ Application::Application(const AppConfig& config)
 
     // create shaders, materials, and objects and add them to the scene
 //    UnlitScene::loadScene(m_scene, AssetLibrary::instance());
-    LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance());
-//    PbrScene::loadScene(m_scene, AssetLibrary::instance());
+//    LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance());
+    PbrScene::loadScene(m_scene, AssetLibrary::instance());
 
     m_renderer->setGlobalTextures(m_scene);
 }

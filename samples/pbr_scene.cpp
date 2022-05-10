@@ -97,7 +97,8 @@ void PbrScene::loadModels(AssetLibrary &assetLibrary)
 
 void PbrScene::loadLights(Scene& scene)
 {
-    scene.addLight(EntityFactory::createDirectionalLight(glm::vec3(-45.0f, 0.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.8f), 1.0f));
+    scene.addLight(EntityFactory::createDirectionalLight(glm::vec3(-55.0f, 0.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.8f), 1.0f));
+    scene.mainLight(&scene.lights().front());
 }
 
 void PbrScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)

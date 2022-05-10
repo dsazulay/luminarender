@@ -76,7 +76,13 @@ uniform sampler2D u_mainTex;
     #include "shadows.glsl"
 #endif
 
-vec4 lambert(Light light, vec3 normal, vec3 color);
+vec4 lambert(Light light, vec3 normal, vec3 color)
+{
+    float NdotL = max(0.0, dot(normal, light.direction));
+    vec3 radiance = color * light.color * NdotL * light.attenuation;
+
+    return vec4(radiance, 1.0);
+}
 
 void main()
 {
@@ -94,12 +100,4 @@ void main()
         float shadow = 1 - shadowCalculation(v_in.fragPosLightSpace);
         fragColor *= shadow;
     #endif
-}
-
-vec4 lambert(Light light, vec3 normal, vec3 color)
-{
-    float NdotL = max(0.0, dot(normal, light.direction));
-    vec3 radiance = color * light.color * NdotL * light.attenuation;
-
-    return vec4(radiance, 1.0);
 }

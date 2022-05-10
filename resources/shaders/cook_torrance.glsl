@@ -11,14 +11,22 @@ Float u_roughness = 1.0
 #shader vertex
 #version 410 core
 
+#define SHADOWS
+
 layout (location = 0) in vec3 a_position;
 layout (location = 1) in vec3 a_normal;
 layout (location = 2) in vec2 a_uv;
 
-out vec3 v_normal;
-out vec3 v_worldPos;
-out vec3 v_viewDir;
-out vec2 v_uv;
+out Varyings
+{
+    vec3 normal;
+    vec3 worldPos;
+    vec3 viewDir;
+    vec2 uv;
+    #ifdef SHADOWS
+        vec4 fragPosLightSpace;
+    #endif
+} v_out;
 
 layout (std140) uniform Matrices
 {
@@ -29,23 +37,37 @@ layout (std140) uniform Matrices
 
 uniform mat4 u_model;
 uniform mat3 u_normalMatrix;
+#ifdef SHADOWS
+    uniform mat4 u_lightSpaceMatrix;
+#endif
 
 void main()
 {
     gl_Position = u_projection * u_view * u_model * vec4(a_position, 1);
-    v_normal = u_normalMatrix * a_normal;
-    v_worldPos = vec3(u_model * vec4(a_position, 1));
-    v_viewDir = u_viewPos.xyz - v_worldPos;
-    v_uv = a_uv;
+    v_out.normal = u_normalMatrix * a_normal;
+    v_out.worldPos = vec3(u_model * vec4(a_position, 1));
+    v_out.viewDir = u_viewPos.xyz - v_out.worldPos;
+    v_out.uv = a_uv;
+    #ifdef SHADOWS
+        v_out.fragPosLightSpace = u_lightSpaceMatrix * u_model * vec4(a_position, 1);
+    #endif
 }
 
 #shader fragment
 #version 410 core
 
-in vec3 v_normal;
-in vec3 v_worldPos;
-in vec3 v_viewDir;
-in vec2 v_uv;
+#define SHADOWS
+
+in Varyings
+{
+    vec3 normal;
+    vec3 worldPos;
+    vec3 viewDir;
+    vec2 uv;
+    #ifdef SHADOWS
+        vec4 fragPosLightSpace;
+    #endif
+} v_in;
 
 out vec4 fragColor;
 
@@ -60,12 +82,19 @@ uniform sampler2D u_metallicTex;
 uniform sampler2D u_roughnessTex;
 uniform sampler2D u_aoTex;
 
-
 uniform samplerCube u_irradianceTex;
 uniform samplerCube u_prefilterMap;
 uniform sampler2D u_brdfLUT;
 
+#ifdef SHADOWS
+    uniform sampler2D u_shadowMap;
+    uniform vec3 u_lightPos;
+#endif
+
 #include "lighting.glsl"
+#ifdef SHADOWS
+    #include "shadows.glsl"
+#endif
 
 vec3 fresnelSchlick(float cosTheta, vec3 f0)
 {
@@ -129,27 +158,33 @@ vec3 cookTorrance(vec3 albedo, vec3 lightDir, vec3 normal, vec3 viewDir, vec3 f0
 
 void main()
 {
-    vec3 albedo = pow(texture(u_albedoTex, v_uv).rgb, vec3(2.2)) * u_albedo.rgb;
-    float metallic = texture(u_metallicTex, v_uv).r * u_metallic;
-    float roughness = texture(u_roughnessTex, v_uv).r * u_roughness;
+    vec3 albedo = pow(texture(u_albedoTex, v_in.uv).rgb, vec3(2.2)) * u_albedo.rgb;
+    float metallic = texture(u_metallicTex, v_in.uv).r * u_metallic;
+    float roughness = texture(u_roughnessTex, v_in.uv).r * u_roughness;
 
     vec3 f0 = vec3(0.04);
     f0 = mix(f0, albedo, metallic);
 
     fragColor = vec4(0, 0, 0, 1);
-    vec3 normal = normalize(v_normal);
-    vec3 viewDir = normalize(v_viewDir);
+    vec3 normal = normalize(v_in.normal);
+    vec3 viewDir = normalize(v_in.viewDir);
     vec3 reflection = reflect(-viewDir, normal);
 
     for (int i = 0; i < getLightCount(); i++)
     {
-        Light l = getLight(i, v_worldPos);
+        Light l = getLight(i, v_in.worldPos);
         vec3 radiance = cookTorrance(albedo, l.direction, normal, viewDir, f0, roughness, metallic);
 
         float NdotL = max(dot(normal, l.direction), 0.0);
         fragColor += vec4(radiance * l.color * l.attenuation * NdotL, 0.0);
     }
 
+    #ifdef SHADOWS
+        float shadow = 1 - shadowCalculation(v_in.fragPosLightSpace);
+        fragColor *= shadow;
+    #endif
+
+    // global illumination
     vec3 F = fresnelSchlickRoughness(max(dot(normal, viewDir), 0.0), f0, roughness);
     vec3 kD = (1 - metallic) * (1 - F);
 
@@ -161,10 +196,11 @@ void main()
     vec2 brdf  = texture(u_brdfLUT, vec2(max(dot(normal, viewDir), 0.0), roughness)).rg;
     vec3 specular = prefilteredColor * (F * brdf.x + brdf.y);
 
-    vec3 ambient = (kD * irradiance * albedo + specular) * texture(u_aoTex, v_uv).r;
+    vec3 ambient = (kD * irradiance * albedo + specular) * texture(u_aoTex, v_in.uv).r;
 
     fragColor += vec4(ambient, 0.0);
 
+    // tone mapping and linear workspace conversion
     fragColor = fragColor / (fragColor + 1);
     fragColor = pow(fragColor, vec4(1/2.2));
 }
