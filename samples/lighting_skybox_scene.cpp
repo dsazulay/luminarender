@@ -74,7 +74,7 @@ void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
     Mesh* cubeMap = assetLibrary.getMesh("cubeMap");
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 
-    scene.addSkybox(EntityFactory::createFromMesh(
+    scene.addSkybox(EntityFactory::createFromMesh("Skybox",
             glm::vec3(0.0, 0.0, 0.0), skyboxMat, cubeMap));
 }
 
@@ -90,7 +90,7 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
 
-    Entity e = EntityFactory::createFromMesh(
+    Entity e = EntityFactory::createFromMesh("Quad",
             SampleResources::object_positions[0], greyMat, quad);
 
     auto transform = e.getComponent<Transform>();
@@ -100,13 +100,13 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
 
     scene.addObject(e);
 
-    scene.addObject(EntityFactory::createFromMesh(
+    scene.addObject(EntityFactory::createFromMesh("Sphere",
             SampleResources::object_positions[1], blueMat, sphere));
 
-    scene.addObject(EntityFactory::createFromMesh(
+    scene.addObject(EntityFactory::createFromMesh("Cube",
             SampleResources::object_positions[3], woodBoxMat, cube));
 
-    Entity spitfireEntity = EntityFactory::createFromModel(
+    Entity spitfireEntity = EntityFactory::createFromModel("Spitfire",
             SampleResources::object_positions[4], spitfireMat,spitfire);
 
     auto t = spitfireEntity.getComponent<Transform>();

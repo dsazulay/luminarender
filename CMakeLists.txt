@@ -55,7 +55,7 @@ add_executable(InteractiveGraphics
         renderer/shadow_pass.cpp renderer/shadow_pass.h
         renderer/render_target.cpp renderer/render_target.h
         renderer/forward_pass.cpp renderer/forward_pass.h
-        renderer/normal_visualizer_pass.cpp renderer/normal_visualizer_pass.h)
+        renderer/normal_visualizer_pass.cpp renderer/normal_visualizer_pass.h ui/hierarchy_panel.cpp ui/hierarchy_panel.h)
 
 find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(InteractiveGraphics PUBLIC glfw)

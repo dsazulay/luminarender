@@ -5,6 +5,7 @@
 #include "imgui_impl_opengl3.h"
 #include "events/event.h"
 #include "events/dispatcher.h"
+#include "ui/hierarchy_panel.h"
 
 void ImguiRenderer::init() {
     IMGUI_CHECKVERSION();
@@ -35,7 +36,7 @@ void ImguiRenderer::terminate() {
     ImGui::DestroyContext();
 }
 
-void ImguiRenderer::update(unsigned int frameBufferTexcolorID) {
+void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -65,6 +66,8 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID) {
 //    glm::vec2 viewportMaxBound = { viewportMaxRegion.x + viewportPos.x, viewportMaxRegion.y + viewportPos.y };
 
     ImGui::End();
+
+    HierarchyPanel::update(scene);
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

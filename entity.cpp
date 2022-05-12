@@ -8,7 +8,7 @@ unsigned int Entity::id() const
     return m_id;
 }
 
-Entity::Entity()
+Entity::Entity() : m_name("Object")
 {
 
 }
@@ -29,7 +29,6 @@ void Entity::addChild(Entity entity)
     auto t = entity.getComponent<Transform>();
     auto pt = getComponent<Transform>();
 
-    // TODO: fix skew on non uniform scaling
     t->modelMatrix(glm::inverse(pt->modelMatrix()) * t->modelMatrix());
     t->updateFromModelMatrix();
     t->eulerAngles(t->eulerAngles() - pt->eulerAngles());
@@ -61,4 +60,14 @@ void Entity::updateSelfAndChild()
 std::list<Entity>& Entity::getChildren()
 {
     return m_children;
+}
+
+std::string Entity::name() const
+{
+    return m_name;
+}
+
+void Entity::name(std::string entityName)
+{
+    m_name = entityName;
 }

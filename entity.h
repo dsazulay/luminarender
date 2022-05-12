@@ -11,6 +11,8 @@ public:
     ~Entity();
     void deleteComponents();
     unsigned int id() const;
+    std::string name() const;
+    void name(std::string entityName);
     template <class T>
     std::shared_ptr<T> getComponent();
 
@@ -25,6 +27,7 @@ public:
 
 private:
     unsigned int m_id;
+    std::string m_name;
     std::vector<std::shared_ptr<IComponent>> m_components;
 
     Entity* m_parent = nullptr;

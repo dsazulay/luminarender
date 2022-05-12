@@ -56,7 +56,7 @@ void UnlitScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     Material* containerMat = assetLibrary.getMaterial("containerMat");
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
 
-    Entity e = EntityFactory::createFromMesh(
+    Entity e = EntityFactory::createFromMesh("Quad",
             SampleResources::object_positions[0], greyMat, quad);
 
     auto transform = e.getComponent<Transform>();
@@ -66,12 +66,12 @@ void UnlitScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
 
     scene.addObject(e);
 
-    scene.addObject(EntityFactory::createFromMesh(
+    scene.addObject(EntityFactory::createFromMesh("Sphere",
             SampleResources::object_positions[1], blueMat, sphere));
 
-    scene.addObject(EntityFactory::createFromMesh(
+    scene.addObject(EntityFactory::createFromMesh("Cube 1",
             SampleResources::object_positions[2],containerMat, cube));
 
-    scene.addObject(EntityFactory::createFromMesh(
+    scene.addObject(EntityFactory::createFromMesh("Cube 2",
             SampleResources::object_positions[3], woodBoxMat, cube));
 }

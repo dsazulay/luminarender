@@ -40,14 +40,6 @@ Entity EntityFactory::createMesh(glm::vec3 pos, Material *mat, std::pair<std::ve
 
 Entity EntityFactory::createLight(LightType lightType, glm::vec3 pos, glm::vec3 rot, glm::vec3 color, float intensity, float cutoff, float outerCutoff)
 {
-//    Tag tag;
-//    if (lightType == 0)
-//        tag.name = "Directional Light";
-//    else if (lightType == 1)
-//        tag.name = "Point Light";
-//    else
-//        tag.name = "Spot Light";
-
     Transform transform;
     transform.position(pos);
     transform.eulerAngles(rot);
@@ -65,10 +57,17 @@ Entity EntityFactory::createLight(LightType lightType, glm::vec3 pos, glm::vec3 
     e.addComponent(transform);
     e.addComponent(light);
 
+    if (lightType == 0)
+        e.name("Directional Light");
+    else if (lightType == 1)
+        e.name("Point Light");
+    else
+        e.name("Spot Light");
+
     return e;
 }
 
-Entity EntityFactory::createFromMesh(glm::vec3 pos, Material *mat, Mesh* mesh)
+Entity EntityFactory::createFromMesh(const char* name, glm::vec3 pos, Material *mat, Mesh* mesh)
 {
     Transform transform;
     transform.position(pos);
@@ -81,24 +80,26 @@ Entity EntityFactory::createFromMesh(glm::vec3 pos, Material *mat, Mesh* mesh)
 
 
     Entity e;
+    e.name(name);
     e.addComponent(transform);
     e.addComponent(meshRenderer);
 
     return e;
 }
 
-Entity EntityFactory::createFromModel(glm::vec3 pos, Material* mat, Model* model)
+Entity EntityFactory::createFromModel(const char* name, glm::vec3 pos, Material* mat, Model* model)
 {
     Transform transform;
     transform.position(pos);
     transform.updateModelMatrix();
 
     Entity e;
+    e.name(name);
     e.addComponent(transform);
 
-    for (auto mesh : model->m_meshes)
+    for (auto& mesh : model->m_meshes)
     {
-        e.addChild(createFromMesh(pos, mat, mesh.second));
+        e.addChild(createFromMesh(mesh.first.c_str(), pos, mat, mesh.second));
     }
 
     e.updateSelfAndChild();
