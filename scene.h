@@ -25,5 +25,5 @@ private:
     std::list<Entity> m_objects;
     Entity m_skybox;
     bool m_hasSkybox{};
-    Entity* m_mainLight;
+    Entity* m_mainLight = nullptr;
 };

@@ -35,9 +35,12 @@ void ForwardPass::renderEntity(Entity& entity, Entity* mainLight)
     material->shader->setMat3("u_normalMatrix", glm::transpose(glm::inverse(glm::mat3(transform->modelMatrix()))));
 
     // shadow
-    auto t = mainLight->getComponent<Transform>();
-    material->shader->setVec3("u_lightPos", t->getDirection() * -10.0f);
-    material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
+    if (mainLight != nullptr)
+    {
+        auto t = mainLight->getComponent<Transform>();
+        material->shader->setVec3("u_lightPos", t->getDirection() * -10.0f);
+        material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
+    }
 
     // set material uniforms (e.g. color, textures)
     int texCount = 0;

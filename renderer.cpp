@@ -10,11 +10,14 @@
 
 void Renderer::render(Scene& scene)
 {
-    m_shadowRenderTarget.setAsTarget();
-    m_shadowRenderPass.render(scene);
-    m_shadowRenderTarget.unsetAsTarget();
+    if (scene.mainLight() != nullptr)
+    {
+        m_shadowRenderTarget.setAsTarget();
+        m_shadowRenderPass.render(scene);
+        m_shadowRenderTarget.unsetAsTarget();
+        m_forwardPass.lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
+    }
 
-    m_forwardPass.lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
     m_mainRenderTarget.setAsTarget();
     m_forwardPass.render(scene);
 //    m_normalVisualizerPass.render(scene);
