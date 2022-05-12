@@ -17,11 +17,6 @@ void ShadowPass::render(Scene& scene)
     for (auto& entity : scene.objects())
     {
         renderEntity(entity);
-
-        for (auto& childEntity : entity.getChildren())
-        {
-            renderEntity(childEntity);
-        }
     }
 }
 
@@ -39,18 +34,24 @@ void ShadowPass::renderEntity(Entity &entity)
 {
     auto transform = entity.getComponent<Transform>();
     auto mesh = entity.getComponent<MeshRenderer>();
-    if (mesh == nullptr)
-        return;
-    Material *material = m_shadowMat;
-    material->shader->use();
+    if (mesh != nullptr)
+    {
+        Material *material = m_shadowMat;
+        material->shader->use();
 
-    // set object uniforms (e.g. transform)
-    material->shader->setMat4("u_model", transform->modelMatrix());
-    material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
+        // set object uniforms (e.g. transform)
+        material->shader->setMat4("u_model", transform->modelMatrix());
+        material->shader->setMat4("u_lightSpaceMatrix", lightSpaceMatrix);
 
-    material->setUniformData();
+        material->setUniformData();
 
-    glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int) mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+        glBindVertexArray(mesh->vao());
+        glDrawElements(GL_TRIANGLES, (int) mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
+    }
+
+    for (auto& childEntity : entity.getChildren())
+    {
+        renderEntity(childEntity);
+    }
 }

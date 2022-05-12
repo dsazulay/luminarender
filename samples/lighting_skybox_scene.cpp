@@ -98,13 +98,17 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     transform->scale(glm::vec3(10.0, 10.0, 10.0));
     transform->updateModelMatrix();
 
+
+    Entity sphereEntity = EntityFactory::createFromMesh("Sphere",
+            SampleResources::object_positions[1], blueMat, sphere);
+
+    Entity cubeEntity = EntityFactory::createFromMesh("Cube",
+            SampleResources::object_positions[3], woodBoxMat, cube);
+
+    cubeEntity.addChild(sphereEntity);
+    e.addChild(cubeEntity);
+    e.updateSelfAndChild();
     scene.addObject(e);
-
-    scene.addObject(EntityFactory::createFromMesh("Sphere",
-            SampleResources::object_positions[1], blueMat, sphere));
-
-    scene.addObject(EntityFactory::createFromMesh("Cube",
-            SampleResources::object_positions[3], woodBoxMat, cube));
 
     Entity spitfireEntity = EntityFactory::createFromModel("Spitfire",
             SampleResources::object_positions[4], spitfireMat,spitfire);
