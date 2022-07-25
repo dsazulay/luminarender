@@ -4,10 +4,10 @@ int main()
 {
     AppConfig config{};
     config.windowName = "Interactive Graphics";
-    config.windowWidth = 800;
-    config.windowHeight = 600;
-    config.viewportWidth = 640;
-    config.viewportHeight = 480;
+    config.windowWidth = 1280;
+    config.windowHeight = 720;
+    config.viewportWidth = 960;
+    config.viewportHeight = 540;
 
     Application app(config);
     app.run();

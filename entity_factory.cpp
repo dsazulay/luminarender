@@ -3,19 +3,19 @@
 #include "components/transform.h"
 #include "assets/model.h"
 
-Entity EntityFactory::createDirectionalLight(glm::vec3 rot, glm::vec3 color, float intensity)
+Entity EntityFactory::createDirectionalLight(const char* name, glm::vec3 rot, glm::vec3 color, float intensity)
 {
-    return createLight(LightType::DIRECTIONAL, glm::vec3(0.0), rot, color, intensity, 0.0f, 0.0f);
+    return createLight(name, LightType::DIRECTIONAL, glm::vec3(0.0), rot, color, intensity, 0.0f, 0.0f);
 }
 
-Entity EntityFactory::createPointLight(glm::vec3 pos, glm::vec3 color, float intensity)
+Entity EntityFactory::createPointLight(const char* name, glm::vec3 pos, glm::vec3 color, float intensity)
 {
-    return createLight(LightType::POINT, pos, glm::vec3(0.0f, 0.0f, 0.0f), color, intensity, 0.0f, 0.0f);
+    return createLight(name, LightType::POINT, pos, glm::vec3(0.0f, 0.0f, 0.0f), color, intensity, 0.0f, 0.0f);
 }
 
-Entity EntityFactory::createSpotLight(glm::vec3 pos, glm::vec3 rot, glm::vec3 color, float intensity, float cutoff, float outerCutoff)
+Entity EntityFactory::createSpotLight(const char* name, glm::vec3 pos, glm::vec3 rot, glm::vec3 color, float intensity, float cutoff, float outerCutoff)
 {
-    return createLight(LightType::SPOT, pos, rot, color, intensity, cutoff, outerCutoff);
+    return createLight(name, LightType::SPOT, pos, rot, color, intensity, cutoff, outerCutoff);
 }
 
 Entity EntityFactory::createMesh(glm::vec3 pos, Material *mat, std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives)
@@ -38,7 +38,7 @@ Entity EntityFactory::createMesh(glm::vec3 pos, Material *mat, std::pair<std::ve
     return e;
 }
 
-Entity EntityFactory::createLight(LightType lightType, glm::vec3 pos, glm::vec3 rot, glm::vec3 color, float intensity, float cutoff, float outerCutoff)
+Entity EntityFactory::createLight(const char* name, LightType lightType, glm::vec3 pos, glm::vec3 rot, glm::vec3 color, float intensity, float cutoff, float outerCutoff)
 {
     Transform transform;
     transform.position(pos);
@@ -54,15 +54,10 @@ Entity EntityFactory::createLight(LightType lightType, glm::vec3 pos, glm::vec3 
     light.outerCutoff = outerCutoff;
 
     Entity e;
+    e.name(name);
     e.addComponent(transform);
     e.addComponent(light);
 
-    if (lightType == 0)
-        e.name("Directional Light");
-    else if (lightType == 1)
-        e.name("Point Light");
-    else
-        e.name("Spot Light");
 
     return e;
 }
