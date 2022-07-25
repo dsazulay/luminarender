@@ -10,6 +10,11 @@ void HierarchyPanel::update(Scene &scene)
         renderEntity(entity);
     }
 
+    for (auto& entity : scene.lights())
+    {
+        renderEntity(entity);
+    }
+
     ImGui::End();
 }
 
