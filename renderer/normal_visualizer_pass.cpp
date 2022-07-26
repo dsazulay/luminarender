@@ -7,7 +7,7 @@ void NormalVisualizerPass::render(Scene &scene)
 {
     for (auto& entity : scene.objects())
     {
-        renderNormalVectorOfEntity(entity);
+        renderNormalVectorOfEntity(*entity);
     }
 }
 
@@ -35,7 +35,7 @@ void NormalVisualizerPass::renderNormalVectorOfEntity(Entity &entity)
 
     for (auto& childEntity : entity.getChildren())
     {
-        renderNormalVectorOfEntity(childEntity);
+        renderNormalVectorOfEntity(*childEntity);
     }
 }
 

@@ -9,6 +9,8 @@ class Entity
 public:
     Entity();
     ~Entity();
+
+//    Entity(Entity& e);
     void deleteComponents();
     unsigned int id() const;
     std::string name() const;
@@ -19,8 +21,8 @@ public:
     template <class T>
     void addComponent(T& component);
 
-    void addChild(Entity entity);
-    std::list<Entity>& getChildren();
+    void addChild(std::unique_ptr<Entity> entity);
+    std::vector<std::unique_ptr<Entity>>& getChildren();
     void setParent(Entity* entity);
 
     void updateSelfAndChild();
@@ -31,7 +33,7 @@ private:
     std::vector<std::shared_ptr<IComponent>> m_components;
 
     Entity* m_parent = nullptr;
-    std::list<Entity> m_children;
+    std::vector<std::unique_ptr<Entity>> m_children;
 };
 
 template<class T>

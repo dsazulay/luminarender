@@ -98,7 +98,7 @@ void PbrScene::loadModels(AssetLibrary &assetLibrary)
 void PbrScene::loadLights(Scene& scene)
 {
     scene.addLight(EntityFactory::createDirectionalLight("Directional Light", glm::vec3(-55.0f, 0.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.8f), 1.0f));
-    scene.mainLight(&scene.lights().front());
+    scene.mainLight(scene.lights().front().get());
 }
 
 void PbrScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
@@ -124,15 +124,15 @@ void PbrScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     Material* woodBoxMat = assetLibrary.getMaterial("metalBoxMat");
     Material* cerberusMat = assetLibrary.getMaterial("cerberusMat");
 
-    Entity e = EntityFactory::createFromMesh("Quad",
+    auto e = EntityFactory::createFromMesh("Quad",
             SampleResources::object_positions[0], greyMat, quad);
 
-    auto transform = e.getComponent<Transform>();
+    auto transform = e->getComponent<Transform>();
     transform->eulerAngles(glm::vec3(-90.0, 0.0, 0.0));
     transform->scale(glm::vec3(10.0, 10.0, 10.0));
     transform->updateModelMatrix();
 
-    scene.addObject(e);
+    scene.addObject(std::move(e));
 
     scene.addObject(EntityFactory::createFromMesh("Sphere",
             SampleResources::object_positions[1], blueMat, sphere));
@@ -140,25 +140,25 @@ void PbrScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     scene.addObject(EntityFactory::createFromMesh("Cube",
             SampleResources::object_positions[3], woodBoxMat, cube));
 
-    Entity spitfireEntity = EntityFactory::createFromModel("Spitfire",
+    auto spitfireEntity = EntityFactory::createFromModel("Spitfire",
             SampleResources::object_positions[4], spitfireMat,spitfire);
 
-    auto t = spitfireEntity.getComponent<Transform>();
+    auto t = spitfireEntity->getComponent<Transform>();
     t->scale(glm::vec3(0.05, 0.05, 0.05));
     t->eulerAngles(glm::vec3(-96, 0, 0));
     t->updateModelMatrix();
-    spitfireEntity.updateSelfAndChild();
+    spitfireEntity->updateSelfAndChild();
 
-    scene.addObject(spitfireEntity);
+    scene.addObject(std::move(spitfireEntity));
 
-    Entity cerberusEntity = EntityFactory::createFromModel("Cerberus",
+    auto cerberusEntity = EntityFactory::createFromModel("Cerberus",
             SampleResources::object_positions[5], cerberusMat,cerberus);
 
-    t = cerberusEntity.getComponent<Transform>();
+    t = cerberusEntity->getComponent<Transform>();
     t->scale(glm::vec3(0.05, 0.05, 0.05));
     t->eulerAngles(glm::vec3(-96, 0, 0));
     t->updateModelMatrix();
-    cerberusEntity.updateSelfAndChild();
+    cerberusEntity->updateSelfAndChild();
 
-    scene.addObject(cerberusEntity);
+    scene.addObject(std::move(cerberusEntity));
 }

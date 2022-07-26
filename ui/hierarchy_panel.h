@@ -6,5 +6,5 @@ class HierarchyPanel
 {
 public:
     static void update(Scene& scene);
-    static void renderEntity(Entity& entity);
+    static void renderEntity(Entity& entity, Scene& scene);
 };

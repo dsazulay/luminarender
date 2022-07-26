@@ -7,18 +7,18 @@ void HierarchyPanel::update(Scene &scene)
 
     for (auto& entity : scene.objects())
     {
-        renderEntity(entity);
+        renderEntity(*entity, scene);
     }
 
     for (auto& entity : scene.lights())
     {
-        renderEntity(entity);
+        renderEntity(*entity, scene);
     }
 
     ImGui::End();
 }
 
-void HierarchyPanel::renderEntity(Entity &entity)
+void HierarchyPanel::renderEntity(Entity &entity, Scene& scene)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 
@@ -26,14 +26,23 @@ void HierarchyPanel::renderEntity(Entity &entity)
         flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
         ImGui::TreeNodeEx(entity.name().c_str(), flags, "%s", entity.name().c_str());
+        if (ImGui::IsItemClicked())
+        {
+            scene.selected(&entity);
+        }
     }
     else
     {
         if (ImGui::TreeNodeEx(entity.name().c_str(), flags, "%s", entity.name().c_str()))
         {
+            if (ImGui::IsItemClicked())
+            {
+                scene.selected(&entity);
+            }
+
             for (auto& child : entity.getChildren())
             {
-                renderEntity(child);
+                renderEntity(*child, scene);
             }
             ImGui::TreePop();
         }

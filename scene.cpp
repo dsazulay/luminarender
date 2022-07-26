@@ -1,34 +1,34 @@
 #include "scene.h"
 
-void Scene::addLight(Entity entity)
+void Scene::addLight(std::unique_ptr<Entity> entity)
 {
-    m_lights.push_back(entity);
+    m_lights.push_back(std::move(entity));
 }
 
-void Scene::addObject(Entity entity)
+void Scene::addObject(std::unique_ptr<Entity> entity)
 {
-    m_objects.emplace_back(entity);
+    m_objects.push_back(std::move(entity));
 }
 
-void Scene::addSkybox(Entity entity)
+void Scene::addSkybox(std::unique_ptr<Entity> entity)
 {
-    m_skybox = entity;
+    m_skybox = std::move(entity);
     m_hasSkybox = true;
 }
 
-std::vector<Entity>& Scene::lights()
+std::vector<std::unique_ptr<Entity>>& Scene::lights()
 {
     return m_lights;
 }
 
-std::list<Entity>& Scene::objects()
+std::vector<std::unique_ptr<Entity>>& Scene::objects()
 {
     return m_objects;
 }
 
 Entity& Scene::skybox()
 {
-    return m_skybox;
+    return *m_skybox;
 }
 
 bool Scene::hasSkybox()
@@ -44,4 +44,14 @@ Entity* Scene::mainLight() const
 void Scene::mainLight(Entity *light)
 {
     m_mainLight = light;
+}
+
+void Scene::selected(Entity* entity)
+{
+    m_selected = entity;
+}
+
+Entity* Scene::selected()
+{
+    return m_selected;
 }

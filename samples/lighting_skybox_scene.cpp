@@ -2,6 +2,7 @@
 #include "sample_resources.h"
 #include "../entity_factory.h"
 #include "../components/transform.h"
+#include <utility>
 
 void LightingSkyboxScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
 {
@@ -66,7 +67,7 @@ void LightingSkyboxScene::loadLights(Scene& scene)
     scene.addLight(EntityFactory::createDirectionalLight("Directional Light", glm::vec3(-45.0f, 20.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.8f), 1.0f));
     // scene.addLight(EntityFactory::createPointLight("Point Light", glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.7f, 0.8f, 0.5f), 1.0f));
     // scene.addLight(EntityFactory::createSpotLight("Spot Light", glm::vec3(-1.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.8f, 0.5f, 0.2f), 1.0f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f))));
-    scene.mainLight(&scene.lights().front());
+    scene.mainLight(scene.lights().front().get());
 }
 
 void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
@@ -90,36 +91,36 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
 
-    Entity e = EntityFactory::createFromMesh("Quad",
+    auto e = EntityFactory::createFromMesh("Quad",
             SampleResources::object_positions[0], greyMat, quad);
 
-    auto transform = e.getComponent<Transform>();
+    auto transform = e->getComponent<Transform>();
     transform->eulerAngles(glm::vec3(-90.0, 0.0, 0.0));
     transform->scale(glm::vec3(10.0, 10.0, 10.0));
     transform->updateModelMatrix();
 
 
-    Entity sphereEntity = EntityFactory::createFromMesh("Sphere",
+    auto sphereEntity = EntityFactory::createFromMesh("Sphere",
             SampleResources::object_positions[1], blueMat, sphere);
 
-    Entity cubeEntity = EntityFactory::createFromMesh("Cube",
+    auto cubeEntity = EntityFactory::createFromMesh("Cube",
             SampleResources::object_positions[3], woodBoxMat, cube);
 
-    cubeEntity.addChild(sphereEntity);
-    e.addChild(cubeEntity);
-    e.updateSelfAndChild();
-    scene.addObject(e);
+    cubeEntity->addChild(std::move(sphereEntity));
+    e->addChild(std::move(cubeEntity));
+    e->updateSelfAndChild();
+    scene.addObject(std::move(e));
 
-    Entity spitfireEntity = EntityFactory::createFromModel("Spitfire",
+    auto spitfireEntity = EntityFactory::createFromModel("Spitfire",
             SampleResources::object_positions[4], spitfireMat,spitfire);
 
-    auto t = spitfireEntity.getComponent<Transform>();
+    auto t = spitfireEntity->getComponent<Transform>();
     t->scale(glm::vec3(0.05, 0.05, 0.05));
     t->eulerAngles(glm::vec3(-96, 0, 0));
     t->updateModelMatrix();
-    spitfireEntity.updateSelfAndChild();
+    spitfireEntity->updateSelfAndChild();
 
-    scene.addObject(spitfireEntity);
+    scene.addObject(std::move(spitfireEntity));
 }
 
 

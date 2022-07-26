@@ -24,7 +24,7 @@ void Renderer::render(Scene& scene)
     m_mainRenderTarget.unsetAsTarget();
 }
 
-void Renderer::setupLights(std::vector<Entity> &lights)
+void Renderer::setupLights(std::vector<std::unique_ptr<Entity>> &lights)
 {
     std::size_t offset = sizeof(glm::vec4);
     std::size_t uniformStructSize = sizeof(LightUniformStruct);
@@ -34,8 +34,8 @@ void Renderer::setupLights(std::vector<Entity> &lights)
 
     for (auto& entity : lights)
     {
-        auto transform = entity.getComponent<Transform>();
-        auto light = entity.getComponent<Light>();
+        auto transform = entity->getComponent<Transform>();
+        auto light = entity->getComponent<Light>();
 
         light->uniformStruct.posAndCutoff = glm::vec4(transform->position(), light->cutoff);
         light->uniformStruct.dirAndOuterCutoff = glm::vec4(transform->getDirection(), light->outerCutoff);

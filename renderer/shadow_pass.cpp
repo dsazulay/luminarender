@@ -16,7 +16,7 @@ void ShadowPass::render(Scene& scene)
 
     for (auto& entity : scene.objects())
     {
-        renderEntity(entity);
+        renderEntity(*entity);
     }
 }
 
@@ -52,6 +52,6 @@ void ShadowPass::renderEntity(Entity &entity)
 
     for (auto& childEntity : entity.getChildren())
     {
-        renderEntity(childEntity);
+        renderEntity(*childEntity);
     }
 }

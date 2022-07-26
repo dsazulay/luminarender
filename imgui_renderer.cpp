@@ -6,6 +6,8 @@
 #include "events/event.h"
 #include "events/dispatcher.h"
 #include "ui/hierarchy_panel.h"
+#include "ui/properties_panel.h"
+#include <cstddef>
 
 void ImguiRenderer::init() {
     IMGUI_CHECKVERSION();
@@ -43,7 +45,7 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene) {
 
     ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
     ImGui::Begin("Viewport");
@@ -68,6 +70,10 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene) {
     ImGui::End();
 
     HierarchyPanel::update(scene);
+    if (scene.selected() != nullptr)
+    {
+        PropertiesPanel::update(scene.selected());
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

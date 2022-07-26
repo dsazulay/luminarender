@@ -14,7 +14,7 @@ class Renderer {
 public:
     Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos);
     void updateTransformMatrices();
-    void setupLights(std::vector<Entity>& lights);
+    void setupLights(std::vector<std::unique_ptr<Entity>> &lights);
     void render(Scene& scene);
 
     glm::mat4 cascadeShadows(glm::vec3 lightDir);

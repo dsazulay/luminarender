@@ -56,15 +56,15 @@ void UnlitScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     Material* containerMat = assetLibrary.getMaterial("containerMat");
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
 
-    Entity e = EntityFactory::createFromMesh("Quad",
+    auto e = EntityFactory::createFromMesh("Quad",
             SampleResources::object_positions[0], greyMat, quad);
 
-    auto transform = e.getComponent<Transform>();
+    auto transform = e->getComponent<Transform>();
     transform->eulerAngles(glm::vec3(-90.0, 0.0, 0.0));
     transform->scale(glm::vec3(5.0, 5.0, 5.0));
     transform->updateModelMatrix();
 
-    scene.addObject(e);
+    scene.addObject(std::move(e));
 
     scene.addObject(EntityFactory::createFromMesh("Sphere",
             SampleResources::object_positions[1], blueMat, sphere));

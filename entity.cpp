@@ -23,17 +23,17 @@ void Entity::deleteComponents()
 
 }
 
-void Entity::addChild(Entity entity)
+void Entity::addChild(std::unique_ptr<Entity> entity)
 {
-    entity.m_parent = this;
-    auto t = entity.getComponent<Transform>();
+    entity->m_parent = this;
+    auto t = entity->getComponent<Transform>();
     auto pt = getComponent<Transform>();
 
     t->modelMatrix(glm::inverse(pt->modelMatrix()) * t->modelMatrix());
     t->updateFromModelMatrix();
     t->eulerAngles(t->eulerAngles() - pt->eulerAngles());
 
-    m_children.emplace_back(entity);
+    m_children.push_back(std::move(entity));
 }
 
 void Entity::setParent(Entity *entity)
@@ -53,11 +53,11 @@ void Entity::updateSelfAndChild()
 
     for (auto& child : m_children)
     {
-        child.updateSelfAndChild();
+        child->updateSelfAndChild();
     }
 }
 
-std::list<Entity>& Entity::getChildren()
+std::vector<std::unique_ptr<Entity>>& Entity::getChildren()
 {
     return m_children;
 }
@@ -71,3 +71,8 @@ void Entity::name(std::string entityName)
 {
     m_name = entityName;
 }
+
+//Entity::Entity(Entity &e)
+//{
+//
+//}

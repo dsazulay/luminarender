@@ -7,7 +7,7 @@ void ForwardPass::render(Scene& scene)
 {
     for (auto& entity : scene.objects())
     {
-        renderEntity(entity, scene.mainLight());
+        renderEntity(*entity, scene.mainLight());
     }
 
     if (scene.hasSkybox())
@@ -71,7 +71,7 @@ void ForwardPass::renderEntity(Entity& entity, Entity* mainLight)
 
     for (auto& childEntity : entity.getChildren())
     {
-        renderEntity(childEntity, mainLight);
+        renderEntity(*childEntity, mainLight);
     }
 
 }
