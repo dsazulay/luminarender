@@ -25,6 +25,9 @@ public:
 
     void setGlobalTextures(Scene& scene);
 
+    glm::mat4& viewMatrix();
+    glm::mat4& projMatrix();
+
 private:
     UniformBufferObject m_matricesUBO;
     UniformBufferObject m_lightUBO;
@@ -42,6 +45,9 @@ private:
     NormalVisualizerPass m_normalVisualizerPass;
 
     Camera m_camera;
+
+    glm::mat4 m_viewMatrix;
+    glm::mat4 m_projMatrix;
 
     void onViewportResize(const Event& e);
 };

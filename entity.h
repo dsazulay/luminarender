@@ -23,6 +23,7 @@ public:
 
     void addChild(std::unique_ptr<Entity> entity);
     std::vector<std::unique_ptr<Entity>>& getChildren();
+    Entity* getParent();
     void setParent(Entity* entity);
 
     void updateSelfAndChild();

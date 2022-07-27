@@ -1,3 +1,5 @@
+#include "components/transform.h"
+#include "entity.h"
 #include "pch.h"
 #include "imgui_renderer.h"
 #include "imgui.h"
@@ -8,6 +10,10 @@
 #include "ui/hierarchy_panel.h"
 #include "ui/properties_panel.h"
 #include <cstddef>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include "../imguizmo/ImGuizmo.h"
 
 void ImguiRenderer::init() {
     IMGUI_CHECKVERSION();
@@ -38,7 +44,7 @@ void ImguiRenderer::terminate() {
     ImGui::DestroyContext();
 }
 
-void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene) {
+void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm::mat4& viewMatrix, glm::mat4& projMatrix) {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -61,11 +67,55 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene) {
     }
     ImGui::PopStyleVar();
 
-//    auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
-//    auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
-//    auto viewportPos = ImGui::GetWindowPos();
-//    glm::vec2 viewportMinBound = { viewportMinRegion.x + viewportPos.x, viewportMinRegion.y + viewportPos.y };
-//    glm::vec2 viewportMaxBound = { viewportMaxRegion.x + viewportPos.x, viewportMaxRegion.y + viewportPos.y };
+    auto viewportMinRegion = ImGui::GetWindowContentRegionMin();
+    auto viewportMaxRegion = ImGui::GetWindowContentRegionMax();
+    auto viewportPos = ImGui::GetWindowPos();
+    glm::vec2 viewportMinBound = { viewportMinRegion.x + viewportPos.x, viewportMinRegion.y + viewportPos.y };
+    glm::vec2 viewportMaxBound = { viewportMaxRegion.x + viewportPos.x, viewportMaxRegion.y + viewportPos.y };
+
+
+    // Guizmos
+    Entity* selected = scene.selected();
+    if (selected != nullptr)
+    {
+        auto t = selected->getComponent<Transform>();
+        ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist();
+        ImGuizmo::SetRect(viewportMinBound.x, viewportMinBound.y,
+                          viewportMaxBound.x - viewportMinBound.x,
+                          viewportMaxBound.y - viewportMinBound.y);
+
+
+        int guizmoType = ImGuizmo::OPERATION::TRANSLATE;
+        // int guizmoType = ImGuizmo::OPERATION::ROTATE;
+        // int guizmoType = ImGuizmo::OPERATION::SCALE;
+        glm::mat4 modelMatrix = t->modelMatrix();
+        ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projMatrix),
+                             (ImGuizmo::OPERATION) guizmoType, ImGuizmo::LOCAL,
+                             const_cast<float *>(glm::value_ptr(modelMatrix)));
+
+
+        if (ImGuizmo::IsUsing())
+        {
+            glm::vec3 translation;
+            glm::vec3 rotation;
+            glm::vec3 scale;
+
+            glm::vec3 oldTranslation;
+
+            glm::mat4 localMatrix = modelMatrix;
+            if (selected->getParent() != nullptr)
+            {
+                localMatrix = glm::inverse(selected->getParent()->getComponent<Transform>()->modelMatrix()) * modelMatrix;
+            }
+
+            ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localMatrix), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
+            t->position(translation);
+            glm::vec3 deltaRotation = rotation - t->eulerAngles();
+            t->eulerAngles(t->eulerAngles() + deltaRotation);
+            t->scale(scale);
+        }
+    }
 
     ImGui::End();
 

@@ -57,7 +57,8 @@ add_executable(InteractiveGraphics
         renderer/forward_pass.cpp renderer/forward_pass.h
         renderer/normal_visualizer_pass.cpp renderer/normal_visualizer_pass.h
         ui/hierarchy_panel.cpp ui/hierarchy_panel.h
-        ui/properties_panel.cpp ui/properties_panel.h)
+        ui/properties_panel.cpp ui/properties_panel.h
+        imguizmo/ImGuizmo.cpp imguizmo/ImGuizmo.h)
 
 find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(InteractiveGraphics PUBLIC glfw)

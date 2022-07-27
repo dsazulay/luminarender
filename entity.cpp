@@ -36,6 +36,11 @@ void Entity::addChild(std::unique_ptr<Entity> entity)
     m_children.push_back(std::move(entity));
 }
 
+Entity* Entity::getParent()
+{
+    return m_parent;
+}
+
 void Entity::setParent(Entity *entity)
 {
     m_parent = entity;

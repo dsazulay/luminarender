@@ -47,14 +47,24 @@ void Renderer::setupLights(std::vector<std::unique_ptr<Entity>> &lights)
     }
 }
 
+glm::mat4& Renderer::viewMatrix()
+{
+    return m_viewMatrix;
+}
+
+glm::mat4& Renderer::projMatrix()
+{
+    return m_projMatrix;
+}
+
 void Renderer::updateTransformMatrices()
 {
-    glm::mat4 view = m_camera.getViewMatrix();
-    glm::mat4 projection = glm::perspective(glm::radians(m_camera.zoom),
+    m_viewMatrix = m_camera.getViewMatrix();
+    m_projMatrix = glm::perspective(glm::radians(m_camera.zoom),
                                             (float) m_viewportWidth / (float) m_viewportHeight, 0.1f, 100.0f);
 
-    m_matricesUBO.setBufferData(0, sizeof(glm::mat4), glm::value_ptr(view));
-    m_matricesUBO.setBufferData(sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(projection));
+    m_matricesUBO.setBufferData(0, sizeof(glm::mat4), glm::value_ptr(m_viewMatrix));
+    m_matricesUBO.setBufferData(sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(m_projMatrix));
     m_matricesUBO.setBufferData(2 * sizeof(glm::mat4), sizeof(glm::vec4), glm::value_ptr(m_camera.position));
 }
 
