@@ -50,6 +50,8 @@ void Application::mainloop()
 
         m_window.processInput();
 
+        m_renderer->setGlobalTextures(m_scene);
+
         m_renderer->updateTransformMatrices();
         if (!m_scene.lights().empty())
             m_renderer->setupLights(m_scene.lights());

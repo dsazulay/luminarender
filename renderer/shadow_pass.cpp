@@ -26,7 +26,7 @@ void ShadowPass::updateLightMatrices(Entity* mainLight)
 
     float near_plane = 0.1f, far_plane = 40.0f;
     glm::mat4 lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, near_plane, far_plane);
-    glm::mat4 lightView = glm::lookAt(t->getDirection() * -10.f, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+    glm::mat4 lightView = glm::lookAt(t->getDirection() * -10.f, t->getDirection(), glm::vec3(0.0, 1.0, 0.0));
     lightSpaceMatrix = lightProjection * lightView;
 }
 
