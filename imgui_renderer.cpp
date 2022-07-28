@@ -36,6 +36,9 @@ void ImguiRenderer::init() {
 //        style.WindowRounding = 0.0f;
 //        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 //    }
+
+    Dispatcher::instance().subscribe(KeyPressEvent::descriptor,
+        std::bind(&ImguiRenderer::onKeyPress, this, std::placeholders::_1));
 }
 
 void ImguiRenderer::terminate() {
@@ -86,12 +89,9 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm
                           viewportMaxBound.y - viewportMinBound.y);
 
 
-        int guizmoType = ImGuizmo::OPERATION::TRANSLATE;
-        // int guizmoType = ImGuizmo::OPERATION::ROTATE;
-        // int guizmoType = ImGuizmo::OPERATION::SCALE;
         glm::mat4 modelMatrix = t->modelMatrix();
         ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projMatrix),
-                             (ImGuizmo::OPERATION) guizmoType, ImGuizmo::LOCAL,
+                             (ImGuizmo::OPERATION) m_guizmoType, ImGuizmo::LOCAL,
                              const_cast<float *>(glm::value_ptr(modelMatrix)));
 
 
@@ -130,6 +130,24 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm
 //    ImGui::UpdatePlatformWindows();
 //    ImGui::RenderPlatformWindowsDefault();
 //    glfwMakeContextCurrent(backup_current_context);
+}
+
+void ImguiRenderer::onKeyPress(const Event& e)
+{
+    const auto& event = static_cast<const KeyPressEvent&>(e);
+    int keyCode = event.keyCode();
+    int modifier = event.modifier();
+
+    if (modifier != -1)
+        return;
+
+    if (keyCode == 87)
+        m_guizmoType = ImGuizmo::OPERATION::TRANSLATE;
+    else if (keyCode == 69)
+        m_guizmoType = ImGuizmo::OPERATION::ROTATE;
+    else if (keyCode == 82)
+        m_guizmoType = ImGuizmo::OPERATION::SCALE;
+
 }
 
 void ImguiRenderer::setBackendImplementation(GLFWwindow *window) {

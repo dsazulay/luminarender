@@ -25,6 +25,11 @@ void Camera::onKeyPress(const Event& e)
 {
     const auto& event = static_cast<const KeyPressEvent&>(e);
     int keyCode = event.keyCode();
+    int modifier = event.modifier();
+
+    if (modifier != 342)
+        return;
+
     float velocity = movementSpeed * Application::deltaTime;
     if (keyCode == 87)
         position += front * velocity;

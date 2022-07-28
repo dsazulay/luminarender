@@ -71,11 +71,13 @@ private:
 class KeyPressEvent : public Event
 {
 public:
-    KeyPressEvent(int keyCode) : m_keyCode(keyCode) {}
+    KeyPressEvent(int keyCode, int modifier) : m_keyCode(keyCode), m_modifier(modifier) {}
     const char* type() const override { return descriptor; }
     int keyCode() const { return m_keyCode; }
+    int modifier() const { return m_modifier; }
 
     static constexpr char* descriptor = (char*) "KeyPressEvent";
 private:
     int m_keyCode;
+    int m_modifier;
 };

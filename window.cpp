@@ -70,34 +70,41 @@ void Window::processInput() const
     if(glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(m_window, true);
 
+    int modifier = -1;
+    if (glfwGetKey(m_window, GLFW_KEY_LEFT_ALT))
+        modifier = GLFW_KEY_LEFT_ALT;
+
     if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        KeyPressEvent e(GLFW_KEY_W);
+        KeyPressEvent e(GLFW_KEY_W, modifier);
         Dispatcher::instance().post(e);
     }
     else if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        KeyPressEvent e(GLFW_KEY_S);
+        KeyPressEvent e(GLFW_KEY_S, modifier);
         Dispatcher::instance().post(e);
     }
     if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        KeyPressEvent e(GLFW_KEY_A);
+        KeyPressEvent e(GLFW_KEY_A, modifier);
         Dispatcher::instance().post(e);
     }
     else if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        KeyPressEvent e(GLFW_KEY_D);
+        KeyPressEvent e(GLFW_KEY_D, modifier);
         Dispatcher::instance().post(e);
     }
-//    if (glfwGetKey(m_Window, GLFW_KEY_Q) == GLFW_PRESS)
-//        m_GuizmoType = -1;
-//    if (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS)
-//        m_GuizmoType = ImGuizmo::OPERATION::TRANSLATE;
-//    if (glfwGetKey(m_Window, GLFW_KEY_E) == GLFW_PRESS)
-//        m_GuizmoType = ImGuizmo::OPERATION::ROTATE;
-//    if (glfwGetKey(m_Window, GLFW_KEY_R) == GLFW_PRESS)
-//        m_GuizmoType = ImGuizmo::OPERATION::SCALE;
+
+    if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
+    {
+       KeyPressEvent e(GLFW_KEY_E, modifier);
+       Dispatcher::instance().post(e);
+    }
+    if (glfwGetKey(m_window, GLFW_KEY_R) == GLFW_PRESS)
+    {
+         KeyPressEvent e(GLFW_KEY_R, modifier);
+         Dispatcher::instance().post(e);
+    }
 }
 
 void Window::swapBuffers() const
