@@ -101,8 +101,6 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm
             glm::vec3 rotation;
             glm::vec3 scale;
 
-            glm::vec3 oldTranslation;
-
             glm::mat4 localMatrix = modelMatrix;
             if (selected->getParent() != nullptr)
             {

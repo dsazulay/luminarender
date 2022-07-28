@@ -22,6 +22,12 @@ void HierarchyPanel::renderEntity(Entity &entity, Scene& scene)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 
+    // TODO: change this to use entity's ID instead of name
+    if (scene.selected() != nullptr && entity.name() == scene.selected()->name())
+    {
+        flags |= ImGuiTreeNodeFlags_Selected;
+    }
+
     if (entity.getChildren().empty()) {
         flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
@@ -33,13 +39,14 @@ void HierarchyPanel::renderEntity(Entity &entity, Scene& scene)
     }
     else
     {
-        if (ImGui::TreeNodeEx(entity.name().c_str(), flags, "%s", entity.name().c_str()))
+        bool shouldExpand = ImGui::TreeNodeEx(entity.name().c_str(), flags, "%s", entity.name().c_str());
+        if (ImGui::IsItemClicked())
         {
-            if (ImGui::IsItemClicked())
-            {
-                scene.selected(&entity);
-            }
+            scene.selected(&entity);
+        }
 
+        if (shouldExpand)
+        {
             for (auto& child : entity.getChildren())
             {
                 renderEntity(*child, scene);
