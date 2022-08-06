@@ -9,6 +9,7 @@ public:
     static constexpr char* shader_lambert = (char*) "resources/shaders/lambert.glsl";
     static constexpr char* shader_pbr = (char*) "resources/shaders/cook_torrance.glsl";
     static constexpr char* shader_skybox = (char*) "resources/shaders/skybox.glsl";
+    static constexpr char* shader_skytriangle = (char*) "resources/shaders/skytriangle.glsl";
     static constexpr char* shader_skybox_equirectangular = (char*) "resources/shaders/skybox_equirectangular.glsl";
     static constexpr char* shader_skybox_irradiance = (char*) "resources/shaders/skybox_irradiance.glsl";
     static constexpr char* shader_prefilter = (char*) "resources/shaders/prefilter.glsl";

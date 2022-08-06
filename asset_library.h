@@ -14,6 +14,7 @@ public:
     {
         Cube,
         CubeMapModel,
+        TriangleMapModel,
         Quad,
         Sphere
     };

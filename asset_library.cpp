@@ -128,6 +128,10 @@ Mesh* AssetLibrary::loadMesh(AssetLibrary::BasicMesh basicModel)
             m = new Mesh(Primitives::getCubeMapPrimitives());
             name = "cubeMap";
             break;
+        case BasicMesh::TriangleMapModel:
+            m = new Mesh(Primitives::getTriangleMapPrimitives());
+            name = "triangleMap";
+            break;
         case BasicMesh::Quad:
             m = new Mesh(Primitives::getQuadPrimitives());
             name = "quad";

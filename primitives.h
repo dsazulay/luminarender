@@ -21,6 +21,11 @@ public:
         return getMapPrimitives(cubeMapVertices, 72, m_cubeMapIndices, 36);
     }
 
+    static std::pair<std::vector<Vertex>, std::vector<unsigned int>> getTriangleMapPrimitives()
+    {
+        return getMapPrimitives(m_triangleMapVertices, 9, m_triangleMapIndices, 3);
+    }
+
     static std::pair<std::vector<Vertex>, std::vector<unsigned int>> getSpherePrimitives()
     {
         std::vector<Vertex> outVertices;
@@ -192,6 +197,16 @@ private:
             0.5f,  0.5f, -0.5f,
             0.5f,  0.5f,  0.5f,
             -0.5f,  0.5f,  0.5f,
+    };
+
+    static constexpr float m_triangleMapVertices[9] = {
+        -1.0f, -1.0f, 0.999f,
+        3.0f, -1.0f, 0.999f,
+        -1.0f, 3.0f, 0.999f
+    };
+
+    static constexpr unsigned int m_triangleMapIndices[3] = {
+        0, 1, 2
     };
 
     static std::pair<std::vector<Vertex>, std::vector<unsigned int>> getPrimitives(float const* vertices, int verticesSize, unsigned int const* indices, int indicesSize)
