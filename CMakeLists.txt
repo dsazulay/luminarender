@@ -18,6 +18,16 @@ message(STATUS "Installing glad")
 add_subdirectory(external/glad)
 set_property(TARGET Glad PROPERTY FOLDER "Dependencies")
 
+# ImGui
+message(STATUS "Installing imgui")
+add_subdirectory(external/imgui)
+set_property(TARGET ImGui PROPERTY FOLDER "Dependencies")
+
+# ImGui
+message(STATUS "Installing imguizmo")
+add_subdirectory(external/imguizmo)
+set_property(TARGET ImGuizmo PROPERTY FOLDER "Dependencies")
+
 # GLFW
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "GLFW lib only" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "GLFW lib only" FORCE)
@@ -52,6 +62,8 @@ target_link_directories(InteractiveGraphics PUBLIC lib/assimp)
 
 target_link_libraries(${PROJECT_NAME}
     Glad
+    ImGui
+    ImGuizmo
     glfw
     glm_static
     fmt

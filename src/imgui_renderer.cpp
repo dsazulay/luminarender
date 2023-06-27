@@ -13,7 +13,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "../imguizmo/ImGuizmo.h"
+#include <ImGuizmo.h>
 
 void ImguiRenderer::init() {
     IMGUI_CHECKVERSION();
