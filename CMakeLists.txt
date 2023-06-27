@@ -13,6 +13,14 @@ file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
 
 # Dependencies
 
+# GLFW
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "GLFW lib only" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "GLFW lib only" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW lib only" FORCE)
+message(STATUS "Installing glfw via submodule")
+add_subdirectory(external/glfw)
+set_property(TARGET glfw PROPERTY FOLDER "Dependencies")
+
 # fmt
 message(STATUS "Installing fmt via submodule")
 add_subdirectory(external/fmt)
@@ -30,17 +38,16 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
 
 add_executable(${PROJECT_NAME} ${FILE_SOURCES})
 
-find_package(glfw3 3.3 REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PUBLIC glfw
     PUBLIC fmt
 )
 
 target_include_directories(${PROJECT_NAME}
+    PUBLIC external/glfw
     PUBLIC external/fmt
 )
 
 target_link_directories(InteractiveGraphics PUBLIC lib/assimp)
 target_link_libraries(InteractiveGraphics PUBLIC assimp)
 
-#target_precompile_headers(InteractiveGraphics PUBLIC pch.h)
