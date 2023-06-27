@@ -98,11 +98,17 @@ void Window::processInput() const
         Dispatcher::instance().post(e);
     }
 
-    if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
+    if (glfwGetKey(m_window, GLFW_KEY_Q) == GLFW_PRESS)
+    {
+       KeyPressEvent e(GLFW_KEY_Q, modifier);
+       Dispatcher::instance().post(e);
+    }
+    else if (glfwGetKey(m_window, GLFW_KEY_E) == GLFW_PRESS)
     {
        KeyPressEvent e(GLFW_KEY_E, modifier);
        Dispatcher::instance().post(e);
     }
+
     if (glfwGetKey(m_window, GLFW_KEY_R) == GLFW_PRESS)
     {
          KeyPressEvent e(GLFW_KEY_R, modifier);

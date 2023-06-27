@@ -39,6 +39,10 @@ void Camera::onKeyPress(const Event& e)
         position -= right * velocity;
     else if (keyCode == 68)
         position += right * velocity;
+    else if (keyCode == 81)
+        position += up * velocity;
+    else if (keyCode == 69)
+        position -= up * velocity;
 }
 
 void Camera::onMouseMove(const Event& e)
