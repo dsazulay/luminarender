@@ -9,6 +9,18 @@ include_directories("/opt/homebrew/include")
 
 file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
 
+# =============================================================
+
+# Dependencies
+
+# fmt
+message(STATUS "Installing fmt via submodule")
+add_subdirectory(external/fmt)
+set_property(TARGET fmt PROPERTY FOLDER "Dependencies")
+
+# =============================================================
+
+# Sources
 file(GLOB_RECURSE FILE_SOURCES RELATIVE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
@@ -16,10 +28,17 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
 )
 
-add_executable(InteractiveGraphics ${FILE_SOURCES})
+add_executable(${PROJECT_NAME} ${FILE_SOURCES})
 
 find_package(glfw3 3.3 REQUIRED)
-target_link_libraries(InteractiveGraphics PUBLIC glfw)
+target_link_libraries(${PROJECT_NAME}
+    PUBLIC glfw
+    PUBLIC fmt
+)
+
+target_include_directories(${PROJECT_NAME}
+    PUBLIC external/fmt
+)
 
 target_link_directories(InteractiveGraphics PUBLIC lib/assimp)
 target_link_libraries(InteractiveGraphics PUBLIC assimp)

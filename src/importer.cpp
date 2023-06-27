@@ -53,7 +53,7 @@ Texture* Importer::loadCubeMapFromFiles(std::vector<std::string> faces, const st
         if (data)
             textureVector.push_back(data);
         else
-            LOG_ERROR("Cubemap tex failed to load at path: " << face);
+            LOG_ERROR("Cubemap tex failed to load at path: {}", face);
     }
 
     Texture* texture = new Texture(TextureType::CubeMap, width, height, textureVector);

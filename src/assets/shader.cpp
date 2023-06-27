@@ -201,7 +201,7 @@ void Shader::addGeometryShader(const char* vertexPath)
     if (!success)
     {
         glGetShaderInfoLog(vertex, 512, nullptr, infoLog);
-        LOG_ERROR("Shader compilation failed: " << infoLog);
+        LOG_ERROR("Shader compilation failed: {}", infoLog);
     }
 
     glAttachShader(ID, vertex);
@@ -211,7 +211,7 @@ void Shader::addGeometryShader(const char* vertexPath)
     if (!success)
     {
         glGetProgramInfoLog(ID, 512, nullptr, infoLog);
-        LOG_ERROR("Shader program linking failed: " << infoLog);
+        LOG_ERROR("Shader program linking failed: {}", infoLog);
     }
 
     glDeleteShader(vertex);
@@ -226,7 +226,7 @@ GLenum Shader::getShaderTypeFromString(const std::string& type)
     else if (type == "geometry")
         return GL_GEOMETRY_SHADER;
 
-    LOG_ERROR("Invalid shader type: " << type);
+    LOG_ERROR("Invalid shader type: {}", type);
     return -1;
 }
 
@@ -249,7 +249,7 @@ void Shader::compile(std::unordered_map<GLenum, std::string>& shaderSources)
         if (!success)
         {
             glGetShaderInfoLog(shaderID, 512, nullptr, infoLog);
-            LOG_ERROR("Shader compilation failed: " << infoLog);
+            LOG_ERROR("Shader compilation failed: {}", infoLog);
         }
 
         glAttachShader(ID, shaderID);
@@ -264,7 +264,7 @@ void Shader::compile(std::unordered_map<GLenum, std::string>& shaderSources)
     if (!success)
     {
         glGetProgramInfoLog(ID, 512, nullptr, infoLog);
-        LOG_ERROR("Shader program linking failed: " << infoLog);
+        LOG_ERROR("Shader program linking failed: {}", infoLog);
     }
 
     // TODO: separate on another method
