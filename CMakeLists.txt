@@ -13,6 +13,11 @@ file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
 
 # Dependencies
 
+# Glad
+message(STATUS "Installing glad")
+add_subdirectory(external/glad)
+set_property(TARGET Glad PROPERTY FOLDER "Dependencies")
+
 # GLFW
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "GLFW lib only" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "GLFW lib only" FORCE)
@@ -39,7 +44,6 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c
 )
 
 add_executable(${PROJECT_NAME} ${FILE_SOURCES})
@@ -47,6 +51,7 @@ add_executable(${PROJECT_NAME} ${FILE_SOURCES})
 target_link_directories(InteractiveGraphics PUBLIC lib/assimp)
 
 target_link_libraries(${PROJECT_NAME}
+    Glad
     glfw
     glm_static
     fmt
