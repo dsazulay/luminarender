@@ -1,3 +1,5 @@
+#include "entity_factory.h"
+#include "events/event.h"
 #include "pch.h"
 #include <glm/gtc/type_ptr.hpp>
 #include "application.h"
@@ -5,6 +7,7 @@
 #include "samples/lighting_skybox_scene.h"
 #include "samples/pbr_scene.h"
 #include <glad/glad.h>
+#include "events/dispatcher.h"
 
 float Application::deltaTime;
 
@@ -26,6 +29,10 @@ Application::Application(const AppConfig& config)
     // enable seamless cubemap sampling for lower mip levels in the pre-filter map.
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+    Dispatcher::instance().subscribe(UiCreateEmptyEvent::descriptor,
+            std::bind(&Application::onUiCreateEmptyEvent, this, std::placeholders::_1));
+
+
     m_imguiRenderer.init();
     m_imguiRenderer.setBackendImplementation(m_window.glfwWindow());
     m_imguiRenderer.viewportWidth = (float) config.viewportWidth;
@@ -37,7 +44,7 @@ Application::Application(const AppConfig& config)
 //    PbrScene::loadScene(m_scene, AssetLibrary::instance());
 
     m_renderer->setGlobalTextures(m_scene);
-}
+    }
 
 void Application::mainloop()
 {
@@ -92,4 +99,10 @@ void Application::terminate()
 Application::~Application()
 {
     delete m_renderer;
+}
+
+void Application::onUiCreateEmptyEvent(const Event& e)
+{
+    const auto& event = static_cast<const UiCreateEmptyEvent&>(e);
+    m_scene.addObject(EntityFactory::createEmpty(), event.entity());
 }

@@ -5,9 +5,12 @@ void Scene::addLight(std::unique_ptr<Entity> entity)
     m_lights.push_back(std::move(entity));
 }
 
-void Scene::addObject(std::unique_ptr<Entity> entity)
+void Scene::addObject(std::unique_ptr<Entity> entity, Entity* parent)
 {
-    m_objects.push_back(std::move(entity));
+    if (parent != nullptr)
+        parent->addChild(std::move(entity));
+    else
+        m_objects.push_back(std::move(entity));
 }
 
 void Scene::addSkybox(std::unique_ptr<Entity> entity)

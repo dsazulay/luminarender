@@ -20,6 +20,7 @@ class Application
 {
 public:
     explicit Application(const AppConfig& config);
+    void onUiCreateEmptyEvent(const Event& e);
     ~Application();
     void init();
     void run();

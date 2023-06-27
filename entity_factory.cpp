@@ -2,6 +2,9 @@
 #include "components/mesh_renderer.h"
 #include "components/transform.h"
 #include "assets/model.h"
+#include <string>
+
+int EntityFactory::entityCount = 0;
 
 std::unique_ptr<Entity> EntityFactory::createDirectionalLight(const char* name, glm::vec3 rot, glm::vec3 color, float intensity)
 {
@@ -18,6 +21,17 @@ std::unique_ptr<Entity> EntityFactory::createSpotLight(const char* name, glm::ve
     return createLight(name, LightType::SPOT, pos, rot, color, intensity, cutoff, outerCutoff);
 }
 
+std::unique_ptr<Entity> EntityFactory::createEmpty()
+{
+    Transform t;
+    auto e = std::make_unique<Entity>();
+
+    e->name(e->name() + std::to_string(EntityFactory::entityCount++));
+    e->addComponent(t);
+
+    return e;
+}
+
 std::unique_ptr<Entity> EntityFactory::createMesh(glm::vec3 pos, Material *mat, std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives)
 {
     Transform transform;
@@ -32,6 +46,7 @@ std::unique_ptr<Entity> EntityFactory::createMesh(glm::vec3 pos, Material *mat, 
     meshRenderer.initMesh();
 
     auto e = std::make_unique<Entity>();
+    e->name("New Entity");
     e->addComponent(transform);
     e->addComponent(meshRenderer);
 

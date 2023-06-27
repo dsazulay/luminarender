@@ -1,9 +1,26 @@
 #include "hierarchy_panel.h"
 #include "imgui.h"
+#include "../events/event.h"
+#include "../events/dispatcher.h"
 
 void HierarchyPanel::update(Scene &scene)
 {
     ImGui::Begin("Scene Hierarchy");
+
+    if ((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && ImGui::IsWindowHovered())
+    {
+        scene.selected(nullptr);
+    }
+
+    if (ImGui::BeginPopupContextWindow("Scene Hierarchy Popup"))
+    {
+        if (ImGui::Selectable("Create Empty"))
+        {
+             UiCreateEmptyEvent e{scene.selected()};
+             Dispatcher::instance().post(e);
+        }
+        ImGui::EndPopup();
+    }
 
     for (auto& entity : scene.objects())
     {
@@ -32,7 +49,7 @@ void HierarchyPanel::renderEntity(Entity &entity, Scene& scene)
         flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
 
         ImGui::TreeNodeEx(entity.name().c_str(), flags, "%s", entity.name().c_str());
-        if (ImGui::IsItemClicked())
+        if (ImGui::IsItemClicked() || ImGui::IsItemClicked(1))
         {
             scene.selected(&entity);
         }
@@ -40,7 +57,7 @@ void HierarchyPanel::renderEntity(Entity &entity, Scene& scene)
     else
     {
         bool shouldExpand = ImGui::TreeNodeEx(entity.name().c_str(), flags, "%s", entity.name().c_str());
-        if (ImGui::IsItemClicked())
+        if (ImGui::IsItemClicked() || ImGui::IsItemClicked(1))
         {
             scene.selected(&entity);
         }
