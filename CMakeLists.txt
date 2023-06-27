@@ -3,10 +3,6 @@ project(InteractiveGraphics)
 
 set(CMAKE_CXX_STANDARD 20)
 
-include_directories("include")
-include_directories("src/imgui")
-include_directories("/opt/homebrew/include")
-
 file(COPY resources DESTINATION ${CMAKE_BINARY_DIR})
 
 # =============================================================
@@ -74,6 +70,7 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC external/glfw
     PUBLIC external/glm
     PUBLIC external/fmt
+    PUBLIC include
 )
 
 
