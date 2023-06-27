@@ -21,6 +21,12 @@ message(STATUS "Installing glfw via submodule")
 add_subdirectory(external/glfw)
 set_property(TARGET glfw PROPERTY FOLDER "Dependencies")
 
+# glm
+message(STATUS "Installing glm via submodule")
+set(BUILD_STATIC_LIBS ON)
+add_subdirectory(external/glm)
+set_property(TARGET glm_static PROPERTY FOLDER "Dependencies")
+
 # fmt
 message(STATUS "Installing fmt via submodule")
 add_subdirectory(external/fmt)
@@ -38,16 +44,19 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
 
 add_executable(${PROJECT_NAME} ${FILE_SOURCES})
 
+target_link_directories(InteractiveGraphics PUBLIC lib/assimp)
+
 target_link_libraries(${PROJECT_NAME}
-    PUBLIC glfw
-    PUBLIC fmt
+    glfw
+    glm_static
+    fmt
+    assimp
 )
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC external/glfw
+    PUBLIC external/glm
     PUBLIC external/fmt
 )
 
-target_link_directories(InteractiveGraphics PUBLIC lib/assimp)
-target_link_libraries(InteractiveGraphics PUBLIC assimp)
 
