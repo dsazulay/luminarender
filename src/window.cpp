@@ -45,8 +45,11 @@ void Window::createWindow(int width, int height, const char *name)
 
     glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xOffset, double yOffset)
     {
-        MouseScrollEvent e(xOffset, yOffset);
-        Dispatcher::instance().post(e);
+        if (glfwGetKey(window, GLFW_KEY_LEFT_ALT))
+        {
+            MouseScrollEvent e(xOffset, yOffset);
+            Dispatcher::instance().post(e);
+        }
     });
 
     glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
