@@ -3,15 +3,20 @@
 
 #include "imgui.h"
 
+char PropertiesPanel::renameBuffer[PropertiesPanel::bufferSize] = "";
 
 void PropertiesPanel::update(Entity* entity)
 {
     ImGui::Begin("Properties");
-
-    char buffer[256];
-    memset(buffer, 0, sizeof(buffer));
-    strncpy(buffer, entity->name().c_str(), sizeof(buffer));
-    ImGui::InputText("Name", buffer, sizeof(buffer));
+    strncpy(renameBuffer, entity->name().c_str(), bufferSize);
+    ImGui::InputText("Name", renameBuffer, bufferSize);
+    if (ImGui::IsItemDeactivated())
+    {
+        if (strncmp(renameBuffer, "", bufferSize) != 0)
+        {
+            entity->name(renameBuffer);
+        }
+    }
 
     auto transform = entity->getComponent<Transform>();
     if (ImGui::TreeNodeEx("transform", ImGuiTreeNodeFlags_DefaultOpen, "Transform"))

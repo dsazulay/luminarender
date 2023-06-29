@@ -5,7 +5,7 @@
 #include <cstring>
 
 std::string HierarchyPanel::rename = "";
-char HierarchyPanel::renameBuffer[32] = "";
+char HierarchyPanel::renameBuffer[HierarchyPanel::bufferSize] = "";
 
 void HierarchyPanel::update(Scene &scene)
 {
@@ -57,10 +57,10 @@ void HierarchyPanel::renderEntity(Entity &entity, Scene& scene)
             ImVec2 p = ImGui::GetCursorScreenPos();
 
             ImGui::SetKeyboardFocusHere(0);
-            ImGui::InputText("##rename", renameBuffer, 32);
+            ImGui::InputText("##rename", renameBuffer, bufferSize);
             if (ImGui::IsItemDeactivated())
             {
-                if (strncmp(renameBuffer, "", 32) != 0)
+                if (strncmp(renameBuffer, "", bufferSize) != 0)
                 {
                     entity.name(renameBuffer);
                 }
@@ -88,10 +88,10 @@ void HierarchyPanel::renderEntity(Entity &entity, Scene& scene)
             ImVec2 p = ImGui::GetCursorScreenPos();
 
             ImGui::SetKeyboardFocusHere(0);
-            ImGui::InputText("##rename", renameBuffer, 32);
+            ImGui::InputText("##rename", renameBuffer, bufferSize);
             if (ImGui::IsItemDeactivated())
             {
-                if (strncmp(renameBuffer, "", 32) != 0)
+                if (strncmp(renameBuffer, "", bufferSize) != 0)
                 {
                     entity.name(renameBuffer);
                 }
