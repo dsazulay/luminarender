@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(InteractiveGraphics)
+project(LuminaRender)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -54,7 +54,7 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
 
 add_executable(${PROJECT_NAME} ${FILE_SOURCES})
 
-target_link_directories(InteractiveGraphics PUBLIC lib/assimp)
+target_link_directories(${PROJECT_NAME} PUBLIC lib/assimp)
 
 target_link_libraries(${PROJECT_NAME}
     Glad
