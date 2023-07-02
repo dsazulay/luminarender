@@ -42,15 +42,13 @@ public:
     Mesh(BasicMeshType meshType);
     Mesh(VertexIndexTuple m);
 
-    int indicesSize() const;
-
+    int indicesCount() const;
     unsigned int vao() const;
-
-    std::vector<Vertex> m_vertices;
-    std::vector<unsigned int> m_indices;
 
 private:
     void initMesh();
 
     unsigned int m_vbo, m_ebo, m_vao;
+    std::vector<Vertex> m_vertices;
+    std::vector<unsigned int> m_indices;
 };

@@ -65,7 +65,7 @@ void ForwardPass::renderEntity(Entity& entity, Entity* mainLight)
         material->setUniformData();
 
         glBindVertexArray(mesh->vao());
-        glDrawElements(GL_TRIANGLES, (int) mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, (int) mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
 
@@ -92,6 +92,7 @@ void ForwardPass::renderSkybox(Entity &skybox)
     }
 
     glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int)mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, (int)mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }
+

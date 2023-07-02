@@ -46,7 +46,6 @@ std::unique_ptr<Entity> EntityFactory::createMesh(glm::vec3 pos, Material *mat, 
     MeshRenderer meshRenderer;
     meshRenderer.mesh = &mesh;
     meshRenderer.material = mat;
-    meshRenderer.initMesh();
 
     auto e = std::make_unique<Entity>();
     e->name("New Entity");
@@ -89,8 +88,6 @@ std::unique_ptr<Entity> EntityFactory::createFromMesh(const char* name, glm::vec
     MeshRenderer meshRenderer;
     meshRenderer.mesh = mesh;
     meshRenderer.material = mat;
-    meshRenderer.initMesh();
-
 
     auto e = std::make_unique<Entity>();
     e->name(name);

@@ -35,7 +35,6 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMapsFromHDR(unsigned int 
     Mesh mesh(BasicMeshType::CubeMap);
     MeshRenderer mr;
     mr.mesh = &mesh;
-    mr.initMesh();
 
     IrradianceMaps maps{};
     maps.cubeMap = generateCubeMapTexture(hdrTexture, captureFBO, captureProjection, captureViews, mr);
@@ -84,7 +83,7 @@ unsigned int IrradianceMapFactory::generateCubeMapTexture(unsigned int hdrTextur
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glBindVertexArray(mr.vao());
-        glDrawElements(GL_TRIANGLES, (int)mr.mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, (int)mr.indicesCount(), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -132,7 +131,7 @@ unsigned int IrradianceMapFactory::generateIrradianceTexture(unsigned int captur
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glBindVertexArray(mr.vao());
-        glDrawElements(GL_TRIANGLES, (int)mr.mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, (int)mr.indicesCount(), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -189,7 +188,7 @@ unsigned int IrradianceMapFactory::generatePrefilterTexture(unsigned int capture
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glBindVertexArray(mr.vao());
-            glDrawElements(GL_TRIANGLES, (int)mr.mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+            glDrawElements(GL_TRIANGLES, (int)mr.indicesCount(), GL_UNSIGNED_INT, nullptr);
             glBindVertexArray(0);
         }
     }
@@ -229,10 +228,9 @@ unsigned int IrradianceMapFactory::generateLUTTexture(unsigned int captureFBO, u
     Mesh quadMesh(BasicMeshType::Quad);
     MeshRenderer quadRenderer;
     quadRenderer.mesh = &quadMesh;
-    quadRenderer.initMesh();
 
     glBindVertexArray(quadRenderer.vao());
-    glDrawElements(GL_TRIANGLES, (int)quadMesh.indicesSize(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, (int)quadRenderer.indicesCount(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

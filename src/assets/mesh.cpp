@@ -1,5 +1,7 @@
 #include "mesh.h"
-#include "glm/trigonometric.hpp"
+
+#include <glad/glad.h>
+#include <glm/trigonometric.hpp>
 
 namespace primitives
 {
@@ -228,15 +230,50 @@ Mesh::Mesh(BasicMeshType meshType)
 
     m_vertices = m.vertices;
     m_indices = m.indices;
+
+    initMesh();
 }
 
 Mesh::Mesh(VertexIndexTuple m)
 {
     m_vertices = m.vertices;
     m_indices = m.indices;
+
+    initMesh();
 }
 
-int Mesh::indicesSize() const
+int Mesh::indicesCount() const
 {
     return (int)m_indices.size();
+}
+
+unsigned int Mesh::vao() const
+{
+    return m_vao;
+}
+
+void Mesh::initMesh()
+{
+    glGenVertexArrays(1, &m_vao);
+    glGenBuffers(1, &m_vbo);
+    glGenBuffers(1, &m_ebo);
+
+    glBindVertexArray(m_vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), &m_indices[0], GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, normal));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, texCoords));
+
+    glBindVertexArray(0);
 }

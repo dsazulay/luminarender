@@ -1,19 +1,14 @@
 #pragma once
 
-#include "../assets/material.h"
 #include "icomponent.h"
+#include "../assets/material.h"
 #include "../assets/mesh.h"
 
-class MeshRenderer : public IComponent
+struct MeshRenderer : public IComponent
 {
-public:
+    int indicesCount() const;
     unsigned int vao() const;
-    void initMesh();
 
     Material* material;
     Mesh* mesh;
-
-private:
-    unsigned int VBO, EBO, VAO;
-
 };

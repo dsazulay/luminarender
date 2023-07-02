@@ -29,7 +29,7 @@ void NormalVisualizerPass::renderNormalVectorOfEntity(Entity &entity)
         material->setUniformData();
 
         glBindVertexArray(mesh->vao());
-        glDrawElements(GL_TRIANGLES, (int) mesh->mesh->indicesSize(), GL_UNSIGNED_INT, nullptr);
+        glDrawElements(GL_TRIANGLES, (int) mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
 
@@ -49,3 +49,4 @@ NormalVisualizerPass::NormalVisualizerPass()
     Shader* s = AssetLibrary::instance().loadShader("normalVector", "resources/shaders/normal_vector.glsl");
     m_material = AssetLibrary::instance().createMaterial("normalVector", s);
 }
+
