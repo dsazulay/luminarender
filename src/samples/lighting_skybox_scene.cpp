@@ -54,10 +54,10 @@ void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary)
 
 void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
 {
-    assetLibrary.loadMesh(AssetLibrary::BasicMesh::Cube);
-    assetLibrary.loadMesh(AssetLibrary::BasicMesh::Quad);
-    assetLibrary.loadMesh(AssetLibrary::BasicMesh::Sphere);
-    assetLibrary.loadMesh(AssetLibrary::BasicMesh::CubeMapModel);
+    assetLibrary.loadMesh(BasicMeshType::Cube);
+    assetLibrary.loadMesh(BasicMeshType::Quad);
+    assetLibrary.loadMesh(BasicMeshType::Sphere);
+    assetLibrary.loadMesh(BasicMeshType::CubeMap);
 
     assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
 }

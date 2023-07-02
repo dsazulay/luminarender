@@ -10,15 +10,6 @@
 class AssetLibrary
 {
 public:
-    enum class BasicMesh
-    {
-        Cube,
-        CubeMapModel,
-        TriangleMapModel,
-        Quad,
-        Sphere
-    };
-
     struct DefaultResources
     {
         static constexpr char* texWhite = (char*) "defaultWhite";
@@ -34,7 +25,7 @@ public:
     Material* createMaterial(const char* name, const char* shader);
     Material* createMaterial(const char* name, Shader*);
     Model* loadModel(const char* name, const char* path);
-    Mesh* loadMesh(BasicMesh basicModel);
+    Mesh* loadMesh(BasicMeshType basicModel);
     Texture* load2DTexture(const char* name, const std::string& file, const std::string& directory);
     Texture* loadHDRTexture(const char* name, const std::string& file, const std::string& directory);
     Texture* loadCubeMapTexture(const char* name, const std::vector<std::string> faces, const std::string& directory);

@@ -17,5 +17,5 @@ public:
 
     static Model* loadModel(const char* path);
     static void processNode(aiNode* node, const aiScene* scene, Model* meshes);
-    static std::pair<std::vector<Vertex>, std::vector<unsigned int>> processMesh(aiMesh* mesh, const aiScene* scene);
+    static VertexIndexTuple processMesh(aiMesh* mesh, const aiScene* scene);
 };

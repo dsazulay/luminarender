@@ -1,5 +1,4 @@
 #include "asset_library.h"
-#include "primitives.h"
 #include "importer.h"
 
 AssetLibrary& AssetLibrary::instance()
@@ -66,6 +65,7 @@ Material* AssetLibrary::createMaterial(const char* name, Shader* shader)
 {
     ASSERT(shader != nullptr, "Shader not loaded!");
     m_materials[name] = new Material(shader);
+    m_materials[name]->name(name);
     return m_materials[name];
 }
 
@@ -114,30 +114,30 @@ bool AssetLibrary::isMeshLoaded(const char *name)
     return m_meshes.find(name) != m_meshes.end();
 }
 
-Mesh* AssetLibrary::loadMesh(AssetLibrary::BasicMesh basicModel)
+Mesh* AssetLibrary::loadMesh(BasicMeshType basicModel)
 {
     Mesh* m;
     const char* name;
     switch (basicModel)
     {
-        case BasicMesh::Cube:
-            m = new Mesh(Primitives::getCubePrimitives());
+        case BasicMeshType::Cube:
+            m = new Mesh(basicModel);
             name = "cube";
             break;
-        case BasicMesh::CubeMapModel:
-            m = new Mesh(Primitives::getCubeMapPrimitives());
+        case BasicMeshType::CubeMap:
+            m = new Mesh(basicModel);
             name = "cubeMap";
             break;
-        case BasicMesh::TriangleMapModel:
-            m = new Mesh(Primitives::getTriangleMapPrimitives());
+        case BasicMeshType::TriangleMap:
+            m = new Mesh(basicModel);
             name = "triangleMap";
             break;
-        case BasicMesh::Quad:
-            m = new Mesh(Primitives::getQuadPrimitives());
+        case BasicMeshType::Quad:
+            m = new Mesh(basicModel);
             name = "quad";
             break;
-        case BasicMesh::Sphere:
-            m = new Mesh(Primitives::getSpherePrimitives());
+        case BasicMeshType::Sphere:
+            m = new Mesh(basicModel);
             name = "sphere";
             break;
         default:

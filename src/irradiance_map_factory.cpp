@@ -2,7 +2,6 @@
 #include "assets/shader.h"
 #include "assets/mesh.h"
 #include "components/mesh_renderer.h"
-#include "primitives.h"
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 #include <glm/ext/matrix_transform.hpp>
@@ -33,7 +32,7 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMapsFromHDR(unsigned int 
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Mesh mesh(Primitives::getCubeMapPrimitives());
+    Mesh mesh(BasicMeshType::CubeMap);
     MeshRenderer mr;
     mr.mesh = &mesh;
     mr.initMesh();
@@ -227,7 +226,7 @@ unsigned int IrradianceMapFactory::generateLUTTexture(unsigned int captureFBO, u
 
     // pbr: generate a 2D LUT from the BRDF equations used.
     // ----------------------------------------------------
-    Mesh quadMesh(Primitives::getQuadPrimitives());
+    Mesh quadMesh(BasicMeshType::Quad);
     MeshRenderer quadRenderer;
     quadRenderer.mesh = &quadMesh;
     quadRenderer.initMesh();

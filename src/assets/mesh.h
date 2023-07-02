@@ -1,9 +1,9 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include "../pch.h"
-#include "material.h"
-#include "../components/icomponent.h"
+#include <glm/vec3.hpp>
+#include <glm/vec2.hpp>
+
+#include <vector>
 
 struct Vertex
 {
@@ -12,18 +12,45 @@ struct Vertex
     glm::vec2 texCoords;
 };
 
-class Mesh : public IComponent
+struct VertexIndexTuple
+{
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+};
+
+enum class BasicMeshType
+{
+    Quad,
+    Cube,
+    Sphere,
+    CubeMap,
+    TriangleMap,
+};
+
+namespace primitives
+{
+    VertexIndexTuple quad();
+    VertexIndexTuple cube();
+    VertexIndexTuple sphere();
+    VertexIndexTuple cubeMap();
+    VertexIndexTuple triangleMap();
+}
+
+class Mesh
 {
 public:
-    Mesh(std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives);
-    ~Mesh();
-    void setPrimitives(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
-    void setPrimitives(std::pair<std::vector<Vertex>, std::vector<unsigned int>> primitives);
+    Mesh(BasicMeshType meshType);
+    Mesh(VertexIndexTuple m);
 
     int indicesSize() const;
 
+    unsigned int vao() const;
 
-    std::vector<Vertex> m_Vertices;
-    std::vector<unsigned int> m_Indices;
+    std::vector<Vertex> m_vertices;
+    std::vector<unsigned int> m_indices;
 
+private:
+    void initMesh();
+
+    unsigned int m_vbo, m_ebo, m_vao;
 };

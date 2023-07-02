@@ -38,7 +38,10 @@ std::unique_ptr<Entity> EntityFactory::createMesh(glm::vec3 pos, Material *mat, 
     transform.position(pos);
     transform.updateModelMatrix();
 
-    Mesh mesh(primitives);
+    VertexIndexTuple m;
+    m.vertices = primitives.first;
+    m.indices = primitives.second;
+    Mesh mesh(m);
 
     MeshRenderer meshRenderer;
     meshRenderer.mesh = &mesh;

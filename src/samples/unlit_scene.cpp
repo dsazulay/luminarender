@@ -40,9 +40,9 @@ void UnlitScene::loadMaterials(AssetLibrary &assetLibrary)
 
 void UnlitScene::loadModels(AssetLibrary &assetLibrary)
 {
-    assetLibrary.loadMesh(AssetLibrary::BasicMesh::Cube);
-    assetLibrary.loadMesh(AssetLibrary::BasicMesh::Quad);
-    assetLibrary.loadMesh(AssetLibrary::BasicMesh::Sphere);
+    assetLibrary.loadMesh(BasicMeshType::Cube);
+    assetLibrary.loadMesh(BasicMeshType::Quad);
+    assetLibrary.loadMesh(BasicMeshType::Sphere);
 }
 
 void UnlitScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)

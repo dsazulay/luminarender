@@ -1,6 +1,17 @@
 #include "material.h"
 #include "../asset_library.h"
 
+
+void Material::name(std::string n)
+{
+    m_name = n;
+}
+
+std::string Material::name() const
+{
+    return m_name;
+}
+
 void Material::setProperty(const std::string &name, const std::any& value)
 {
     uniforms[name] = value;

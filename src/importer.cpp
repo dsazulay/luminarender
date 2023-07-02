@@ -97,12 +97,11 @@ void Importer::processNode(aiNode *node, const aiScene *scene, Model* model)
     }
 }
 
-std::pair<std::vector<Vertex>, std::vector<unsigned int>> Importer::processMesh(aiMesh *mesh, const aiScene *scene)
+VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene)
 {
-    std::vector<Vertex> outVertices;
-    std::vector<unsigned int> outIndices;
+    VertexIndexTuple m;
 
-    outVertices.reserve(mesh->mNumVertices);
+    m.vertices.reserve(mesh->mNumVertices);
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         Vertex vert{};
@@ -123,7 +122,7 @@ std::pair<std::vector<Vertex>, std::vector<unsigned int>> Importer::processMesh(
         uv.y = mesh->mTextureCoords[0][i].y;
         vert.texCoords = uv;
 
-        outVertices.push_back(vert);
+        m.vertices.push_back(vert);
     }
 
 //    outIndices.reserve(indicesSize);
@@ -131,9 +130,9 @@ std::pair<std::vector<Vertex>, std::vector<unsigned int>> Importer::processMesh(
     {
         aiFace face = mesh->mFaces[i];
         for (unsigned int j = 0; j < face.mNumIndices; j++) {
-            outIndices.push_back(face.mIndices[j]);
+            m.indices.push_back(face.mIndices[j]);
         }
     }
 
-    return std::make_pair(outVertices, outIndices);
+    return m;
 }

@@ -17,6 +17,9 @@ public:
     std::unordered_map<std::string, std::any>& getUniformData();
     std::unordered_map<std::string, unsigned int> textures;
 
+    void name(std::string n);
+    std::string name() const;
+
 private:
     std::unordered_map<std::string, std::any> uniforms;
 
@@ -31,6 +34,8 @@ private:
     void setUniform(const std::string &name, const glm::vec4 &vec) const;
     void setUniform(const std::string &name, const glm::mat3 &mat) const;
     void setUniform(const std::string &name, const glm::mat4 &mat) const;
+
+    std::string m_name;
 
 };
 
