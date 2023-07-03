@@ -1,11 +1,15 @@
 #pragma once
 
-#include "pch.h"
 #include "assets/shader.h"
 #include "assets/material.h"
 #include "assets/mesh.h"
 #include "assets/model.h"
 #include "assets/texture.h"
+
+#include <vector>
+#include <unordered_map>
+#include <string>
+#include <memory>
 
 class AssetLibrary
 {
@@ -25,10 +29,12 @@ public:
     Material* createMaterial(const char* name, const char* shader);
     Material* createMaterial(const char* name, Shader*);
     Model* loadModel(const char* name, const char* path);
-    Mesh* loadMesh(BasicMeshType basicModel);
+    Mesh* loadMesh(const char* name, BasicMeshType basicModel);
     Texture* load2DTexture(const char* name, const std::string& file, const std::string& directory);
     Texture* loadHDRTexture(const char* name, const std::string& file, const std::string& directory);
     Texture* loadCubeMapTexture(const char* name, const std::vector<std::string> faces, const std::string& directory);
+
+    void createDefaultResources();
 
     Shader* getShader(const char* name);
     Material* getMaterial(const char* name);
@@ -38,6 +44,7 @@ public:
 
 private:
     AssetLibrary();
+    void loadDefaultResources();
 
     bool isShaderLoaded(const char* name);
     bool isMaterialCreated(const char* name);

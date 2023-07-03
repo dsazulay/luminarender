@@ -5,16 +5,9 @@
 
 void UnlitScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
 {
-    loadShaders(assetLibrary);
     loadTextures(assetLibrary);
     loadMaterials(assetLibrary);
-    loadModels(assetLibrary);
     loadObjects(scene, assetLibrary);
-}
-
-void UnlitScene::loadShaders(AssetLibrary &assetLibrary)
-{
-    assetLibrary.loadShader("unlit", SampleResources::shader_unlit);
 }
 
 void UnlitScene::loadTextures(AssetLibrary& assetLibrary)
@@ -36,13 +29,6 @@ void UnlitScene::loadMaterials(AssetLibrary &assetLibrary)
 
     Material* woodBoxMat = assetLibrary.createMaterial("woodBoxMat", "unlit");
     woodBoxMat->setTexture("u_mainTex", assetLibrary.getTexture("woodBox")->ID(), 0);
-}
-
-void UnlitScene::loadModels(AssetLibrary &assetLibrary)
-{
-    assetLibrary.loadMesh(BasicMeshType::Cube);
-    assetLibrary.loadMesh(BasicMeshType::Quad);
-    assetLibrary.loadMesh(BasicMeshType::Sphere);
 }
 
 void UnlitScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)

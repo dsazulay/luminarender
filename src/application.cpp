@@ -18,6 +18,7 @@ Application::Application(const AppConfig& config)
 
     ASSERT(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Failed to initialize GLAD");
 
+    AssetLibrary::instance().createDefaultResources();
     m_renderer = new Renderer((float) config.viewportWidth, (float) config.viewportHeight,
                               glm::vec3(0.0, 0.0, 8.0f));
 

@@ -6,19 +6,12 @@
 
 void LightingSkyboxScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
 {
-    loadShaders(assetLibrary);
     loadTextures(assetLibrary);
     loadMaterials(assetLibrary);
     loadModels(assetLibrary);
     loadLights(scene);
     loadSkybox(scene, assetLibrary);
     loadObjects(scene, assetLibrary);
-}
-
-void LightingSkyboxScene::loadShaders(AssetLibrary &assetLibrary)
-{
-    assetLibrary.loadShader("lambert", SampleResources::shader_lambert);
-    assetLibrary.loadShader("skybox", SampleResources::shader_skybox);
 }
 
 void LightingSkyboxScene::loadTextures(AssetLibrary& assetLibrary)
@@ -54,11 +47,6 @@ void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary)
 
 void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
 {
-    assetLibrary.loadMesh(BasicMeshType::Cube);
-    assetLibrary.loadMesh(BasicMeshType::Quad);
-    assetLibrary.loadMesh(BasicMeshType::Sphere);
-    assetLibrary.loadMesh(BasicMeshType::CubeMap);
-
     assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
 }
 
@@ -87,7 +75,7 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     Model* spitfire = assetLibrary.getModel("spitfireModel");
 
     Material* greyMat = assetLibrary.getMaterial("greyMat");
-    Material* blueMat = assetLibrary.getMaterial("blueMat");
+    Material* blueMat = assetLibrary.getMaterial("defaultPbr");
     Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
 

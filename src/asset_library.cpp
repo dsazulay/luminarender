@@ -1,5 +1,9 @@
-#include "asset_library.h"
+#include "asset_library.h" 
+
+#include "samples/sample_resources.h"
 #include "importer.h"
+
+#include "glm/vec4.hpp"
 
 AssetLibrary& AssetLibrary::instance()
 {
@@ -114,36 +118,15 @@ bool AssetLibrary::isMeshLoaded(const char *name)
     return m_meshes.find(name) != m_meshes.end();
 }
 
-Mesh* AssetLibrary::loadMesh(BasicMeshType basicModel)
+Mesh* AssetLibrary::loadMesh(const char* name, BasicMeshType basicModel)
 {
-    Mesh* m;
-    const char* name;
-    switch (basicModel)
+    if (isMeshLoaded(name))
     {
-        case BasicMeshType::Cube:
-            m = new Mesh(basicModel);
-            name = "cube";
-            break;
-        case BasicMeshType::CubeMap:
-            m = new Mesh(basicModel);
-            name = "cubeMap";
-            break;
-        case BasicMeshType::TriangleMap:
-            m = new Mesh(basicModel);
-            name = "triangleMap";
-            break;
-        case BasicMeshType::Quad:
-            m = new Mesh(basicModel);
-            name = "quad";
-            break;
-        case BasicMeshType::Sphere:
-            m = new Mesh(basicModel);
-            name = "sphere";
-            break;
-        default:
-            LOG_WARN("No basic model found!");
-            break;
+        LOG_WARN("mesh already loaded");
+        return m_meshes[name];
     }
+
+    Mesh* m = new Mesh(basicModel);
     m_meshes[name] = m;
 
     return m;
@@ -215,5 +198,28 @@ bool AssetLibrary::isTextureLoaded(const char *name)
 
 AssetLibrary::AssetLibrary()
 {
+    loadDefaultResources();
+}
+
+void AssetLibrary::loadDefaultResources()
+{
+    loadShader("skybox", SampleResources::shader_skybox);
+    loadShader("unlit", SampleResources::shader_unlit);
+    loadShader("lambert", SampleResources::shader_lambert);
+    loadShader("pbr", SampleResources::shader_pbr);
+    
+    loadMesh("quad", BasicMeshType::Quad);
+    loadMesh("cube", BasicMeshType::Cube);
+    loadMesh("sphere", BasicMeshType::Sphere);
+    loadMesh("cubeMap", BasicMeshType::CubeMap);
+    loadMesh("triangleMap", BasicMeshType::TriangleMap);
+
     load2DTexture(DefaultResources::texWhite, texture_defaultWhite, texture_dir);
+}
+
+void AssetLibrary::createDefaultResources()
+{
+    Material* defaultPbr = createMaterial("defaultPbr", "pbr");
+    defaultPbr->setProperty("u_albedo", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
+    defaultPbr->setProperty("u_roughness", 0.8f);
 }

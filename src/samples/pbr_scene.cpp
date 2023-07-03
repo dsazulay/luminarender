@@ -8,7 +8,6 @@ void PbrScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
 {
     unsigned int skyboxTex;
 
-    loadShaders(assetLibrary);
     loadTextures(assetLibrary);
     loadIrradianceTextures(scene, assetLibrary, skyboxTex);
     loadMaterials(assetLibrary, skyboxTex);
@@ -16,13 +15,6 @@ void PbrScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
     loadLights(scene);
     loadSkybox(scene, assetLibrary);
     loadObjects(scene, assetLibrary);
-}
-
-void PbrScene::loadShaders(AssetLibrary &assetLibrary)
-{
-    assetLibrary.loadShader("lambert", SampleResources::shader_lambert);
-    assetLibrary.loadShader("pbr", SampleResources::shader_pbr);
-    assetLibrary.loadShader("skybox", SampleResources::shader_skybox);
 }
 
 void PbrScene::loadTextures(AssetLibrary& assetLibrary)
@@ -86,11 +78,6 @@ void PbrScene::loadMaterials(AssetLibrary &assetLibrary, unsigned int& skyboxTex
 
 void PbrScene::loadModels(AssetLibrary &assetLibrary)
 {
-    assetLibrary.loadMesh(BasicMeshType::Cube);
-    assetLibrary.loadMesh(BasicMeshType::Quad);
-    assetLibrary.loadMesh(BasicMeshType::Sphere);
-    assetLibrary.loadMesh(BasicMeshType::CubeMap);
-
     assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
     assetLibrary.loadModel("cerberusModel", SampleResources::model_cerberus);
 }
