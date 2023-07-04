@@ -1,6 +1,7 @@
 #pragma once
 
 #include "components/mesh_renderer.h"
+#include <glm/mat4x4.hpp>
 
 struct IrradianceMaps
 {

@@ -1,11 +1,22 @@
 #pragma once
 
-#include "../scene.h"
+class Entity;
+class Material;
+class MeshRenderer;
+class Transform;
 
-class PropertiesPanel
+namespace ui
 {
-public:
-    static void update(Entity* entity);
-    static const int bufferSize = 256;
-    static char renameBuffer[bufferSize];
-};
+    namespace hierarchy
+    {
+
+    }
+
+    namespace properties
+    {
+        void draw(Entity* entity);
+        void draw(Transform* transform);
+        void draw(MeshRenderer* renderer);
+        void draw(Material* mat);
+    }
+}

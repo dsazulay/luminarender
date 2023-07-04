@@ -18,11 +18,13 @@ struct VertexIndexTuple
     std::vector<unsigned int> indices;
 };
 
-enum class BasicMeshType
+enum class MeshType
 {
+    None,
     Quad,
     Cube,
     Sphere,
+    Custom,
     CubeMap,
     TriangleMap,
 };
@@ -39,15 +41,18 @@ namespace primitives
 class Mesh
 {
 public:
-    Mesh(BasicMeshType meshType);
+    Mesh(MeshType meshType);
     Mesh(VertexIndexTuple m);
 
     int indicesCount() const;
     unsigned int vao() const;
+    MeshType meshType() const;
+    void meshType(MeshType m);
 
 private:
     void initMesh();
 
+    MeshType m_meshType;
     unsigned int m_vbo, m_ebo, m_vao;
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;

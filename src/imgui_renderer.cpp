@@ -118,10 +118,7 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm
     ImGui::End();
 
     HierarchyPanel::update(scene);
-    if (scene.selected() != nullptr)
-    {
-        PropertiesPanel::update(scene.selected());
-    }
+    ui::properties::draw(scene.selected());
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

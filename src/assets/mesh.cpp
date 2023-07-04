@@ -206,28 +206,31 @@ namespace primitives
     }
 }
 
-Mesh::Mesh(BasicMeshType meshType)
+Mesh::Mesh(MeshType meshType)
 {
     VertexIndexTuple m;
     switch (meshType)
     {
-        case BasicMeshType::Quad:
+        case MeshType::Quad:
             m = primitives::quad();
             break;
-        case BasicMeshType::Cube:
+        case MeshType::Cube:
             m = primitives::cube();
             break;
-        case BasicMeshType::Sphere:
+        case MeshType::Sphere:
             m = primitives::sphere();
             break;
-        case BasicMeshType::CubeMap:
+        case MeshType::CubeMap:
             m = primitives::cubeMap();
             break;
-        case BasicMeshType::TriangleMap:
+        case MeshType::TriangleMap:
             m = primitives::triangleMap();
+            break;
+        default:
             break;
     }
 
+    m_meshType = meshType;
     m_vertices = m.vertices;
     m_indices = m.indices;
 
@@ -250,6 +253,16 @@ int Mesh::indicesCount() const
 unsigned int Mesh::vao() const
 {
     return m_vao;
+}
+
+MeshType Mesh::meshType() const
+{
+    return m_meshType;
+}
+
+void Mesh::meshType(MeshType mt)
+{
+    m_meshType = mt;
 }
 
 void Mesh::initMesh()

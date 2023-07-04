@@ -32,7 +32,7 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMapsFromHDR(unsigned int 
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Mesh mesh(BasicMeshType::CubeMap);
+    Mesh mesh(MeshType::CubeMap);
     MeshRenderer mr;
     mr.mesh = &mesh;
 
@@ -225,7 +225,7 @@ unsigned int IrradianceMapFactory::generateLUTTexture(unsigned int captureFBO, u
 
     // pbr: generate a 2D LUT from the BRDF equations used.
     // ----------------------------------------------------
-    Mesh quadMesh(BasicMeshType::Quad);
+    Mesh quadMesh(MeshType::Quad);
     MeshRenderer quadRenderer;
     quadRenderer.mesh = &quadMesh;
 

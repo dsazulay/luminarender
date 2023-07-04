@@ -15,7 +15,7 @@ void NormalVisualizerPass::renderNormalVectorOfEntity(Entity &entity)
 {
     auto transform = entity.getComponent<Transform>();
     auto mesh = entity.getComponent<MeshRenderer>();
-    if (mesh != nullptr)
+    if (mesh != nullptr && mesh->mesh != nullptr && mesh->material != nullptr)
     {
         Material *material = m_material;
 

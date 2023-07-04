@@ -1,6 +1,7 @@
 #include "forward_pass.h"
 #include "../components/transform.h"
 #include "../components/mesh_renderer.h"
+#include "../assets/material.h"
 #include <glad/glad.h>
 
 void ForwardPass::render(Scene& scene)
@@ -18,7 +19,7 @@ void ForwardPass::renderEntity(Entity& entity, Entity* mainLight)
 {
     auto transform = entity.getComponent<Transform>();
     auto mesh = entity.getComponent<MeshRenderer>();
-    if (mesh != nullptr)
+    if (mesh != nullptr && mesh->mesh != nullptr && mesh->material != nullptr)
     {
         Material *material = mesh->material;
         material->shader->use();

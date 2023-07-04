@@ -118,7 +118,7 @@ bool AssetLibrary::isMeshLoaded(const char *name)
     return m_meshes.find(name) != m_meshes.end();
 }
 
-Mesh* AssetLibrary::loadMesh(const char* name, BasicMeshType basicModel)
+Mesh* AssetLibrary::loadMesh(const char* name, MeshType basicModel)
 {
     if (isMeshLoaded(name))
     {
@@ -208,11 +208,11 @@ void AssetLibrary::loadDefaultResources()
     loadShader("lambert", SampleResources::shader_lambert);
     loadShader("pbr", SampleResources::shader_pbr);
     
-    loadMesh("quad", BasicMeshType::Quad);
-    loadMesh("cube", BasicMeshType::Cube);
-    loadMesh("sphere", BasicMeshType::Sphere);
-    loadMesh("cubeMap", BasicMeshType::CubeMap);
-    loadMesh("triangleMap", BasicMeshType::TriangleMap);
+    loadMesh("quad", MeshType::Quad);
+    loadMesh("cube", MeshType::Cube);
+    loadMesh("sphere", MeshType::Sphere);
+    loadMesh("cubeMap", MeshType::CubeMap);
+    loadMesh("triangleMap", MeshType::TriangleMap);
 
     load2DTexture(DefaultResources::texWhite, texture_defaultWhite, texture_dir);
 }
