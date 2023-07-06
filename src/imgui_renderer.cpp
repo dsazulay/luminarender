@@ -117,7 +117,7 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm
 
     ImGui::End();
 
-    HierarchyPanel::update(scene);
+    ui::hierarchy::draw(&scene);
     ui::properties::draw(scene.selected());
 
     ImGui::Render();

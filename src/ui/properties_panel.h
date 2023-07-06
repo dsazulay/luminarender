@@ -1,22 +1,17 @@
 #pragma once
 
+class Scene;
 class Entity;
-class Material;
-class MeshRenderer;
-class Transform;
 
 namespace ui
 {
     namespace hierarchy
     {
-
+        void draw(Scene* scene);
     }
 
     namespace properties
     {
         void draw(Entity* entity);
-        void draw(Transform* transform);
-        void draw(MeshRenderer* renderer);
-        void draw(Material* mat);
     }
 }
