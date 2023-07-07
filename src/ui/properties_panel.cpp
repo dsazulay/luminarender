@@ -8,10 +8,82 @@
 #include "../assets/material.h"
 #include "../events/event.h"
 #include "../events/dispatcher.h"
+#include "../entity_factory.h"
 
+#include "../tinyfiledialogs.h"
 #include "imgui.h"
 
 #include <string>
+
+namespace ui::mainmenu
+{
+    void drawMenuFile(Scene* scene);
+    void drawMenuEdit();
+}
+
+void ui::mainmenu::draw(Scene* scene)
+{
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("File"))
+        {
+            drawMenuFile(scene);
+            ImGui::EndMenu();
+        }
+        if (ImGui::BeginMenu("Edit"))
+        {
+            drawMenuEdit(); 
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+}
+
+void ui::mainmenu::drawMenuFile(Scene* scene)
+{
+    if (ImGui::MenuItem("New")) {}
+    if (ImGui::MenuItem("Open", "Ctrl+O")) {}
+    if (ImGui::BeginMenu("Open Recent"))
+    {
+        ImGui::MenuItem("fish_hat.c");
+        ImGui::MenuItem("fish_hat.inl");
+        ImGui::MenuItem("fish_hat.h");
+        if (ImGui::BeginMenu("More.."))
+        {
+            ImGui::MenuItem("Hello");
+            ImGui::MenuItem("Sailor");
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenu();
+    }
+    if (ImGui::MenuItem("Save", "Ctrl+S")) {}
+    if (ImGui::MenuItem("Save As..")) {}
+
+    ImGui::Separator();
+    if (ImGui::MenuItem("Import model"))
+    {
+        const char* selection = tinyfd_openFileDialog("Select File",
+                "", 0, nullptr, nullptr, 0);
+
+        if (selection != nullptr)
+        {
+            // TODO: extract file name + check for name repetition
+            auto model = AssetLibrary::instance().loadModel(selection, selection);
+            auto entity = EntityFactory::createFromModel("name", model);
+            scene->addObject(std::move(entity));
+        }
+    }
+}
+
+void ui::mainmenu::drawMenuEdit()
+{
+    if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+    if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+    ImGui::Separator();
+    if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+    if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+    if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+}
 
 namespace ui::hierarchy
 {

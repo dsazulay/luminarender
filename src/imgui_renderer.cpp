@@ -54,6 +54,7 @@ void ImguiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm
 
     ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
+    ui::mainmenu::draw(&scene);
     // ImGui::ShowDemoWindow();
 
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});

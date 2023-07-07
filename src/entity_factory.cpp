@@ -2,6 +2,7 @@
 #include "components/mesh_renderer.h"
 #include "components/transform.h"
 #include "assets/model.h"
+#include "asset_library.h"
 #include <string>
 
 int EntityFactory::entityCount = 0;
@@ -115,4 +116,10 @@ std::unique_ptr<Entity> EntityFactory::createFromModel(const char* name, glm::ve
 
     e->updateSelfAndChild();
     return std::move(e);
+}
+
+
+std::unique_ptr<Entity> EntityFactory::createFromModel(const char* name, Model* model)
+{
+    return createFromModel(name, glm::vec3(0.0f, 0.0f, 0.0f), AssetLibrary::instance().getMaterial("defaultPbr"), model);
 }
