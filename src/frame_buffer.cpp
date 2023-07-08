@@ -63,7 +63,10 @@ FrameBuffer::FrameBuffer(int width, int height, Type type)
 
 void FrameBuffer::deleteBuffer()
 {
-
+    glDeleteTextures(1, &m_TexcolorBuffer);
+    if (m_type != Type::Shadow)
+        glDeleteRenderbuffers(1, &m_RenderBuffer);
+    glDeleteFramebuffers(1, &m_FrameBuffer);
 }
 
 FrameBuffer::~FrameBuffer()
