@@ -1,4 +1,4 @@
-#include "properties_panel.h"
+#include "panel.h"
 
 #include "../asset_library.h"
 #include "../scene.h"

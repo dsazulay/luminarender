@@ -34,10 +34,10 @@ Application::Application(const AppConfig& config)
             std::bind(&Application::onUiCreateEmptyEvent, this, std::placeholders::_1));
 
 
-    m_imguiRenderer.init();
-    m_imguiRenderer.setBackendImplementation(m_window.glfwWindow());
-    m_imguiRenderer.viewportWidth = (float) config.viewportWidth;
-    m_imguiRenderer.viewportHeight = (float) config.viewportHeight;
+    m_uiRenderer.init();
+    m_uiRenderer.setBackendImplementation(m_window.glfwWindow());
+    m_uiRenderer.viewportWidth = (float) config.viewportWidth;
+    m_uiRenderer.viewportHeight = (float) config.viewportHeight;
 
     // create shaders, materials, and objects and add them to the scene
 //    UnlitScene::loadScene(m_scene, AssetLibrary::instance());
@@ -72,7 +72,7 @@ void Application::mainloop()
         glClearColor(0.4f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        m_imguiRenderer.update(m_renderer->getTexcolorBufferID(), m_scene, m_renderer->viewMatrix(), m_renderer->projMatrix());
+        m_uiRenderer.update(m_renderer->getTexcolorBufferID(), m_scene, m_renderer->viewMatrix(), m_renderer->projMatrix());
 
         m_window.swapBuffers();
         m_window.pollEvents();
@@ -93,7 +93,7 @@ void Application::run()
 
 void Application::terminate()
 {
-    m_imguiRenderer.terminate();
+    m_uiRenderer.terminate();
     m_window.terminate();
 }
 

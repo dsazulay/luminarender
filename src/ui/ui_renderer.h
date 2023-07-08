@@ -1,12 +1,13 @@
 #pragma once
 
 #include <GLFW/glfw3.h>
-#include "events/event.h"
-#include "frame_buffer.h"
-#include "scene.h"
-#include <glm/glm.hpp>
+#include "../events/event.h"
+#include "../scene.h"
 
-class ImguiRenderer {
+#include <glm/mat4x4.hpp>
+
+class UiRenderer
+{
 public:
     void init();
     void terminate();

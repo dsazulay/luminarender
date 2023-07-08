@@ -3,7 +3,7 @@
 #include "window.h"
 #include "renderer.h"
 #include "scene.h"
-#include "imgui_renderer.h"
+#include "ui/ui_renderer.h"
 #include "asset_library.h"
 #include <glm/glm.hpp>
 
@@ -33,7 +33,7 @@ private:
 
     Window m_window{};
     Renderer* m_renderer;
-    ImguiRenderer m_imguiRenderer{};
+    UiRenderer m_uiRenderer{};
     Scene m_scene;
 
     int m_windowWidth{};
