@@ -1,14 +1,12 @@
 #pragma once
 
-#include "pch.h"
-#include "assets/material.h"
-#include "entity.h"
+#include "../camera.h"
 #include "uniform_buffer_object.h"
-#include "camera.h"
 #include "frame_buffer.h"
-#include "renderer/shadow_pass.h"
-#include "renderer/forward_pass.h"
-#include "renderer/normal_visualizer_pass.h"
+#include "render_target.h"
+#include "shadow_pass.h"
+#include "forward_pass.h"
+#include "normal_visualizer_pass.h"
 
 class Renderer {
 public:

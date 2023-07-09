@@ -1,8 +1,10 @@
 #include "pbr_scene.h"
+
 #include "sample_resources.h"
 #include "../entity_factory.h"
 #include "../components/transform.h"
 #include "../irradiance_map_factory.h"
+
 
 void PbrScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
 {

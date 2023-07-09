@@ -1,7 +1,10 @@
 #include "forward_pass.h"
+
 #include "../components/transform.h"
 #include "../components/mesh_renderer.h"
 #include "../assets/material.h"
+#include "../assets/shader.h"
+
 #include <glad/glad.h>
 
 void ForwardPass::render(Scene& scene)

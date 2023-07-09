@@ -1,8 +1,10 @@
 #pragma once
 
+#include "events/event.h"
+
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-#include "events/event.h"
+
 
 enum Camera_Movement {
     FORWARD,

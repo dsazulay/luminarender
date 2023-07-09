@@ -1,5 +1,10 @@
 #include "shader.h"
 
+#include "../log.h"
+
+#include <regex>
+#include <fstream>
+
 Shader::Shader(const char* shaderPath)
 {
     std::stringstream shaderStream = getStreamFromFile(shaderPath);

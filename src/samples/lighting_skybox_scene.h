@@ -1,7 +1,8 @@
 #pragma once
 
-#include "../asset_library.h"
 #include "../scene.h"
+#include "../assets/asset_library.h"
+
 
 class LightingSkyboxScene
 {

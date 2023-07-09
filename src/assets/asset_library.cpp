@@ -1,9 +1,10 @@
 #include "asset_library.h" 
 
-#include "samples/sample_resources.h"
+#include "../samples/sample_resources.h"
 #include "importer.h"
+#include "../log.h"
 
-#include "glm/vec4.hpp"
+#include <glm/vec4.hpp>
 
 AssetLibrary& AssetLibrary::instance()
 {

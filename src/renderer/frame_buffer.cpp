@@ -1,7 +1,11 @@
-#include "pch.h"
 #include "frame_buffer.h"
 
+#include "../log.h"
+
 #include <glad/glad.h>
+
+#include <vector>
+
 
 void FrameBuffer::createBuffer()
 {
@@ -26,7 +30,7 @@ void FrameBuffer::createBuffer()
 
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
     {
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+        LOG_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -112,7 +116,7 @@ void FrameBuffer::create3Dbuffer()
     int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
+        LOG_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
         throw 0;
     }
 
@@ -144,7 +148,7 @@ void FrameBuffer::createShadowBuffer()
     int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE)
     {
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
+        LOG_ERROR("ERROR::FRAMEBUFFER:: Framebuffer is not complete!");
         throw 0;
     }
 

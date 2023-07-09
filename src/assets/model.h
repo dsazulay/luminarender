@@ -1,7 +1,10 @@
 #pragma once
 
-#include "../pch.h"
-#include "mesh.h"
+#include <vector>
+#include <string>
+#include <utility>
+
+class Mesh;
 
 class Model
 {

@@ -1,7 +1,9 @@
-#include "pch.h"
 #include "window.h"
+
 #include "events/event.h"
 #include "events/dispatcher.h"
+#include "log.h"
+
 
 void Window::init()
 {

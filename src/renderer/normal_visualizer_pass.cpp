@@ -1,7 +1,12 @@
 #include "normal_visualizer_pass.h"
+
 #include "../components/transform.h"
 #include "../components/mesh_renderer.h"
-#include "../asset_library.h"
+#include "../assets/asset_library.h"
+#include "../assets/material.h"
+#include "../camera.h"
+
+#include <glad/glad.h>
 
 void NormalVisualizerPass::render(Scene &scene)
 {

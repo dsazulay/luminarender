@@ -1,13 +1,16 @@
-#include "entity_factory.h"
-#include "events/event.h"
-#include "pch.h"
-#include <glm/gtc/type_ptr.hpp>
 #include "application.h"
+
+#include "entity_factory.h"
 #include "samples/unlit_scene.h"
 #include "samples/lighting_skybox_scene.h"
 #include "samples/pbr_scene.h"
-#include <glad/glad.h>
+#include "events/event.h"
 #include "events/dispatcher.h"
+#include "log.h"
+
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
+
 
 float Application::deltaTime;
 

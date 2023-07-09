@@ -1,8 +1,9 @@
 #pragma once
 
+#include "icomponent.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include "icomponent.h"
 
 class Transform : public IComponent
 {

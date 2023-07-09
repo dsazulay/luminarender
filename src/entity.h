@@ -1,8 +1,10 @@
 #pragma once
 
-#include "pch.h"
 #include "components/icomponent.h"
 
+#include <memory>
+#include <string>
+#include <vector>
 
 class Entity
 {

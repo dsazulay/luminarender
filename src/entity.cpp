@@ -1,7 +1,7 @@
-#include "pch.h"
-#include <glm/gtx/matrix_decompose.hpp>
 #include "entity.h"
+
 #include "components/transform.h"
+#include "log.h"
 
 unsigned int Entity::id() const
 {

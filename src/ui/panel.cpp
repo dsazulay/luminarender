@@ -1,6 +1,6 @@
 #include "panel.h"
 
-#include "../asset_library.h"
+#include "../assets/asset_library.h"
 #include "../scene.h"
 #include "../components/transform.h"
 #include "../components/mesh_renderer.h"
@@ -9,6 +9,7 @@
 #include "../events/event.h"
 #include "../events/dispatcher.h"
 #include "../entity_factory.h"
+#include "../log.h"
 
 #include "../tinyfiledialogs.h"
 #include "imgui.h"

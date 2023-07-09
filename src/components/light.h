@@ -1,7 +1,8 @@
 #pragma once
 
-#include <glm/glm.hpp>
 #include "icomponent.h"
+
+#include <glm/glm.hpp>
 
 enum LightType
 {

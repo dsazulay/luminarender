@@ -1,15 +1,14 @@
 #pragma once
 
-#include "assets/shader.h"
-#include "assets/material.h"
-#include "assets/mesh.h"
-#include "assets/model.h"
-#include "assets/texture.h"
+#include "shader.h"
+#include "material.h"
+#include "mesh.h"
+#include "model.h"
+#include "texture.h"
 
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include <memory>
 
 class AssetLibrary
 {

@@ -1,5 +1,7 @@
 #include "render_target.h"
+
 #include <glad/glad.h>
+
 
 void RenderTarget::updateViewportDimensions()
 {

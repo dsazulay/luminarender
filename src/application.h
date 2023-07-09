@@ -1,10 +1,10 @@
 #pragma once
 
 #include "window.h"
-#include "renderer.h"
 #include "scene.h"
+#include "renderer/renderer.h"
 #include "ui/ui_renderer.h"
-#include "asset_library.h"
+
 #include <glm/glm.hpp>
 
 struct AppConfig

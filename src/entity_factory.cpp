@@ -1,9 +1,12 @@
 #include "entity_factory.h"
+
 #include "components/mesh_renderer.h"
 #include "components/transform.h"
 #include "assets/model.h"
-#include "asset_library.h"
+#include "assets/asset_library.h"
+
 #include <string>
+
 
 int EntityFactory::entityCount = 0;
 

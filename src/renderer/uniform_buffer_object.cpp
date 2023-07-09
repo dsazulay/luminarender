@@ -1,6 +1,7 @@
 #include "uniform_buffer_object.h"
+
 #include <glad/glad.h>
-#include <glm/ext/matrix_float4x4.hpp>
+
 
 UniformBufferObject::UniformBufferObject(const std::size_t bufferSize)
 {

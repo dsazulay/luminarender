@@ -1,8 +1,10 @@
 #pragma once
 
 #include "irenderable.h"
-#include "../assets/material.h"
+
 #include <glm/glm.hpp>
+
+class Material;
 
 class ShadowPass : public IRenderable
 {

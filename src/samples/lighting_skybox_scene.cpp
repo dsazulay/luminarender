@@ -1,8 +1,9 @@
 #include "lighting_skybox_scene.h"
+
 #include "sample_resources.h"
 #include "../entity_factory.h"
 #include "../components/transform.h"
-#include <utility>
+
 
 void LightingSkyboxScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
 {

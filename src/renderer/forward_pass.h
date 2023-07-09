@@ -1,7 +1,7 @@
 #pragma once
 
 #include "irenderable.h"
-#include "render_target.h"
+
 #include <glm/glm.hpp>
 
 class ForwardPass : public IRenderable

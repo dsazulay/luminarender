@@ -1,7 +1,8 @@
 #pragma once
 
 #include "../scene.h"
-#include "../asset_library.h"
+#include "../assets/asset_library.h"
+
 
 class PbrScene
 {

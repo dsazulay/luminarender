@@ -1,8 +1,12 @@
 #pragma once
 
-#include "../pch.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <sstream>
 
 struct PropertyTuple
 {

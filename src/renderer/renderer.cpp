@@ -1,12 +1,14 @@
 #include "renderer.h"
-#include "components/light.h"
-#include "components/mesh_renderer.h"
-#include "components/transform.h"
-#include "events/dispatcher.h"
+
+#include "../components/light.h"
+#include "../components/mesh_renderer.h"
+#include "../components/transform.h"
+#include "../events/dispatcher.h"
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 
 void Renderer::render(Scene& scene)
 {

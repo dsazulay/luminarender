@@ -1,8 +1,11 @@
-#include "pch.h"
 #include "importer.h"
 
+#include "model.h"
+#include "texture.h"
+#include "../log.h"
+
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "../stb_image.h"
 
 Texture* Importer::loadTextureFromFile(const std::string& file, const std::string &directory) {
     std::string filename = directory + '/' + file;
@@ -73,7 +76,7 @@ Model* Importer::loadModel(const char* path)
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
-        std::cout << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
+        LOG_ERROR("ERROR::ASSIMP::{}", import.GetErrorString());
         return model;
     }
 

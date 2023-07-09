@@ -1,8 +1,9 @@
 #pragma once
 
 #include "irenderable.h"
-#include "../assets/material.h"
-#include "../camera.h"
+
+class Camera;
+class Material;
 
 class NormalVisualizerPass : IRenderable
 {

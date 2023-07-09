@@ -1,6 +1,7 @@
 #include "material.h"
-#include "../asset_library.h"
 
+#include "asset_library.h"
+#include "shader.h"
 
 void Material::name(std::string n)
 {

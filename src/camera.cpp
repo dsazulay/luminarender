@@ -1,7 +1,10 @@
 #include "camera.h"
-#include "events/dispatcher.h"
+
 #include "application.h"
+#include "events/dispatcher.h"
+
 #include <glm/gtc/matrix_transform.hpp>
+
 
 Camera::Camera(glm::vec3 position) : front(glm::vec3(0.0f, 0.0f, -1.0f)), worldUp(glm::vec3(0.0f, 1.0f, 0.0f)), yaw(YAW), pitch(PITCH), movementSpeed(SPEED), mouseSensitivity(SENSITIVITY), zoom(ZOOM)
 {

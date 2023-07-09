@@ -1,7 +1,15 @@
 #pragma once
 
-#include "../pch.h"
-#include "shader.h"
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat4x4.hpp>
+
+#include <string>
+#include <unordered_map>
+#include <any>
+#include <typeindex>
+
+class Shader;
 
 class Material
 {

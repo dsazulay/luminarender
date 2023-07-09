@@ -1,12 +1,13 @@
 #pragma once
 
-#include "pch.h"
+#include "mesh.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "assets/model.h"
-#include "assets/texture.h"
+
+class Model;
+class Texture;
 
 class Importer
 {
