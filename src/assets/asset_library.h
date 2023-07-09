@@ -44,6 +44,7 @@ public:
 private:
     AssetLibrary();
     void loadDefaultResources();
+    void setMaterialDefaultResources();
 
     bool isShaderLoaded(const char* name);
     bool isMaterialCreated(const char* name);

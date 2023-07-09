@@ -200,6 +200,7 @@ bool AssetLibrary::isTextureLoaded(const char *name)
 AssetLibrary::AssetLibrary()
 {
     loadDefaultResources();
+    setMaterialDefaultResources();
 }
 
 void AssetLibrary::loadDefaultResources()
@@ -223,4 +224,9 @@ void AssetLibrary::createDefaultResources()
     Material* defaultPbr = createMaterial("defaultPbr", "pbr");
     defaultPbr->setProperty("u_albedo", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
     defaultPbr->setProperty("u_roughness", 0.8f);
+}
+
+void AssetLibrary::setMaterialDefaultResources()
+{
+    Material::setDefaultTexWhite(getTexture(DefaultResources::texWhite)->ID());
 }

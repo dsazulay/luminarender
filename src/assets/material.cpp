@@ -1,7 +1,9 @@
 #include "material.h"
 
-#include "asset_library.h"
 #include "shader.h"
+
+
+unsigned int Material::defaultTexWhite = 0;
 
 void Material::name(std::string n)
 {
@@ -11,6 +13,11 @@ void Material::name(std::string n)
 std::string Material::name() const
 {
     return m_name;
+}
+
+void Material::setDefaultTexWhite(unsigned int id)
+{
+    defaultTexWhite = id;
 }
 
 void Material::setProperty(const std::string &name, const std::any& value)
@@ -143,8 +150,7 @@ void Material::setDefaultValues()
     for (const auto& tex : shader->texDefaultValues())
     {
         if (tex.value == "white") {
-            setTexture(tex.name, AssetLibrary::instance().getTexture(
-                    AssetLibrary::DefaultResources::texWhite)->ID(), 0);
+            setTexture(tex.name, defaultTexWhite, 0);
         }
     }
 }

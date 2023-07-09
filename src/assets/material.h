@@ -27,6 +27,8 @@ public:
 
     void name(std::string n);
     std::string name() const;
+    
+    static void setDefaultTexWhite(unsigned int id);
 
 private:
     std::unordered_map<std::string, std::any> uniforms;
@@ -44,6 +46,8 @@ private:
     void setUniform(const std::string &name, const glm::mat4 &mat) const;
 
     std::string m_name;
+
+    static unsigned int defaultTexWhite;
 
 };
 
