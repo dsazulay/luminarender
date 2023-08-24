@@ -9,7 +9,8 @@ out vec2 v_texcoords;
 
 void main() {
     v_texcoords = a_uv;
-    gl_Position = vec4(a_pos, 1);
+    // multiply by two to tranform coordinates from (-0.5, 0.5) to (-1, 1)
+    gl_Position = vec4(a_pos * 2, 1);
 }
 
 #shader fragment
