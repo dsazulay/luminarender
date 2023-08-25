@@ -206,6 +206,7 @@ AssetLibrary::AssetLibrary()
 void AssetLibrary::loadDefaultResources()
 {
     loadShader("skybox", SampleResources::shader_skybox);
+    loadShader("skytriangle", SampleResources::shader_skytriangle);
     loadShader("unlit", SampleResources::shader_unlit);
     loadShader("lambert", SampleResources::shader_lambert);
     loadShader("pbr", SampleResources::shader_pbr);

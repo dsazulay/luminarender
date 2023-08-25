@@ -48,7 +48,7 @@ Application::Application(const AppConfig& config)
 //    PbrScene::loadScene(m_scene, AssetLibrary::instance());
 
     m_renderer->setGlobalTextures(m_scene);
-    }
+}
 
 void Application::mainloop()
 {
