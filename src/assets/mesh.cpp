@@ -241,6 +241,7 @@ Mesh::Mesh(VertexIndexTuple m)
 {
     m_vertices = m.vertices;
     m_indices = m.indices;
+    m_modelMat = m.material;
 
     initMesh();
 }
@@ -263,6 +264,11 @@ MeshType Mesh::meshType() const
 void Mesh::meshType(MeshType mt)
 {
     m_meshType = mt;
+}
+
+std::string Mesh::modelMat() const
+{
+    return m_modelMat;
 }
 
 void Mesh::initMesh()

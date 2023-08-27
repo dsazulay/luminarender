@@ -80,8 +80,9 @@ void PbrScene::loadMaterials(AssetLibrary &assetLibrary, unsigned int& skyboxTex
 
 void PbrScene::loadModels(AssetLibrary &assetLibrary)
 {
-    assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
-    assetLibrary.loadModel("cerberusModel", SampleResources::model_cerberus);
+    //assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
+    //assetLibrary.loadModel("cerberusModel", SampleResources::model_cerberus);
+    assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj");
 }
 
 void PbrScene::loadLights(Scene& scene)
@@ -104,8 +105,9 @@ void PbrScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     Mesh* cube = assetLibrary.getMesh("cube");
     Mesh* quad = assetLibrary.getMesh("quad");
     Mesh* sphere = assetLibrary.getMesh("sphere");
-    Model* spitfire = assetLibrary.getModel("spitfireModel");
-    Model* cerberus = assetLibrary.getModel("cerberusModel");
+    //Model* spitfire = assetLibrary.getModel("spitfireModel");
+    //Model* cerberus = assetLibrary.getModel("cerberusModel");
+    Model* sponza = assetLibrary.getModel("sponza");
 
     Material* greyMat = assetLibrary.getMaterial("greyMat");
     Material* blueMat = assetLibrary.getMaterial("blueMat");
@@ -129,25 +131,35 @@ void PbrScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     scene.addObject(EntityFactory::createFromMesh("Cube",
             SampleResources::object_positions[3], woodBoxMat, cube));
 
-    auto spitfireEntity = EntityFactory::createFromModel("Spitfire",
-            SampleResources::object_positions[4], spitfireMat,spitfire);
+    //auto spitfireEntity = EntityFactory::createFromModel("Spitfire",
+    //        SampleResources::object_positions[4], spitfireMat,spitfire);
 
-    auto t = spitfireEntity->getComponent<Transform>();
-    t->scale(glm::vec3(0.05, 0.05, 0.05));
-    t->eulerAngles(glm::vec3(-96, 0, 0));
+    //auto t = spitfireEntity->getComponent<Transform>();
+    //t->scale(glm::vec3(0.05, 0.05, 0.05));
+    //t->eulerAngles(glm::vec3(-96, 0, 0));
+    //t->updateModelMatrix();
+    //spitfireEntity->updateSelfAndChild();
+
+    //scene.addObject(std::move(spitfireEntity));
+
+    //auto cerberusEntity = EntityFactory::createFromModel("Cerberus",
+    //        SampleResources::object_positions[5], cerberusMat,cerberus);
+
+    //t = cerberusEntity->getComponent<Transform>();
+    //t->scale(glm::vec3(0.05, 0.05, 0.05));
+    //t->eulerAngles(glm::vec3(-96, 0, 0));
+    //t->updateModelMatrix();
+    //cerberusEntity->updateSelfAndChild();
+
+    //scene.addObject(std::move(cerberusEntity));
+
+
+    auto sponzaEntity = EntityFactory::createFromModel("Sponza", glm::vec3(0.0, 0.0, 0.0), sponza);
+
+    auto t = sponzaEntity->getComponent<Transform>();
+    t->scale(glm::vec3(0.01, 0.01, 0.01));
     t->updateModelMatrix();
-    spitfireEntity->updateSelfAndChild();
+    sponzaEntity->updateSelfAndChild();
 
-    scene.addObject(std::move(spitfireEntity));
-
-    auto cerberusEntity = EntityFactory::createFromModel("Cerberus",
-            SampleResources::object_positions[5], cerberusMat,cerberus);
-
-    t = cerberusEntity->getComponent<Transform>();
-    t->scale(glm::vec3(0.05, 0.05, 0.05));
-    t->eulerAngles(glm::vec3(-96, 0, 0));
-    t->updateModelMatrix();
-    cerberusEntity->updateSelfAndChild();
-
-    scene.addObject(std::move(cerberusEntity));
+    scene.addObject(std::move(sponzaEntity));
 }

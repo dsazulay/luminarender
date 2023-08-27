@@ -2,6 +2,7 @@
 
 #include "model.h"
 #include "texture.h"
+#include "asset_library.h"
 #include "../log.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -104,6 +105,7 @@ VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene)
 {
     VertexIndexTuple m;
 
+    // process vertices
     m.vertices.reserve(mesh->mNumVertices);
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
@@ -128,13 +130,35 @@ VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene)
         m.vertices.push_back(vert);
     }
 
-//    outIndices.reserve(indicesSize);
+    // process indices
+    // outIndices.reserve(indicesSize);
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace face = mesh->mFaces[i];
         for (unsigned int j = 0; j < face.mNumIndices; j++) {
             m.indices.push_back(face.mIndices[j]);
         }
+    }
+
+    // process material
+    if (mesh->mMaterialIndex >= 0)
+    {
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+        aiString matName = material->GetName();
+        Material* mat = AssetLibrary::instance().createMaterial(matName.C_Str(), "lambert");
+        mat->setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        
+        for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i)
+        {
+            aiString texName;
+            material->GetTexture(aiTextureType_DIFFUSE, i, &texName);
+            std::string correctName = texName.C_Str();
+            correctName.replace(8, 1, "/");
+            
+            Texture* tex = AssetLibrary::instance().load2DTexture(correctName.c_str(), correctName.c_str(), "resources/sponza");
+            mat->setTexture("u_mainTex", tex->ID(), 0);
+        }
+        m.material = matName.C_Str();
     }
 
     return m;

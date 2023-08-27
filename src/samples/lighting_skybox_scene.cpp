@@ -42,13 +42,14 @@ void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary)
     Material* woodBoxMat = assetLibrary.createMaterial("woodBoxMat", "lambert");
     woodBoxMat->setTexture("u_mainTex", assetLibrary.getTexture("woodBox")->ID(), 0);
 
-    Material* skyboxMat = assetLibrary.createMaterial("skyboxMat", "skybox");
+    Material* skyboxMat = assetLibrary.createMaterial("skyboxMat", "skytriangle");
     skyboxMat->setTexture("u_mainTex", assetLibrary.getTexture("glaciers")->ID(), 0);
 }
 
 void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
 {
-    assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
+    //assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
+    //assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj");
 }
 
 void LightingSkyboxScene::loadLights(Scene& scene)
@@ -61,7 +62,8 @@ void LightingSkyboxScene::loadLights(Scene& scene)
 
 void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
 {
-    Mesh* cubeMap = assetLibrary.getMesh("cubeMap");
+    //Mesh* cubeMap = assetLibrary.getMesh("cubeMap");
+    Mesh* cubeMap = assetLibrary.getMesh("triangleMap");
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 
     scene.addSkybox(EntityFactory::createFromMesh("Skybox",
@@ -73,10 +75,11 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     Mesh* cube = assetLibrary.getMesh("cube");
     Mesh* quad = assetLibrary.getMesh("quad");
     Mesh* sphere = assetLibrary.getMesh("sphere");
-    Model* spitfire = assetLibrary.getModel("spitfireModel");
+    //Model* spitfire = assetLibrary.getModel("spitfireModel");
+    //Model* sponza = assetLibrary.getModel("sponza");
 
     Material* greyMat = assetLibrary.getMaterial("greyMat");
-    Material* blueMat = assetLibrary.getMaterial("defaultPbr");
+    Material* blueMat = assetLibrary.getMaterial("blueMat");
     Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
 
@@ -100,16 +103,25 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     e->updateSelfAndChild();
     scene.addObject(std::move(e));
 
-    auto spitfireEntity = EntityFactory::createFromModel("Spitfire",
-            SampleResources::object_positions[4], spitfireMat,spitfire);
+    //auto spitfireEntity = EntityFactory::createFromModel("Spitfire",
+            //SampleResources::object_positions[4], spitfireMat, spitfire);
 
-    auto t = spitfireEntity->getComponent<Transform>();
-    t->scale(glm::vec3(0.05, 0.05, 0.05));
-    t->eulerAngles(glm::vec3(-96, 0, 0));
-    t->updateModelMatrix();
-    spitfireEntity->updateSelfAndChild();
+    //auto t = spitfireEntity->getComponent<Transform>();
+    //t->scale(glm::vec3(0.05, 0.05, 0.05));
+    //t->eulerAngles(glm::vec3(-96, 0, 0));
+    //t->updateModelMatrix();
+    //spitfireEntity->updateSelfAndChild();
 
-    scene.addObject(std::move(spitfireEntity));
+    //scene.addObject(std::move(spitfireEntity));
+
+    //auto sponzaEntity = EntityFactory::createFromModel("Sponza", glm::vec3(0.0, 0.0, 0.0), sponza);
+
+    //auto t = sponzaEntity->getComponent<Transform>();
+    //t->scale(glm::vec3(0.01, 0.01, 0.01));
+    //t->updateModelMatrix();
+    //sponzaEntity->updateSelfAndChild();
+
+    //scene.addObject(std::move(sponzaEntity));
 }
 
 

@@ -4,6 +4,7 @@
 #include <glm/vec2.hpp>
 
 #include <vector>
+#include <string>
 
 struct Vertex
 {
@@ -16,6 +17,7 @@ struct VertexIndexTuple
 {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
+    std::string material;
 };
 
 enum class MeshType
@@ -48,6 +50,7 @@ public:
     unsigned int vao() const;
     MeshType meshType() const;
     void meshType(MeshType m);
+    std::string modelMat() const;
 
 private:
     void initMesh();
@@ -56,4 +59,5 @@ private:
     unsigned int m_vbo, m_ebo, m_vao;
     std::vector<Vertex> m_vertices;
     std::vector<unsigned int> m_indices;
+    std::string m_modelMat;
 };

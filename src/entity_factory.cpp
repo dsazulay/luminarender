@@ -121,6 +121,27 @@ std::unique_ptr<Entity> EntityFactory::createFromModel(const char* name, glm::ve
     return std::move(e);
 }
 
+std::unique_ptr<Entity> EntityFactory::createFromModel(const char* name, glm::vec3 pos, Model* model)
+{
+    Transform transform;
+    transform.position(pos);
+    transform.updateModelMatrix();
+
+    auto e = std::make_unique<Entity>();
+    e->name(name);
+    e->addComponent(transform);
+
+    for (auto& mesh : model->m_meshes)
+    {
+        Material* mat = AssetLibrary::instance().getMaterial(mesh.second->modelMat().c_str());
+        auto childEntity = createFromMesh(mesh.first.c_str(), pos, mat, mesh.second);
+        e->addChild(std::move(childEntity));
+    }
+
+    e->updateSelfAndChild();
+    return std::move(e);
+}
+
 
 std::unique_ptr<Entity> EntityFactory::createFromModel(const char* name, Model* model)
 {

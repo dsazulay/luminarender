@@ -11,6 +11,7 @@ public:
     static std::unique_ptr<Entity> createEmpty();
     static std::unique_ptr<Entity> createFromMesh(const char* name, glm::vec3 pos, Material* mat, Mesh* mesh);
     static std::unique_ptr<Entity> createFromModel(const char* name, glm::vec3 pos, Material* mat, Model* model);
+    static std::unique_ptr<Entity> createFromModel(const char* name, glm::vec3 pos, Model* model);
     static std::unique_ptr<Entity> createFromModel(const char* name, Model* model);
 
     static std::unique_ptr<Entity> createDirectionalLight(const char* name, glm::vec3 rot, glm::vec3 color, float intensity);
