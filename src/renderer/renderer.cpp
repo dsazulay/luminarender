@@ -20,10 +20,13 @@ void Renderer::render(Scene& scene)
         m_forwardPass.lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
     }
 
-    m_mainRenderTarget.setAsTarget();
+    m_mainTargetFrameBuffer.bind();
+    glViewport(0, 0, m_viewportWidth, m_viewportHeight);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_forwardPass.render(scene);
 //    m_normalVisualizerPass.render(scene);
-    m_mainRenderTarget.unsetAsTarget();
+    m_mainTargetFrameBuffer.unbind();
 }
 
 void Renderer::setupLights(std::vector<std::unique_ptr<Entity>> &lights)
@@ -73,10 +76,10 @@ void Renderer::updateTransformMatrices()
 Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
     m_shadowRenderTarget(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Shadow),
-    m_mainRenderTarget(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Color),
     m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
     m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
-    m_camera(cameraPos)
+    m_camera(cameraPos),
+    m_mainTargetFrameBuffer(m_viewportWidth, m_viewportHeight, gpurm)
 {
 
     m_matricesUBO.bindBufferToIndex(0);
@@ -86,14 +89,13 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
      std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
 
     m_shadowRenderTarget.resizeFrameBuffer(1024, 1024);
-    m_mainRenderTarget.clearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     m_shadowRenderTarget.clearMask(GL_DEPTH_BUFFER_BIT);
     m_normalVisualizerPass.camera(&m_camera);
 }
 
 unsigned int Renderer::getTexcolorBufferID()
 {
-    return m_mainRenderTarget.getTextureID();
+    return m_mainTargetFrameBuffer.getColorAttachmentID();
 }
 
 void Renderer::onViewportResize(const Event& e)
@@ -101,7 +103,7 @@ void Renderer::onViewportResize(const Event& e)
     const auto& event = static_cast<const ViewportResizeEvent&>(e);
     m_viewportWidth = event.width();
     m_viewportHeight = event.height();
-    m_mainRenderTarget.resizeFrameBuffer(m_viewportWidth, m_viewportHeight);
+    m_mainTargetFrameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
 
     m_shadowRenderTarget.resizeFrameBuffer(m_viewportWidth * 2, m_viewportHeight * 2);
 }

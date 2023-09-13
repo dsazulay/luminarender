@@ -7,6 +7,7 @@
 #include "shadow_pass.h"
 #include "forward_pass.h"
 #include "normal_visualizer_pass.h"
+#include "gpuresourcemanager.h"
 
 class Renderer {
 public:
@@ -27,6 +28,8 @@ public:
     glm::mat4& projMatrix();
 
 private:
+    GPUResourceManager<OpenGL> gpurm;
+
     UniformBufferObject m_matricesUBO;
     UniformBufferObject m_lightUBO;
 
@@ -36,7 +39,9 @@ private:
     glm::mat4 lightSpaceMatrix;
 
     RenderTarget m_shadowRenderTarget;
-    RenderTarget m_mainRenderTarget;
+    //RenderTarget m_mainRenderTarget;
+    ColorDepthStencilBuffer m_mainTargetFrameBuffer;
+
 
     ShadowPass m_shadowRenderPass;
     ForwardPass m_forwardPass;

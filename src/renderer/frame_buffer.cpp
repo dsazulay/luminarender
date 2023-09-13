@@ -1,11 +1,11 @@
 #include "frame_buffer.h"
 
 #include "../log.h"
+#include "gpuresourcemanager.h"
 
 #include <glad/glad.h>
 
 #include <vector>
-
 
 void FrameBuffer::createBuffer()
 {
@@ -154,3 +154,108 @@ void FrameBuffer::createShadowBuffer()
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+NewFrameBuffer::NewFrameBuffer(int width, int height, GPUResourceManager<OpenGL> rm) 
+    : m_width(width), m_height(height), m_rm(rm)
+{
+}
+
+void NewFrameBuffer::resizeBuffer(int width, int height)
+{
+    m_width = width;
+    m_height = height;
+    deleteBuffer();
+    createBuffer();
+}
+
+void NewFrameBuffer::bind()
+{
+    m_rm.bindFrameBuffer(m_frameBufferID);
+}
+
+void NewFrameBuffer::unbind()
+{
+    m_rm.unbindFrameBuffer();
+}
+
+unsigned int NewFrameBuffer::getID()
+{
+    return m_frameBufferID;
+}
+
+ColorDepthStencilBuffer::ColorDepthStencilBuffer(int width, int height, GPUResourceManager<OpenGL> rm)
+    : NewFrameBuffer(width, height, rm)
+{
+    createBuffer();
+}
+
+ColorDepthStencilBuffer::~ColorDepthStencilBuffer()
+{
+    deleteBuffer();
+}
+
+unsigned int ColorDepthStencilBuffer::getColorAttachmentID()
+{
+    return m_colorAttachmentID;
+}
+
+void ColorDepthStencilBuffer::createBuffer()
+{ 
+    m_frameBufferID = m_rm.createFrameBuffer();
+    m_colorAttachmentID = m_rm.createTexture({
+        .width = m_width,
+        .height = m_height,
+        .format = Format::RGB,
+    });
+    m_depthStencilAttachmentID = m_rm.createRenderBuffer({
+        .width = m_width,
+        .height = m_height,
+        .format = Format::DEPTHSTENCIL,
+    });
+
+    m_rm.attachTexture(m_frameBufferID, {
+        .attachment = m_colorAttachmentID,
+        .type = AttachmentType::COLOR0,
+        .target = AttachmentTarget::TEX2D,
+    });
+    m_rm.attachRenderBuffer(m_frameBufferID, {
+        .attachment = m_depthStencilAttachmentID,
+        .type = AttachmentType::DEPTHSTENCIL,
+        .target = AttachmentTarget::RENDERBUFFER,
+    });
+
+    // TODO check frame buffer completition
+    //if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    //{
+    //    LOG_ERROR("ColorDepthStencilBuffer is not complete!");
+    //}
+}
+
+void ColorDepthStencilBuffer::deleteBuffer()
+{
+    m_rm.deleteTexture(m_colorAttachmentID);
+    m_rm.deleteRenderBuffer(m_depthStencilAttachmentID);
+    m_rm.deleteFrameBuffer(m_frameBufferID);
+}
+
+GBuffer::GBuffer(int width, int height, GPUResourceManager<OpenGL> rm)
+    : NewFrameBuffer(width, height, rm)
+{
+    createBuffer();
+}
+
+GBuffer::~GBuffer()
+{
+    deleteBuffer();
+}
+
+void GBuffer::createBuffer()
+{
+
+}
+
+void GBuffer::deleteBuffer()
+{
+
+}
+
