@@ -50,6 +50,7 @@ enum class AttachmentTarget
 
 struct TextureInfo
 {
+    const char* debugName = "Texture";
     int width;
     int height;
     Format format;
@@ -61,6 +62,7 @@ struct TextureInfo
 
 struct RenderBufferInfo
 {
+    const char* debugName = "RenderBuffer";
     int width;
     int height;
     Format format;
@@ -68,11 +70,13 @@ struct RenderBufferInfo
 
 struct FrameBufferInfo
 {
+    const char* debugName = "FrameBuffer";
     bool hasColorBuffer = true;
 };
 
 struct FrameBufferAttachmentInfo
 {
+    const char* debugName = "FrameBufferAttachment";
     id_t attachment;
     AttachmentType type;
     AttachmentTarget target;

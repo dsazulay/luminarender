@@ -3,7 +3,6 @@
 #include "../camera.h"
 #include "uniform_buffer_object.h"
 #include "frame_buffer.h"
-#include "render_target.h"
 #include "shadow_pass.h"
 #include "forward_pass.h"
 #include "normal_visualizer_pass.h"
@@ -38,11 +37,8 @@ private:
 
     glm::mat4 lightSpaceMatrix;
 
-    //RenderTarget m_shadowRenderTarget;
-    //RenderTarget m_mainRenderTarget;
     ColorDepthStencilBuffer m_mainTargetFrameBuffer;
     DepthBuffer m_shadowFrameBuffer;
-
 
     ShadowPass m_shadowRenderPass;
     ForwardPass m_forwardPass;

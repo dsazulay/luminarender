@@ -4,7 +4,7 @@
 
 id_t OpenGL::createTexture(TextureInfo info)
 {
-    LOG_INFO("OpenGL backend create texture");
+    LOG_INFO("OpenGL backend create texture: {}", info.debugName);
     id_t id;
     GLenum format = getFormat(info.format);
     GLint filtering = getFiltering(info.filtering);
@@ -33,7 +33,7 @@ id_t OpenGL::createTexture(TextureInfo info)
 
 id_t OpenGL::createRenderBuffer(RenderBufferInfo info)
 {
-    LOG_INFO("OpenGL backend create render buffer");
+    LOG_INFO("OpenGL backend create render buffer: {}", info.debugName);
     id_t id;
     GLenum format = getFormat(info.format); 
 
@@ -47,7 +47,7 @@ id_t OpenGL::createRenderBuffer(RenderBufferInfo info)
 
 id_t OpenGL::createFrameBuffer(FrameBufferInfo info)
 {
-    LOG_INFO("OpenGL backend create frame buffer");
+    LOG_INFO("OpenGL backend create frame buffer: {}", info.debugName);
     id_t id;
 
     glGenFramebuffers(1, &id);
@@ -82,7 +82,7 @@ void OpenGL::deleteFrameBuffer(id_t frameBuffer)
 
 void OpenGL::attachTexture(id_t frameBuffer, FrameBufferAttachmentInfo info)
 {
-    LOG_INFO("OpenGL backend attach texture");
+    LOG_INFO("OpenGL backend attach texture: {}", info.debugName);
     GLenum type = getAttachmentType(info.type);
     GLenum target = getAttachmentTarget(info.target);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -92,7 +92,7 @@ void OpenGL::attachTexture(id_t frameBuffer, FrameBufferAttachmentInfo info)
 
 void OpenGL::attachRenderBuffer(id_t frameBuffer, FrameBufferAttachmentInfo info)
 {
-    LOG_INFO("OpenGL backend attach render buffer");
+    LOG_INFO("OpenGL backend attach render buffer: {}", info.debugName);
     GLenum type = getAttachmentType(info.type);
     GLenum target = getAttachmentTarget(info.target);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
