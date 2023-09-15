@@ -9,7 +9,7 @@ class OpenGL
 public:
     id_t createTexture(TextureInfo info);
     id_t createRenderBuffer(RenderBufferInfo info);
-    id_t createFrameBuffer();
+    id_t createFrameBuffer(FrameBufferInfo info);
     void deleteTexture(id_t texture);
     void deleteRenderBuffer(id_t renderBuffer);
     void deleteFrameBuffer(id_t frameBuffer);
@@ -19,11 +19,13 @@ public:
 
     void bindFrameBuffer(id_t frameBuffer);
     void unbindFrameBuffer();
+    bool isFrameBufferComplete(id_t frameBuffer);
 
 private:
     GLenum getFormat(Format format);
     GLint getFiltering(Filtering filtering);
     GLint getWrap(Wrap wrap);
+    GLenum getTexType(TexType type);
     GLenum getAttachmentType(AttachmentType type);
     GLenum getAttachmentTarget(AttachmentTarget target);
 };

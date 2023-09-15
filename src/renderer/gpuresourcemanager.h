@@ -16,9 +16,9 @@ public:
         return m_backend.createRenderBuffer(info);
     }
 
-    id_t createFrameBuffer()
+    id_t createFrameBuffer(FrameBufferInfo info)
     {
-        return m_backend.createFrameBuffer();
+        return m_backend.createFrameBuffer(info);
     }
 
     void deleteTexture(id_t texture)
@@ -54,6 +54,11 @@ public:
     void unbindFrameBuffer()
     {
         m_backend.unbindFrameBuffer();
+    }
+
+    bool isFrameBufferComplete(id_t frameBuffer)
+    {
+        return m_backend.isFrameBufferComplete(frameBuffer);
     }
 
 private:

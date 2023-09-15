@@ -9,15 +9,22 @@ id_t OpenGL::createTexture(TextureInfo info)
     GLenum format = getFormat(info.format);
     GLint filtering = getFiltering(info.filtering);
     GLint wrap = getWrap(info.wrap);
+    GLenum type = getTexType(info.type);
 
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
     glTexImage2D(GL_TEXTURE_2D, 0, format, info.width, info.height,
-            0, format, GL_UNSIGNED_BYTE, info.initialData);
+            0, format, type, info.initialData);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+    // TODO: pass border color as parameter
+    if (info.wrap == Wrap::CLAMPBORDER)
+    {
+        float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+    }
     // TODO: handle mip mapping
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -38,13 +45,18 @@ id_t OpenGL::createRenderBuffer(RenderBufferInfo info)
     return id;
 }
 
-id_t OpenGL::createFrameBuffer()
+id_t OpenGL::createFrameBuffer(FrameBufferInfo info)
 {
     LOG_INFO("OpenGL backend create frame buffer");
     id_t id;
 
     glGenFramebuffers(1, &id);
     glBindFramebuffer(GL_FRAMEBUFFER, id);
+    if (!info.hasColorBuffer)
+    {
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return id;
@@ -98,6 +110,16 @@ void OpenGL::unbindFrameBuffer()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+bool OpenGL::isFrameBufferComplete(id_t frameBuffer)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    bool isComplete = glCheckFramebufferStatus(GL_FRAMEBUFFER)
+        == GL_FRAMEBUFFER_COMPLETE;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    return isComplete;
+}
+
 GLenum OpenGL::getFormat(Format format)
 {
     switch (format)
@@ -107,8 +129,8 @@ GLenum OpenGL::getFormat(Format format)
         case Format::RGBA:
             return GL_RGBA;
         case Format::DEPTH:
-            return GL_DEPTH_COMPONENT24;
-        case Format::DEPTHSTENCIL:
+            return GL_DEPTH_COMPONENT;
+        case Format::DEPTH24_STENCIL8:
             return GL_DEPTH24_STENCIL8;
     }
 }
@@ -136,6 +158,17 @@ GLint OpenGL::getWrap(Wrap wrap)
             return GL_CLAMP_TO_EDGE;
         case Wrap::CLAMPBORDER:
             return GL_CLAMP_TO_BORDER;
+    }
+}
+
+GLenum OpenGL::getTexType(TexType type)
+{
+    switch (type)
+    {
+        case TexType::UBYTE:
+            return GL_UNSIGNED_BYTE;
+        case TexType::FLOAT:
+            return GL_FLOAT;
     }
 }
 

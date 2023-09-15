@@ -13,7 +13,13 @@ enum class Format
     RGB,
     RGBA,
     DEPTH,
-    DEPTHSTENCIL
+    DEPTH24_STENCIL8,
+};
+
+enum class TexType
+{
+    UBYTE,
+    FLOAT,
 };
 
 enum class Wrap
@@ -21,7 +27,7 @@ enum class Wrap
     REPEAT,
     MIRROR,
     CLAMPBORDER,
-    CLAMPEDGE
+    CLAMPEDGE,
 };
 
 enum class AttachmentType
@@ -39,7 +45,7 @@ enum class AttachmentType
 enum class AttachmentTarget
 {
     TEX2D,
-    RENDERBUFFER
+    RENDERBUFFER,
 };
 
 struct TextureInfo
@@ -49,6 +55,7 @@ struct TextureInfo
     Format format;
     Filtering filtering = Filtering::BILINEAR;
     Wrap wrap = Wrap::REPEAT;
+    TexType type = TexType::UBYTE;
     unsigned char* initialData = nullptr;
 };
 
@@ -57,6 +64,11 @@ struct RenderBufferInfo
     int width;
     int height;
     Format format;
+};
+
+struct FrameBufferInfo
+{
+    bool hasColorBuffer = true;
 };
 
 struct FrameBufferAttachmentInfo

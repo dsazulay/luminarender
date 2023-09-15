@@ -38,9 +38,10 @@ private:
 
     glm::mat4 lightSpaceMatrix;
 
-    RenderTarget m_shadowRenderTarget;
+    //RenderTarget m_shadowRenderTarget;
     //RenderTarget m_mainRenderTarget;
     ColorDepthStencilBuffer m_mainTargetFrameBuffer;
+    DepthBuffer m_shadowFrameBuffer;
 
 
     ShadowPass m_shadowRenderPass;

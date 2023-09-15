@@ -9,14 +9,18 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "../log.h"
+
 
 void Renderer::render(Scene& scene)
 {
     if (scene.mainLight() != nullptr)
     {
-        m_shadowRenderTarget.setAsTarget();
+        m_shadowFrameBuffer.bind();
+        glViewport(0, 0, 2048, 2048);
+        glClear(GL_DEPTH_BUFFER_BIT);
         m_shadowRenderPass.render(scene);
-        m_shadowRenderTarget.unsetAsTarget();
+        m_shadowFrameBuffer.unbind();
         m_forwardPass.lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
     }
 
@@ -75,11 +79,11 @@ void Renderer::updateTransformMatrices()
 
 Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
-    m_shadowRenderTarget(m_viewportWidth, m_viewportHeight, FrameBuffer::Type::Shadow),
     m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
     m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
     m_camera(cameraPos),
-    m_mainTargetFrameBuffer(m_viewportWidth, m_viewportHeight, gpurm)
+    m_mainTargetFrameBuffer(m_viewportWidth, m_viewportHeight, gpurm),
+    m_shadowFrameBuffer(2048, 2048, gpurm)
 {
 
     m_matricesUBO.bindBufferToIndex(0);
@@ -88,8 +92,6 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
     Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
      std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
 
-    m_shadowRenderTarget.resizeFrameBuffer(1024, 1024);
-    m_shadowRenderTarget.clearMask(GL_DEPTH_BUFFER_BIT);
     m_normalVisualizerPass.camera(&m_camera);
 }
 
@@ -104,8 +106,8 @@ void Renderer::onViewportResize(const Event& e)
     m_viewportWidth = event.width();
     m_viewportHeight = event.height();
     m_mainTargetFrameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
-
-    m_shadowRenderTarget.resizeFrameBuffer(m_viewportWidth * 2, m_viewportHeight * 2);
+    
+    LOG_INFO("{} {}", m_viewportWidth, m_viewportHeight);
 }
 
 void Renderer::setGlobalTextures(Scene& scene)
@@ -118,7 +120,7 @@ void Renderer::setGlobalTextures(Scene& scene)
 
 unsigned int Renderer::getShadowMapTextureID()
 {
-    return m_shadowRenderTarget.getTextureID();
+    return m_shadowFrameBuffer.getDepthAttachmentID();
 }
 
 //std::vector<glm::vec4> Renderer::getFrustumCornersWorldSpace(const glm::mat4 &proj, const glm::mat4 &view)

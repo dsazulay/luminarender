@@ -51,6 +51,35 @@ protected:
     GPUResourceManager<OpenGL> m_rm;
 };
 
+class ColorDepthStencilBuffer : public NewFrameBuffer
+{
+public:
+    ColorDepthStencilBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
+    ~ColorDepthStencilBuffer();
+    id_t getColorAttachmentID();
+
+private:
+    void createBuffer() override;
+    void deleteBuffer() override;
+
+    id_t m_colorAttachmentID;
+    id_t m_depthStencilAttachmentID;
+};
+
+class DepthBuffer : public NewFrameBuffer
+{
+public:
+    DepthBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
+    ~DepthBuffer();
+    id_t getDepthAttachmentID();
+
+private:
+    void createBuffer() override;
+    void deleteBuffer() override;
+
+    id_t m_depthAttachmentID;
+};
+
 class GBuffer : public NewFrameBuffer
 {
 public:
@@ -61,29 +90,9 @@ private:
     void createBuffer() override;
     void deleteBuffer() override;
 
-    unsigned int m_positionAttachmentID;
-    unsigned int m_normalAttachmentID;
-    unsigned int m_albedoSpecAttachmentID;
-    unsigned int m_depthStencilAttachmentID;
-};
-
-class ColorDepthStencilBuffer : public NewFrameBuffer
-{
-public:
-    ColorDepthStencilBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
-    ~ColorDepthStencilBuffer();
-    unsigned int getColorAttachmentID();
-
-private:
-    void createBuffer() override;
-    void deleteBuffer() override;
-
-    unsigned int m_colorAttachmentID;
-    unsigned int m_depthStencilAttachmentID;
-};
-
-class DepthBuffer : public NewFrameBuffer
-{
-
+    id_t m_positionAttachmentID;
+    id_t m_normalAttachmentID;
+    id_t m_albedoSpecAttachmentID;
+    id_t m_depthStencilAttachmentID;
 };
 

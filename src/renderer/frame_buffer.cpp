@@ -194,14 +194,14 @@ ColorDepthStencilBuffer::~ColorDepthStencilBuffer()
     deleteBuffer();
 }
 
-unsigned int ColorDepthStencilBuffer::getColorAttachmentID()
+id_t ColorDepthStencilBuffer::getColorAttachmentID()
 {
     return m_colorAttachmentID;
 }
 
 void ColorDepthStencilBuffer::createBuffer()
 { 
-    m_frameBufferID = m_rm.createFrameBuffer();
+    m_frameBufferID = m_rm.createFrameBuffer({});
     m_colorAttachmentID = m_rm.createTexture({
         .width = m_width,
         .height = m_height,
@@ -210,7 +210,7 @@ void ColorDepthStencilBuffer::createBuffer()
     m_depthStencilAttachmentID = m_rm.createRenderBuffer({
         .width = m_width,
         .height = m_height,
-        .format = Format::DEPTHSTENCIL,
+        .format = Format::DEPTH24_STENCIL8,
     });
 
     m_rm.attachTexture(m_frameBufferID, {
@@ -224,17 +224,63 @@ void ColorDepthStencilBuffer::createBuffer()
         .target = AttachmentTarget::RENDERBUFFER,
     });
 
-    // TODO check frame buffer completition
-    //if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-    //{
-    //    LOG_ERROR("ColorDepthStencilBuffer is not complete!");
-    //}
+    if (!m_rm.isFrameBufferComplete(m_frameBufferID))
+    {
+        LOG_ERROR("ColorDepthStencilBuffer is not complete!");
+    }
 }
 
 void ColorDepthStencilBuffer::deleteBuffer()
 {
     m_rm.deleteTexture(m_colorAttachmentID);
     m_rm.deleteRenderBuffer(m_depthStencilAttachmentID);
+    m_rm.deleteFrameBuffer(m_frameBufferID);
+}
+
+DepthBuffer::DepthBuffer(int width, int height, GPUResourceManager<OpenGL> rm)
+    : NewFrameBuffer(width, height, rm)
+{
+    createBuffer();
+}
+
+DepthBuffer::~DepthBuffer()
+{
+    deleteBuffer();
+}
+
+id_t DepthBuffer::getDepthAttachmentID()
+{
+    return m_depthAttachmentID;
+}
+
+void DepthBuffer::createBuffer()
+{
+    m_frameBufferID = m_rm.createFrameBuffer({
+        .hasColorBuffer = false,
+    });
+    m_depthAttachmentID = m_rm.createTexture({
+        .width = m_width,
+        .height = m_height,
+        .format = Format::DEPTH,
+        .filtering = Filtering::POINT,
+        .wrap = Wrap::CLAMPBORDER,
+        .type = TexType::FLOAT,
+    });
+    m_rm.attachTexture(m_frameBufferID, {
+        .attachment = m_depthAttachmentID,
+        .type = AttachmentType::DEPTH,
+        .target = AttachmentTarget::TEX2D,
+    });
+    
+    if (!m_rm.isFrameBufferComplete(m_frameBufferID))
+    {
+        LOG_ERROR("DepthBuffer is not complete!");
+    }
+}
+
+void DepthBuffer::deleteBuffer()
+{
+    m_rm.deleteTexture(m_depthAttachmentID);
     m_rm.deleteFrameBuffer(m_frameBufferID);
 }
 
