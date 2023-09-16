@@ -2,18 +2,21 @@
 
 #include "../log.h"
 
+#include <vector>
+
 id_t OpenGL::createTexture(TextureInfo info)
 {
     LOG_INFO("OpenGL backend create texture: {}", info.debugName);
     id_t id;
     GLenum format = getFormat(info.format);
+    GLenum byteFormat = getByteFormat(info.byteFormat);
     GLint filtering = getFiltering(info.filtering);
     GLint wrap = getWrap(info.wrap);
     GLenum type = getTexType(info.type);
 
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
-    glTexImage2D(GL_TEXTURE_2D, 0, format, info.width, info.height,
+    glTexImage2D(GL_TEXTURE_2D, 0, byteFormat, info.width, info.height,
             0, format, type, info.initialData);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
@@ -35,11 +38,11 @@ id_t OpenGL::createRenderBuffer(RenderBufferInfo info)
 {
     LOG_INFO("OpenGL backend create render buffer: {}", info.debugName);
     id_t id;
-    GLenum format = getFormat(info.format); 
+    GLenum byteFormat = getByteFormat(info.byteFormat);
 
     glGenRenderbuffers(1, &id);
     glBindRenderbuffer(GL_RENDERBUFFER, id);
-    glRenderbufferStorage(GL_RENDERBUFFER, format, info.width, info.height);
+    glRenderbufferStorage(GL_RENDERBUFFER, byteFormat, info.width, info.height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     return id;
@@ -100,6 +103,23 @@ void OpenGL::attachRenderBuffer(id_t frameBuffer, FrameBufferAttachmentInfo info
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void OpenGL::setTargetBuffers(id_t frameBuffer, FrameBufferTargetInfo info)
+{
+    LOG_INFO("OpenGL backend set target buffers: {}", info.debugName);
+    // TODO: check if there's a better way to do this without using std::vector
+    std::vector<GLenum> types;
+    types.reserve(info.size);
+    for (int i = 0; i < info.size; ++i)
+    {
+        GLenum type = getAttachmentType(info.types[i]);
+        types.push_back(type);
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glDrawBuffers(info.size, types.data());
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void OpenGL::bindFrameBuffer(id_t frameBuffer)
 {
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -120,6 +140,23 @@ bool OpenGL::isFrameBufferComplete(id_t frameBuffer)
     return isComplete;
 }
 
+// Commands
+void OpenGL::setViewportSize(int x, int y, int width, int height)
+{
+    glViewport(x, y, width, height);
+}
+
+void OpenGL::setClearColor(float r, float g, float b, float a)
+{
+    glClearColor(r, g, b, a);
+}
+
+void OpenGL::clear(ClearMask mask)
+{
+    GLbitfield glmask = getClearMask(mask);
+    glClear(glmask);
+}
+
 GLenum OpenGL::getFormat(Format format)
 {
     switch (format)
@@ -130,7 +167,22 @@ GLenum OpenGL::getFormat(Format format)
             return GL_RGBA;
         case Format::DEPTH:
             return GL_DEPTH_COMPONENT;
-        case Format::DEPTH24_STENCIL8:
+    }
+}
+
+GLenum OpenGL::getByteFormat(ByteFormat format)
+{
+    switch (format)
+    {
+        case ByteFormat::RGB:
+            return GL_RGB;
+        case ByteFormat::RGBA:
+            return GL_RGBA;
+        case ByteFormat::RGBA16F:
+            return GL_RGBA16F;
+        case ByteFormat::DEPTH:
+            return GL_DEPTH_COMPONENT;
+        case ByteFormat::DEPTH24_STENCIL8:
             return GL_DEPTH24_STENCIL8;
     }
 }
@@ -203,5 +255,20 @@ GLenum OpenGL::getAttachmentTarget(AttachmentTarget target)
             return GL_TEXTURE_2D;
         case AttachmentTarget::RENDERBUFFER:
             return GL_RENDERBUFFER;
+    }
+}
+
+GLbitfield OpenGL::getClearMask(ClearMask mask)
+{
+    switch (mask)
+    {
+        case ClearMask::COLOR:
+            return GL_COLOR_BUFFER_BIT;
+        case ClearMask::DEPTH:
+            return GL_DEPTH_BUFFER_BIT;
+        case ClearMask::STENCIL:
+            return GL_STENCIL_BUFFER_BIT;
+        case ClearMask::COLORDEPTH:
+            return GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
     }
 }

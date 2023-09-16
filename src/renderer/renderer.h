@@ -7,6 +7,8 @@
 #include "forward_pass.h"
 #include "normal_visualizer_pass.h"
 #include "gpuresourcemanager.h"
+#include "gpucommands.h"
+
 
 class Renderer {
 public:
@@ -28,6 +30,7 @@ public:
 
 private:
     GPUResourceManager<OpenGL> gpurm;
+    GPUCommands<OpenGL> gpucommands;
 
     UniformBufferObject m_matricesUBO;
     UniformBufferObject m_lightUBO;

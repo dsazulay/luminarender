@@ -13,6 +13,14 @@ enum class Format
     RGB,
     RGBA,
     DEPTH,
+};
+
+enum class ByteFormat
+{
+    RGB,
+    RGBA,
+    RGBA16F,
+    DEPTH,
     DEPTH24_STENCIL8,
 };
 
@@ -48,12 +56,21 @@ enum class AttachmentTarget
     RENDERBUFFER,
 };
 
+enum class ClearMask
+{
+    COLOR,
+    DEPTH,
+    STENCIL,
+    COLORDEPTH,
+};
+
 struct TextureInfo
 {
     const char* debugName = "Texture";
     int width;
     int height;
     Format format;
+    ByteFormat byteFormat;
     Filtering filtering = Filtering::BILINEAR;
     Wrap wrap = Wrap::REPEAT;
     TexType type = TexType::UBYTE;
@@ -65,7 +82,7 @@ struct RenderBufferInfo
     const char* debugName = "RenderBuffer";
     int width;
     int height;
-    Format format;
+    ByteFormat byteFormat;
 };
 
 struct FrameBufferInfo
@@ -82,4 +99,10 @@ struct FrameBufferAttachmentInfo
     AttachmentTarget target;
 };
 
+struct FrameBufferTargetInfo
+{
+    const char* debugName = "FrameBufferTarget";
+    int size;
+    AttachmentType* types;
+};
 

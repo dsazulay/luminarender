@@ -17,19 +17,19 @@ void Renderer::render(Scene& scene)
     if (scene.mainLight() != nullptr)
     {
         m_shadowFrameBuffer.bind();
-        glViewport(0, 0, 2048, 2048);
-        glClear(GL_DEPTH_BUFFER_BIT);
+        gpucommands.setViewportSize(0, 0, 2048, 2048);
+        gpucommands.clear(ClearMask::DEPTH);
         m_shadowRenderPass.render(scene);
         m_shadowFrameBuffer.unbind();
         m_forwardPass.lightSpaceMatrix = m_shadowRenderPass.lightSpaceMatrix;
     }
 
     m_mainTargetFrameBuffer.bind();
-    glViewport(0, 0, m_viewportWidth, m_viewportHeight);
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    gpucommands.setViewportSize(0, 0, m_viewportWidth, m_viewportHeight);
+    gpucommands.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    gpucommands.clear(ClearMask::COLORDEPTH);
     m_forwardPass.render(scene);
-//    m_normalVisualizerPass.render(scene);
+    //m_normalVisualizerPass.render(scene);
     m_mainTargetFrameBuffer.unbind();
 }
 

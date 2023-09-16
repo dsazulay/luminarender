@@ -16,17 +16,25 @@ public:
 
     void attachTexture(id_t frameBuffer, FrameBufferAttachmentInfo info);
     void attachRenderBuffer(id_t frameBuffer, FrameBufferAttachmentInfo info);
+    void setTargetBuffers(id_t frameBuffer, FrameBufferTargetInfo info);
 
     void bindFrameBuffer(id_t frameBuffer);
     void unbindFrameBuffer();
     bool isFrameBufferComplete(id_t frameBuffer);
 
+    // Commands
+    void setViewportSize(int x, int y, int width, int height);
+    void setClearColor(float r, float g, float b, float a);
+    void clear(ClearMask mask);
+
 private:
     GLenum getFormat(Format format);
+    GLenum getByteFormat(ByteFormat format);
     GLint getFiltering(Filtering filtering);
     GLint getWrap(Wrap wrap);
     GLenum getTexType(TexType type);
     GLenum getAttachmentType(AttachmentType type);
     GLenum getAttachmentTarget(AttachmentTarget target);
+    GLbitfield getClearMask(ClearMask mask);
 };
 

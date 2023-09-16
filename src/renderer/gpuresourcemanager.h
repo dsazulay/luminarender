@@ -46,6 +46,11 @@ public:
         m_backend.attachRenderBuffer(frameBuffer, indo);
     }
 
+    void setTargetBuffers(id_t frameBuffer, FrameBufferTargetInfo info)
+    {
+        m_backend.setTargetBuffers(frameBuffer, info);
+    }
+
     void bindFrameBuffer(id_t frameBuffer)
     {
         m_backend.bindFrameBuffer(frameBuffer);

@@ -22,8 +22,6 @@ Application::Application(const AppConfig& config)
     ASSERT(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Failed to initialize GLAD");
 
     AssetLibrary::instance().createDefaultResources();
-    m_renderer = new Renderer((float) config.viewportWidth, (float) config.viewportHeight,
-                              glm::vec3(0.0, 0.0, 8.0f));
 
     // TODO: move to render config location
     glEnable(GL_DEPTH_TEST);
@@ -42,6 +40,8 @@ Application::Application(const AppConfig& config)
     m_uiRenderer.viewportWidth = (float) config.viewportWidth;
     m_uiRenderer.viewportHeight = (float) config.viewportHeight;
 
+    m_renderer = new Renderer((float) config.viewportWidth, (float) config.viewportHeight,
+                              glm::vec3(0.0, 0.0, 8.0f));
     // create shaders, materials, and objects and add them to the scene
 //    UnlitScene::loadScene(m_scene, AssetLibrary::instance());
     LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance());
