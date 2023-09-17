@@ -193,6 +193,21 @@ GBuffer::~GBuffer()
     deleteBuffer();
 }
 
+id_t GBuffer::getPositionAttachmentID()
+{
+    return m_positionAttachmentID;
+}
+
+id_t GBuffer::getNormalAttachmentID()
+{
+    return m_normalAttachmentID;
+}
+
+id_t GBuffer::getAlbedoSpecAttachmentID()
+{
+    return m_albedoSpecAttachmentID;
+}
+
 void GBuffer::createBuffer()
 {
     m_frameBufferID = m_rm.createFrameBuffer({

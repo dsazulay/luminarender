@@ -1,6 +1,8 @@
 #pragma once
 
 #include "../camera.h"
+#include "geometrypass.h"
+#include "lightingpass.h"
 #include "uniform_buffer_object.h"
 #include "frame_buffer.h"
 #include "shadow_pass.h"
@@ -29,7 +31,7 @@ public:
     glm::mat4& projMatrix();
 
 private:
-    GPUResourceManager<OpenGL> gpurm;
+    GPUResourceManager<OpenGL> gpurm{};
     GPUCommands<OpenGL> gpucommands;
 
     UniformBufferObject m_matricesUBO;
@@ -42,10 +44,13 @@ private:
 
     ColorDepthStencilBuffer m_mainTargetFrameBuffer;
     DepthBuffer m_shadowFrameBuffer;
+    GBuffer m_gbuffer;
 
     ShadowPass m_shadowRenderPass;
     ForwardPass m_forwardPass;
     NormalVisualizerPass m_normalVisualizerPass;
+    GeometryPass m_geometryPass;
+    LightingPass m_lightingPass;
 
     Camera m_camera;
 

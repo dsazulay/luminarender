@@ -14,6 +14,7 @@
 
 void Renderer::render(Scene& scene)
 {
+    /*
     if (scene.mainLight() != nullptr)
     {
         m_shadowFrameBuffer.bind();
@@ -31,6 +32,23 @@ void Renderer::render(Scene& scene)
     m_forwardPass.render(scene);
     //m_normalVisualizerPass.render(scene);
     m_mainTargetFrameBuffer.unbind();
+    */
+   
+    m_gbuffer.bind();
+    gpucommands.setViewportSize(0, 0, m_viewportWidth, m_viewportHeight);
+    gpucommands.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    gpucommands.clear(ClearMask::COLORDEPTH);
+    m_geometryPass.render(scene);
+    m_gbuffer.unbind();
+
+    m_mainTargetFrameBuffer.bind();
+    gpucommands.setViewportSize(0, 0, m_viewportWidth, m_viewportHeight);
+    gpucommands.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    gpucommands.clear(ClearMask::COLORDEPTH);
+    m_lightingPass.render();
+    //m_normalVisualizerPass.render(scene);
+    m_mainTargetFrameBuffer.unbind();
+
 }
 
 void Renderer::setupLights(std::vector<std::unique_ptr<Entity>> &lights)
@@ -83,7 +101,8 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
     m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
     m_camera(cameraPos),
     m_mainTargetFrameBuffer(m_viewportWidth, m_viewportHeight, gpurm),
-    m_shadowFrameBuffer(2048, 2048, gpurm)
+    m_shadowFrameBuffer(2048, 2048, gpurm),
+    m_gbuffer(m_viewportWidth, m_viewportHeight, gpurm)
 {
 
     m_matricesUBO.bindBufferToIndex(0);
@@ -93,6 +112,10 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
      std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
 
     m_normalVisualizerPass.camera(&m_camera);
+
+    m_lightingPass.gposition = m_gbuffer.getPositionAttachmentID();
+    m_lightingPass.gnormal = m_gbuffer.getNormalAttachmentID();
+    m_lightingPass.galbedospec = m_gbuffer.getAlbedoSpecAttachmentID();
 }
 
 unsigned int Renderer::getTexcolorBufferID()
@@ -106,6 +129,7 @@ void Renderer::onViewportResize(const Event& e)
     m_viewportWidth = event.width();
     m_viewportHeight = event.height();
     m_mainTargetFrameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
+    m_gbuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
     
     LOG_INFO("{} {}", m_viewportWidth, m_viewportHeight);
 }

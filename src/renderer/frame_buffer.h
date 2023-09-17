@@ -56,6 +56,10 @@ class GBuffer : public FrameBuffer
 public:
     GBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
     ~GBuffer();
+    
+    id_t getPositionAttachmentID();
+    id_t getNormalAttachmentID();
+    id_t getAlbedoSpecAttachmentID();
 
 private:
     void createBuffer() override;
