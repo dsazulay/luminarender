@@ -1,6 +1,5 @@
 #include "renderer.h"
 
-#include "../components/light.h"
 #include "../components/mesh_renderer.h"
 #include "../components/transform.h"
 #include "../events/dispatcher.h"
@@ -10,6 +9,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "../log.h"
+#include "../ecs.h"
+#include "../components/components.h"
+
 
 
 void Renderer::render(Scene& scene)
@@ -33,6 +35,8 @@ void Renderer::render(Scene& scene)
     //m_normalVisualizerPass.render(scene);
     m_mainTargetFrameBuffer.unbind();
     */
+
+    m_lightSystem->update(m_lightUBO, m_coordinator);
    
     m_gbuffer.bind();
     gpucommands.setViewportSize(0, 0, m_viewportWidth, m_viewportHeight);
@@ -49,29 +53,6 @@ void Renderer::render(Scene& scene)
     //m_normalVisualizerPass.render(scene);
     m_mainTargetFrameBuffer.unbind();
 
-}
-
-void Renderer::setupLights(std::vector<std::unique_ptr<Entity>> &lights)
-{
-    std::size_t offset = sizeof(glm::vec4);
-    std::size_t uniformStructSize = sizeof(LightUniformStruct);
-
-    glm::vec4 nLights = glm::vec4(2, 1, 1, 0);
-    m_lightUBO.setBufferData(0, sizeof(glm::vec4), &nLights);
-
-    for (auto& entity : lights)
-    {
-        auto transform = entity->getComponent<Transform>();
-        auto light = entity->getComponent<Light>();
-
-        light->uniformStruct.posAndCutoff = glm::vec4(transform->position(), light->cutoff);
-        light->uniformStruct.dirAndOuterCutoff = glm::vec4(transform->getDirection(), light->outerCutoff);
-        light->uniformStruct.colorAndIntensity = glm::vec4(light->color, light->intensity);
-        light->uniformStruct.attenuationAndType = glm::vec4(light->attenuation, light->lightType);
-
-        m_lightUBO.setBufferData(offset, uniformStructSize, &light->uniformStruct);
-        offset += uniformStructSize;
-    }
 }
 
 glm::mat4& Renderer::viewMatrix()
@@ -95,14 +76,15 @@ void Renderer::updateTransformMatrices()
     m_matricesUBO.setBufferData(2 * sizeof(glm::mat4), sizeof(glm::vec4), glm::value_ptr(m_camera.position));
 }
 
-Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos) :
+Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos, ecs::Coordinator& coordinator) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
     m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
     m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
     m_camera(cameraPos),
     m_mainTargetFrameBuffer(m_viewportWidth, m_viewportHeight, gpurm),
     m_shadowFrameBuffer(2048, 2048, gpurm),
-    m_gbuffer(m_viewportWidth, m_viewportHeight, gpurm)
+    m_gbuffer(m_viewportWidth, m_viewportHeight, gpurm),
+    m_coordinator{coordinator}
 {
 
     m_matricesUBO.bindBufferToIndex(0);
@@ -116,6 +98,14 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
     m_lightingPass.gposition = m_gbuffer.getPositionAttachmentID();
     m_lightingPass.gnormal = m_gbuffer.getNormalAttachmentID();
     m_lightingPass.galbedospec = m_gbuffer.getAlbedoSpecAttachmentID();
+
+    m_lightSystem = m_coordinator.registerSystem<LightSystem>().get();
+    {
+        ecs::Mask mask;
+        mask.set(m_coordinator.getComponentType<ecs::Transform>());
+        mask.set(m_coordinator.getComponentType<ecs::Light>());
+        m_coordinator.setSystemMask<LightSystem>(mask);
+    }
 }
 
 unsigned int Renderer::getTexcolorBufferID()

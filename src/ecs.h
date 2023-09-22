@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstdint>
 #include <bitset>
 #include <array>
@@ -6,11 +8,13 @@
 #include <cassert>
 #include <set>
 
+namespace ecs
+{
 using Entity = uint32_t;
 const Entity MAX_ENTITIES = 1000;
 
 using ComponentType = std::uint8_t;
-const ComponentType MAX_COMPONENTS = 8;
+const ComponentType MAX_COMPONENTS = 4;
 
 using Mask = std::bitset<MAX_COMPONENTS>;
 
@@ -48,7 +52,7 @@ public:
 };
 
 template<typename T>
-class ComponentArray : IComponentArray
+class ComponentArray : public IComponentArray
 {
 public:
     void insertData(Entity entity, T component)
@@ -57,6 +61,7 @@ public:
         size_t newIndex = m_size;
         m_entityToIndex[entity] = newIndex;
         m_indexToEntity[newIndex] = entity;
+        m_componentArray[newIndex] = component;
         m_size++;
     }
 
@@ -104,7 +109,7 @@ public:
     template<typename T>
     T& getComponent(Entity entity)
     {
-        return getComponentArray<T>()->GetData(entity);
+        return getComponentArray<T>()->getData(entity);
     }
 
 private:
@@ -127,7 +132,7 @@ public:
     std::set<Entity> m_entities;
 };
 
-class SystemManager : System
+class SystemManager
 {
 public:
     template<typename T>
@@ -137,7 +142,7 @@ public:
 
         assert(m_systems.find(typeName) == m_systems.end() && "System already registered");
 
-        auto system = std::make_shared<T>();
+        std::shared_ptr<T> system = std::make_shared<T>();
         m_systems.insert({typeName, system});
         return system;
     }
@@ -234,3 +239,5 @@ private:
     std::unique_ptr<ComponentManager> m_componentManager;
     std::unique_ptr<SystemManager> m_systemManager;
 };
+}
+

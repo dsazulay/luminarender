@@ -3,16 +3,19 @@
 #include "sample_resources.h"
 #include "../entity_factory.h"
 #include "../components/transform.h"
+#include "../components/components.h"
 
 
-void LightingSkyboxScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
+
+void LightingSkyboxScene::loadScene(Scene &scene, AssetLibrary &assetLibrary, ecs::Coordinator& coordinator)
 {
     loadTextures(assetLibrary);
     loadMaterials(assetLibrary);
     loadModels(assetLibrary);
-    loadLights(scene);
+    loadLights(scene, coordinator);
     loadSkybox(scene, assetLibrary);
     loadObjects(scene, assetLibrary);
+    loadObjects(scene, assetLibrary, coordinator);
 }
 
 void LightingSkyboxScene::loadTextures(AssetLibrary& assetLibrary)
@@ -52,12 +55,18 @@ void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
     //assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj");
 }
 
-void LightingSkyboxScene::loadLights(Scene& scene)
+void LightingSkyboxScene::loadLights(Scene& scene, ecs::Coordinator& coordinator)
 {
-    scene.addLight(EntityFactory::createDirectionalLight("Directional Light", glm::vec3(-45.0f, 20.0f, 0.0f), glm::vec3(0.9f, 0.9f, 0.8f), 1.0f));
     // scene.addLight(EntityFactory::createPointLight("Point Light", glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.7f, 0.8f, 0.5f), 1.0f));
     // scene.addLight(EntityFactory::createSpotLight("Spot Light", glm::vec3(-1.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.8f, 0.5f, 0.2f), 1.0f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f))));
-    scene.mainLight(scene.lights().front().get());
+    ecs::Entity light = coordinator.createEntity();
+    coordinator.addComponent(light, ecs::Light{
+        .color = glm::vec3(0.9, 0.9, 0.8),
+    });
+    coordinator.addComponent(light, ecs::Transform{
+        .rotation = glm::vec3(-45.0, 20.0, 0.0),
+        .quaternion =  glm::quat(glm::radians(glm::vec3(-45.0, 20.0, 0.0))),
+    });
 }
 
 void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
@@ -68,6 +77,51 @@ void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
 
     scene.addSkybox(EntityFactory::createFromMesh("Skybox",
             glm::vec3(0.0, 0.0, 0.0), skyboxMat, cubeMap));
+}
+
+void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, ecs::Coordinator& coordinator)
+{
+    Mesh* cube = assetLibrary.getMesh("cube");
+    Mesh* quad = assetLibrary.getMesh("quad");
+    Mesh* sphere = assetLibrary.getMesh("sphere");
+
+    Material* greyMat = assetLibrary.getMaterial("greyMat");
+    Material* blueMat = assetLibrary.getMaterial("blueMat");
+    Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
+
+   auto sphereEntity = coordinator.createEntity();
+   coordinator.addComponent(sphereEntity, ecs::MeshRenderer{
+        .mesh = sphere,
+        .material = blueMat,
+    });
+   coordinator.addComponent(sphereEntity, ecs::Transform{
+        .position = SampleResources::object_positions[1],
+    });
+   
+    auto cubeEntity = coordinator.createEntity();
+    coordinator.addComponent(cubeEntity, ecs::MeshRenderer{
+        .mesh = cube,
+        .material = woodBoxMat,
+    });
+    coordinator.addComponent(cubeEntity, ecs::Transform{
+        .position = SampleResources::object_positions[3],
+        .children = { sphereEntity },
+    });
+    auto a = coordinator.getComponent<ecs::Transform>(sphereEntity);
+    a.parent = cubeEntity;
+    
+    auto e = coordinator.createEntity();
+    coordinator.addComponent(e, ecs::MeshRenderer{
+        .mesh = quad,
+        .material = greyMat,
+    });
+    coordinator.addComponent(e, ecs::Transform{
+        .rotation = glm::vec3(-90.0, 0.0, 0.0),
+        .scale = glm::vec3(10.0, 10.0, 10.0),
+        .children = { cubeEntity },
+    });
+    auto b = coordinator.getComponent<ecs::Transform>(cubeEntity);
+    b.parent = e;
 }
 
 void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)

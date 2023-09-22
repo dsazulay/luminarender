@@ -10,13 +10,14 @@
 #include "normal_visualizer_pass.h"
 #include "gpuresourcemanager.h"
 #include "gpucommands.h"
+#include "../ecs.h"
+#include "light_system.h"
 
 
 class Renderer {
 public:
-    Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos);
+    Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos, ecs::Coordinator& coordinator);
     void updateTransformMatrices();
-    void setupLights(std::vector<std::unique_ptr<Entity>> &lights);
     void render(Scene& scene);
 
     glm::mat4 cascadeShadows(glm::vec3 lightDir);
@@ -51,6 +52,9 @@ private:
     NormalVisualizerPass m_normalVisualizerPass;
     GeometryPass m_geometryPass;
     LightingPass m_lightingPass;
+
+    ecs::Coordinator& m_coordinator;
+    LightSystem* m_lightSystem;
 
     Camera m_camera;
 

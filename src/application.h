@@ -1,9 +1,11 @@
 #pragma once
 
+#include "renderer/light_system.h"
 #include "window.h"
 #include "scene.h"
 #include "renderer/renderer.h"
 #include "ui/ui_renderer.h"
+#include "ecs.h"
 
 #include <glm/glm.hpp>
 
@@ -35,6 +37,7 @@ private:
     Renderer* m_renderer;
     UiRenderer m_uiRenderer{};
     Scene m_scene;
+    ecs::Coordinator m_coordinator;
 
     int m_windowWidth{};
     int m_windowHeight{};
