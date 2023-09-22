@@ -119,10 +119,7 @@ void ui::hierarchy::draw(Scene* scene)
         draw(scene, entity.get());
     }
 
-    for (auto& entity : scene->lights())
-    {
-        draw(scene, entity.get());
-    }
+    // Render light entities
 
     ImGui::End();
 }
