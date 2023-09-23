@@ -39,14 +39,12 @@ Application::Application(const AppConfig& config)
     m_coordinator.registerComponent<ecs::MeshRenderer>();
     m_coordinator.registerComponent<ecs::Light>();
 
-
     m_uiRenderer.init();
     m_uiRenderer.setBackendImplementation(m_window.glfwWindow());
     m_uiRenderer.viewportWidth = (float) config.viewportWidth;
     m_uiRenderer.viewportHeight = (float) config.viewportHeight;
 
-    m_renderer = new Renderer((float) config.viewportWidth, (float) config.viewportHeight,
-                              glm::vec3(0.0, 0.0, 8.0f), m_coordinator);
+    m_renderer = new Renderer((float) config.viewportWidth, (float) config.viewportHeight, glm::vec3(0.0, 0.0, 8.0f), m_coordinator);
     // create shaders, materials, and objects and add them to the scene
 //    UnlitScene::loadScene(m_scene, AssetLibrary::instance());
     LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance(), m_coordinator);

@@ -97,7 +97,7 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
    coordinator.addComponent(sphereEntity, ecs::Transform{
         .position = SampleResources::object_positions[1],
     });
-   
+ 
     auto cubeEntity = coordinator.createEntity();
     coordinator.addComponent(cubeEntity, ecs::MeshRenderer{
         .mesh = cube,
@@ -105,7 +105,7 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
     });
     coordinator.addComponent(cubeEntity, ecs::Transform{
         .position = SampleResources::object_positions[3],
-        .children = { sphereEntity },
+        .children = {sphereEntity},
     });
     auto a = coordinator.getComponent<ecs::Transform>(sphereEntity);
     a.parent = cubeEntity;
@@ -118,7 +118,7 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
     coordinator.addComponent(e, ecs::Transform{
         .rotation = glm::vec3(-90.0, 0.0, 0.0),
         .scale = glm::vec3(10.0, 10.0, 10.0),
-        .children = { cubeEntity },
+        .children = {cubeEntity},
     });
     auto b = coordinator.getComponent<ecs::Transform>(cubeEntity);
     b.parent = e;

@@ -62,13 +62,13 @@ public:
         m_entityToIndex[entity] = newIndex;
         m_indexToEntity[newIndex] = entity;
         m_componentArray[newIndex] = component;
-        m_size++;
+        ++m_size;
     }
 
     T& getData(Entity entity)
     {
         assert(m_entityToIndex.find(entity) != m_entityToIndex.end() && "Retrieving non-existing component");
-        return m_componentArray[entity];
+        return m_componentArray[m_entityToIndex[entity]];
     }
 
 private:

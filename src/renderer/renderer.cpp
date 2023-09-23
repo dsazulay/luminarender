@@ -37,22 +37,7 @@ void Renderer::render(Scene& scene)
     */
 
     m_lightSystem->update(m_lightUBO, m_coordinator);
-   
-    m_gbuffer.bind();
-    gpucommands.setViewportSize(0, 0, m_viewportWidth, m_viewportHeight);
-    gpucommands.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    gpucommands.clear(ClearMask::COLORDEPTH);
-    m_geometryPass.render(scene);
-    m_gbuffer.unbind();
-
-    m_mainTargetFrameBuffer.bind();
-    gpucommands.setViewportSize(0, 0, m_viewportWidth, m_viewportHeight);
-    gpucommands.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    gpucommands.clear(ClearMask::COLORDEPTH);
-    m_lightingPass.render();
-    //m_normalVisualizerPass.render(scene);
-    m_mainTargetFrameBuffer.unbind();
-
+    m_renderSystem->update(m_coordinator);
 }
 
 glm::mat4& Renderer::viewMatrix()
@@ -81,9 +66,6 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
     m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
     m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
     m_camera(cameraPos),
-    m_mainTargetFrameBuffer(m_viewportWidth, m_viewportHeight, gpurm),
-    m_shadowFrameBuffer(2048, 2048, gpurm),
-    m_gbuffer(m_viewportWidth, m_viewportHeight, gpurm),
     m_coordinator{coordinator}
 {
 
@@ -95,10 +77,6 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
 
     m_normalVisualizerPass.camera(&m_camera);
 
-    m_lightingPass.gposition = m_gbuffer.getPositionAttachmentID();
-    m_lightingPass.gnormal = m_gbuffer.getNormalAttachmentID();
-    m_lightingPass.galbedospec = m_gbuffer.getAlbedoSpecAttachmentID();
-
     m_lightSystem = m_coordinator.registerSystem<LightSystem>().get();
     {
         ecs::Mask mask;
@@ -106,11 +84,20 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
         mask.set(m_coordinator.getComponentType<ecs::Light>());
         m_coordinator.setSystemMask<LightSystem>(mask);
     }
+
+    m_renderSystem = m_coordinator.registerSystem<RenderSystem>().get();
+    {
+        ecs::Mask mask;
+        mask.set(m_coordinator.getComponentType<ecs::Transform>());
+        mask.set(m_coordinator.getComponentType<ecs::MeshRenderer>());
+        m_coordinator.setSystemMask<RenderSystem>(mask);
+    }
+    m_renderSystem->init(viewportWidth, viewportHeight);
 }
 
 unsigned int Renderer::getTexcolorBufferID()
 {
-    return m_mainTargetFrameBuffer.getColorAttachmentID();
+    return m_renderSystem->getFinalRenderTexID();
 }
 
 void Renderer::onViewportResize(const Event& e)
@@ -118,8 +105,7 @@ void Renderer::onViewportResize(const Event& e)
     const auto& event = static_cast<const ViewportResizeEvent&>(e);
     m_viewportWidth = event.width();
     m_viewportHeight = event.height();
-    m_mainTargetFrameBuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
-    m_gbuffer.resizeBuffer(m_viewportWidth, m_viewportHeight);
+    m_renderSystem->resizeBuffers(m_viewportWidth, m_viewportHeight);
     
     LOG_INFO("{} {}", m_viewportWidth, m_viewportHeight);
 }
@@ -134,7 +120,8 @@ void Renderer::setGlobalTextures(Scene& scene)
 
 unsigned int Renderer::getShadowMapTextureID()
 {
-    return m_shadowFrameBuffer.getDepthAttachmentID();
+    //return m_shadowFrameBuffer.getDepthAttachmentID();
+    return 0;
 }
 
 //std::vector<glm::vec4> Renderer::getFrustumCornersWorldSpace(const glm::mat4 &proj, const glm::mat4 &view)

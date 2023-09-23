@@ -1,8 +1,6 @@
 #pragma once
 
 #include "../camera.h"
-#include "geometrypass.h"
-#include "lightingpass.h"
 #include "uniform_buffer_object.h"
 #include "frame_buffer.h"
 #include "shadow_pass.h"
@@ -12,6 +10,7 @@
 #include "gpucommands.h"
 #include "../ecs.h"
 #include "light_system.h"
+#include "render_system.h"
 
 
 class Renderer {
@@ -32,7 +31,6 @@ public:
     glm::mat4& projMatrix();
 
 private:
-    GPUResourceManager<OpenGL> gpurm{};
     GPUCommands<OpenGL> gpucommands;
 
     UniformBufferObject m_matricesUBO;
@@ -43,18 +41,13 @@ private:
 
     glm::mat4 lightSpaceMatrix;
 
-    ColorDepthStencilBuffer m_mainTargetFrameBuffer;
-    DepthBuffer m_shadowFrameBuffer;
-    GBuffer m_gbuffer;
-
     ShadowPass m_shadowRenderPass;
     ForwardPass m_forwardPass;
     NormalVisualizerPass m_normalVisualizerPass;
-    GeometryPass m_geometryPass;
-    LightingPass m_lightingPass;
 
     ecs::Coordinator& m_coordinator;
     LightSystem* m_lightSystem;
+    RenderSystem* m_renderSystem;
 
     Camera m_camera;
 
