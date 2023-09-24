@@ -1,5 +1,6 @@
 #include "application.h"
 
+#include "renderer/transform_system.h"
 #include "samples/unlit_scene.h"
 #include "samples/lighting_skybox_scene.h"
 #include "samples/pbr_scene.h"
@@ -43,6 +44,14 @@ Application::Application(const AppConfig& config)
     m_uiRenderer.setBackendImplementation(m_window.glfwWindow());
     m_uiRenderer.viewportWidth = (float) config.viewportWidth;
     m_uiRenderer.viewportHeight = (float) config.viewportHeight;
+
+    TransformSystem* transformSystem = m_coordinator.registerSystem<TransformSystem>().get();
+    {
+        ecs::Mask mask;
+        mask.set(m_coordinator.getComponentType<ecs::Transform>());
+        m_coordinator.setSystemMask<TransformSystem>(mask);
+    }
+    transformSystem->init(&m_coordinator);
 
     m_renderer = new Renderer((float) config.viewportWidth, (float) config.viewportHeight, glm::vec3(0.0, 0.0, 8.0f), m_coordinator);
     // create shaders, materials, and objects and add them to the scene

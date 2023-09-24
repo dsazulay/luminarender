@@ -11,10 +11,10 @@ void LightSystem::update(UniformBufferObject& lightUBO, ecs::Coordinator& coordi
     glm::vec4 nLights = glm::vec4(2, 1, 1, 0);
     lightUBO.setBufferData(0, sizeof(glm::vec4), &nLights);
 
-    for (auto& entity : m_entities)
+    for (auto entity : m_entities)
     {
-        auto transform = coordinator.getComponent<ecs::Transform>(entity);
-        auto light = coordinator.getComponent<ecs::Light>(entity);
+        auto& transform = coordinator.getComponent<ecs::Transform>(entity);
+        auto& light = coordinator.getComponent<ecs::Light>(entity);
 
         LightUniformStruct lightUniform;
         lightUniform.posAndCutoff = glm::vec4(transform.position, light.cutoff);

@@ -4,7 +4,7 @@
 #include "../entity_factory.h"
 #include "../components/transform.h"
 #include "../components/components.h"
-
+#include "../renderer/transform_system.h"
 
 
 void LightingSkyboxScene::loadScene(Scene &scene, AssetLibrary &assetLibrary, ecs::Coordinator& coordinator)
@@ -105,23 +105,24 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
     });
     coordinator.addComponent(cubeEntity, ecs::Transform{
         .position = SampleResources::object_positions[3],
-        .children = {sphereEntity},
     });
-    auto a = coordinator.getComponent<ecs::Transform>(sphereEntity);
-    a.parent = cubeEntity;
     
-    auto e = coordinator.createEntity();
-    coordinator.addComponent(e, ecs::MeshRenderer{
+    auto quadEntity = coordinator.createEntity();
+    coordinator.addComponent(quadEntity, ecs::MeshRenderer{
         .mesh = quad,
         .material = greyMat,
     });
-    coordinator.addComponent(e, ecs::Transform{
+    coordinator.addComponent(quadEntity, ecs::Transform{
+        .position = SampleResources::object_positions[0],
         .rotation = glm::vec3(-90.0, 0.0, 0.0),
         .scale = glm::vec3(10.0, 10.0, 10.0),
-        .children = {cubeEntity},
     });
-    auto b = coordinator.getComponent<ecs::Transform>(cubeEntity);
-    b.parent = e;
+
+    auto transformSystem = coordinator.getSytem<TransformSystem>();
+    transformSystem->update();
+    transformSystem->addChild(cubeEntity, sphereEntity);
+    transformSystem->addChild(quadEntity, cubeEntity);
+    transformSystem->updateHierarchically();
 }
 
 void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)

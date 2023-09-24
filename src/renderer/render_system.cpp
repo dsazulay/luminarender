@@ -46,10 +46,10 @@ void RenderSystem::geometryPass(ecs::Coordinator& coordinator)
     gpucommands.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     gpucommands.clear(ClearMask::COLORDEPTH);
 
-    for (auto& entity : m_entities)
+    for (auto entity : m_entities)
     {
-        auto transform = coordinator.getComponent<ecs::Transform>(entity);
-        auto meshRenderer = coordinator.getComponent<ecs::MeshRenderer>(entity);
+        auto& transform = coordinator.getComponent<ecs::Transform>(entity);
+        auto& meshRenderer = coordinator.getComponent<ecs::MeshRenderer>(entity);
 
         Material* origMaterial = meshRenderer.material;
         Material* material = AssetLibrary::instance().getMaterial("GBuffer");
