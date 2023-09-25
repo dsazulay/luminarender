@@ -67,6 +67,11 @@ void FrameBuffer::bind()
     m_rm.bindFrameBuffer(m_frameBufferID);
 }
 
+void FrameBuffer::bind(FrameBufferOp op)
+{
+    m_rm.bindFrameBuffer(op, m_frameBufferID);
+}
+
 void FrameBuffer::unbind()
 {
     m_rm.unbindFrameBuffer();

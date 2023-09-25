@@ -125,6 +125,12 @@ void OpenGL::bindFrameBuffer(id_t frameBuffer)
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 }
 
+void OpenGL::bindFrameBuffer(FrameBufferOp op, id_t frameBuffer)
+{
+    GLenum glop = getFrameBufferOp(op);
+    glBindFramebuffer(glop, frameBuffer);
+}
+
 void OpenGL::unbindFrameBuffer()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -155,6 +161,13 @@ void OpenGL::clear(ClearMask mask)
 {
     GLbitfield glmask = getClearMask(mask);
     glClear(glmask);
+}
+
+void OpenGL::blit(int width, int height, ClearMask mask, Filtering filtering)
+{
+    GLbitfield glmask = getClearMask(mask);
+    GLint glfiltering = getFiltering(filtering);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, glmask, glfiltering);
 }
 
 GLenum OpenGL::getFormat(Format format)
@@ -270,5 +283,18 @@ GLbitfield OpenGL::getClearMask(ClearMask mask)
             return GL_STENCIL_BUFFER_BIT;
         case ClearMask::COLORDEPTH:
             return GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT;
+    }
+}
+
+GLenum OpenGL::getFrameBufferOp(FrameBufferOp op)
+{
+    switch (op)
+    {
+        case FrameBufferOp::READ:
+            return GL_READ_FRAMEBUFFER;
+        case FrameBufferOp::WRITE:
+            return GL_DRAW_FRAMEBUFFER;
+        case FrameBufferOp::READWRITE:
+            return GL_FRAMEBUFFER;
     }
 }

@@ -20,6 +20,12 @@ public:
     {
         backend.clear(mask);
     }
+
+    void blit(int width, int height, ClearMask mask, Filtering filtering)
+    {
+        backend.blit(width, height, mask, filtering);
+    }
+
 private:
     T backend;
 };

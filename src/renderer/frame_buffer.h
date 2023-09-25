@@ -9,6 +9,7 @@ public:
     FrameBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
     void resizeBuffer(int width, int height);
     void bind();
+    void bind(FrameBufferOp op);
     void unbind();
     id_t getID();
 

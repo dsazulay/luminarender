@@ -56,6 +56,11 @@ public:
         m_backend.bindFrameBuffer(frameBuffer);
     }
 
+    void bindFrameBuffer(FrameBufferOp op, id_t frameBuffer)
+    {
+        m_backend.bindFrameBuffer(op, frameBuffer);
+    }
+
     void unbindFrameBuffer()
     {
         m_backend.unbindFrameBuffer();

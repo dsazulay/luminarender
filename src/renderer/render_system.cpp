@@ -24,6 +24,13 @@ void RenderSystem::update(ecs::Coordinator& coordinator)
 {
     geometryPass(coordinator);
     lightingPass();
+
+    // copy depth buffer from geometry pass
+    m_gbuffer->bind(FrameBufferOp::READ);
+    m_mainTargetFrameBuffer->bind(FrameBufferOp::WRITE); 
+    gpucommands.blit(m_width, m_height, ClearMask::DEPTH, Filtering::POINT);
+
+    skyboxPass();
 }
 
 void RenderSystem::resizeBuffers(int width, int height)
@@ -106,6 +113,29 @@ void RenderSystem::lightingPass()
 
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int) mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+
+    m_mainTargetFrameBuffer->unbind();
+}
+
+void RenderSystem::skyboxPass()
+{
+    m_mainTargetFrameBuffer->bind();
+    
+    auto mesh = AssetLibrary::instance().getMesh("triangleMap");
+    Material* material = AssetLibrary::instance().getMaterial("skyboxMat");
+    material->shader->use();
+
+    int texCount = 0;
+    for (const auto& texture : material->textures)
+    {
+        material->shader->setInt(texture.first, texCount);
+        glActiveTexture(GL_TEXTURE0 + texCount);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, texture.second);
+    }
+
+    glBindVertexArray(mesh->vao());
+    glDrawElements(GL_TRIANGLES, (int)mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 
     m_mainTargetFrameBuffer->unbind();

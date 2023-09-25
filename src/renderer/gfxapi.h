@@ -64,6 +64,13 @@ enum class ClearMask
     COLORDEPTH,
 };
 
+enum class FrameBufferOp
+{
+    READ,
+    WRITE,
+    READWRITE,
+};
+
 struct TextureInfo
 {
     const char* debugName = "Texture";

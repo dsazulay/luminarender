@@ -19,6 +19,7 @@ public:
     void setTargetBuffers(id_t frameBuffer, FrameBufferTargetInfo info);
 
     void bindFrameBuffer(id_t frameBuffer);
+    void bindFrameBuffer(FrameBufferOp op, id_t frameBuffer);
     void unbindFrameBuffer();
     bool isFrameBufferComplete(id_t frameBuffer);
 
@@ -26,6 +27,7 @@ public:
     void setViewportSize(int x, int y, int width, int height);
     void setClearColor(float r, float g, float b, float a);
     void clear(ClearMask mask);
+    void blit(int width, int height, ClearMask mask, Filtering filtering);
 
 private:
     GLenum getFormat(Format format);
@@ -36,5 +38,6 @@ private:
     GLenum getAttachmentType(AttachmentType type);
     GLenum getAttachmentTarget(AttachmentTarget target);
     GLbitfield getClearMask(ClearMask mask);
+    GLenum getFrameBufferOp(FrameBufferOp op);
 };
 
