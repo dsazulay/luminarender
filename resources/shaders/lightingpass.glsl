@@ -16,7 +16,7 @@ void main()
 #shader fragment
 #version 410 core
 
-#include "lighting.glsl"
+#define SHADOWS
 
 in vec2 v_uv;
 
@@ -25,6 +25,14 @@ out vec4 fragColor;
 uniform sampler2D u_gposition;
 uniform sampler2D u_normal;
 uniform sampler2D u_albedospec;
+#ifdef SHADOWS
+    uniform sampler2D u_shadowMap;
+#endif
+
+#include "lighting.glsl"
+#ifdef SHADOWS
+    #include "shadows.glsl"
+#endif
 
 vec4 lambert(Light light, vec3 normal, vec3 color)
 {
@@ -47,4 +55,9 @@ void main()
         Light l = getLight(i, worldPos);
         fragColor += lambert(l, normal, mainTex.xyz);
     }
+
+    #ifdef SHADOWS
+        float shadow = 1 - shadowCalculation(lightSpaceMatrix * vec4(worldPos, 1), shadowLightPos.rgb, worldPos, normal);
+        fragColor *= shadow;
+    #endif
 }

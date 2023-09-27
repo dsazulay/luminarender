@@ -15,6 +15,7 @@ public:
     void resizeBuffers(int width, int height);
     id_t getFinalRenderTexID();
 private:
+    void shadowPass(ecs::Coordinator& coordinator);
     void geometryPass(ecs::Coordinator& coordinator);
     void lightingPass();
     void skyboxPass();

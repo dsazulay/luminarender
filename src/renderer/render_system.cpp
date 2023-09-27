@@ -18,10 +18,13 @@ void RenderSystem::init(int width, int height)
     AssetLibrary::instance().createMaterial("GBuffer", s);
     s = AssetLibrary::instance().loadShader("LightingPass", "resources/shaders/lightingpass.glsl");
     AssetLibrary::instance().createMaterial("LightingPass", s);
+    s = AssetLibrary::instance().loadShader("simpleShadowMap", "resources/shaders/simple_shadow_depth.glsl");
+    AssetLibrary::instance().createMaterial("shadowMat", s);
 }
 
 void RenderSystem::update(ecs::Coordinator& coordinator)
 {
+    shadowPass(coordinator);
     geometryPass(coordinator);
     lightingPass();
 
@@ -44,6 +47,32 @@ void RenderSystem::resizeBuffers(int width, int height)
 id_t RenderSystem::getFinalRenderTexID()
 {
     return m_mainTargetFrameBuffer->getColorAttachmentID();
+}
+
+void RenderSystem::shadowPass(ecs::Coordinator& coordinator)
+{
+    m_shadowFrameBuffer->bind();
+    gpucommands.setViewportSize(0, 0, 2048, 2048);
+    gpucommands.clear(ClearMask::DEPTH);
+    
+    for (auto entity : m_entities)
+    {
+        auto& transform = coordinator.getComponent<ecs::Transform>(entity);
+        auto& meshRenderer = coordinator.getComponent<ecs::MeshRenderer>(entity);
+
+        Material *material = AssetLibrary::instance().getMaterial("shadowMat");
+        material->shader->use();
+
+        // set object uniforms (e.g. transform)
+        material->shader->setMat4("u_model", transform.modelMatrix);
+        material->setUniformData();
+
+        glBindVertexArray(meshRenderer.mesh->vao());
+        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
+    }
+
+    m_shadowFrameBuffer->unbind();
 }
 
 void RenderSystem::geometryPass(ecs::Coordinator& coordinator)
@@ -110,6 +139,10 @@ void RenderSystem::lightingPass()
     material->shader->setInt("u_albedospec", 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getAlbedoSpecAttachmentID());
+
+    material->shader->setInt("u_shadowMap", 3);
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, m_shadowFrameBuffer->getDepthAttachmentID());
 
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int) mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);

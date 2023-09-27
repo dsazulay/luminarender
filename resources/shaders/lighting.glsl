@@ -9,6 +9,8 @@ struct LightUniform
 layout (std140) uniform Lights
 {
     vec4 nLights;
+    vec4 shadowLightPos;
+    mat4 lightSpaceMatrix;
     LightUniform light[12];
 };
 
@@ -85,3 +87,4 @@ Light getSpotLight(LightUniform light, vec3 worldPos)
 
     return l;
 }
+

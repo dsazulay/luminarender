@@ -64,7 +64,7 @@ void Renderer::updateTransformMatrices()
 Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos, ecs::Coordinator& coordinator) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
     m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
-    m_lightUBO((sizeof(glm::vec4) + 12 * sizeof(LightUniformStruct))),
+    m_lightUBO(2 * sizeof(glm::vec4) + sizeof(glm::mat4) + 12 * sizeof(LightUniformStruct)),
     m_camera(cameraPos),
     m_coordinator{coordinator}
 {

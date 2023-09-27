@@ -1,4 +1,4 @@
-float shadowCalculation(vec4 fragPosLightSpace)
+float shadowCalculation(vec4 fragPosLightSpace, vec3 lightPos, vec3 worldPos, vec3 normalWS)
 {
     // perform perspective divide
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
@@ -9,8 +9,8 @@ float shadowCalculation(vec4 fragPosLightSpace)
     // get depth of current fragment from light's perspective
     float currentDepth = projCoords.z;
     // calculate bias (based on depth map resolution and slope)
-    vec3 normal = normalize(v_in.normal);
-    vec3 lightDir = normalize(u_lightPos - v_in.worldPos);
+    vec3 normal = normalize(normalWS);
+    vec3 lightDir = normalize(lightPos - worldPos);
     float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
     // check whether current frag pos is in shadow
     // float shadow = currentDepth - bias > closestDepth  ? 1.0 : 0.0;
@@ -29,7 +29,14 @@ float shadowCalculation(vec4 fragPosLightSpace)
 
     // keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
     if(projCoords.z > 1.0)
-    shadow = 0.0;
+        shadow = 0.0;
 
     return shadow;
+}
+
+// TODO: this is only to avoid compilation errors with the old system
+// TODO: remove this
+float shadowCalculation(vec4 fragPosLightSpace)
+{
+    return 1.0;
 }
