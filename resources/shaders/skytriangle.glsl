@@ -15,9 +15,9 @@ void main()
 {
 
     mat4 view = u_view;
-    view[3] = vec4(0.0);
-    v_texcoords = (inverse(u_projection * u_view) * vec4(a_pos, 1.0)).xyz;
-    gl_Position = vec4(a_pos, 1.0);
+    view[3] = vec4(0.0, 0.0, 0.0, 1.0);
+    v_texcoords = (inverse(u_projection * view) * vec4(a_pos, 1.0)).xyz;
+    gl_Position = a_pos.xyzz;
 }
 
 #shader fragment
