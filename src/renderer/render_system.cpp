@@ -10,7 +10,7 @@ void RenderSystem::init(int width, int height)
     m_width = width;
     m_height = height;
     m_mainTargetFrameBuffer = std::make_unique<ColorDepthStencilBuffer>(width, height, m_gpurm);
-    m_shadowFrameBuffer = std::make_unique<DepthBuffer>(2048, 2048, m_gpurm);
+    m_shadowFrameBuffer = std::make_unique<DepthBuffer>(shadowMapSize, shadowMapSize, m_gpurm);
     m_gbuffer = std::make_unique<GBuffer>(width, height, m_gpurm);
 
     // TODO: Move this to asset initalization
@@ -52,7 +52,7 @@ id_t RenderSystem::getFinalRenderTexID()
 void RenderSystem::shadowPass(ecs::Coordinator& coordinator)
 {
     m_shadowFrameBuffer->bind();
-    gpucommands.setViewportSize(0, 0, 2048, 2048);
+    gpucommands.setViewportSize(0, 0, shadowMapSize, shadowMapSize);
     gpucommands.clear(ClearMask::DEPTH);
     
     for (auto entity : m_entities)

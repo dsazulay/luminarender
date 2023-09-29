@@ -31,5 +31,7 @@ private:
 
     int m_width;
     int m_height;
+
+    const int shadowMapSize = 1024;
 };
 
