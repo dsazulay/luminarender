@@ -69,7 +69,7 @@ void ui::mainmenu::drawMenuFile(Scene* scene)
         if (selection != nullptr)
         {
             // TODO: extract file name + check for name repetition
-            auto model = AssetLibrary::instance().loadModel(selection, selection);
+            auto model = AssetLibrary::instance().loadModel(selection, selection, true);
             auto entity = EntityFactory::createFromModel("name", model);
             scene->addObject(std::move(entity));
         }

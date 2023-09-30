@@ -88,7 +88,7 @@ bool AssetLibrary::isMaterialCreated(const char* name)
     return (m_materials.find(name) != m_materials.end());
 }
 
-Model* AssetLibrary::loadModel(const char *name, const char *path)
+Model* AssetLibrary::loadModel(const char *name, const char *path, bool material)
 {
     if (isModelLoaded(name))
     {
@@ -96,7 +96,7 @@ Model* AssetLibrary::loadModel(const char *name, const char *path)
         return m_models[name];
     }
 
-    m_models[name] = Importer::loadModel(path);
+    m_models[name] = Importer::loadModel(path, material);
     for (auto mesh : m_models[name]->m_meshes)
     {
         m_meshes[mesh.first] = mesh.second;

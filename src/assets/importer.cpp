@@ -68,7 +68,7 @@ Texture* Importer::loadCubeMapFromFiles(std::vector<std::string> faces, const st
     return texture;
 }
 
-Model* Importer::loadModel(const char* path)
+Model* Importer::loadModel(const char* path, bool material)
 {
     Model* model = new Model();
 
@@ -81,27 +81,27 @@ Model* Importer::loadModel(const char* path)
         return model;
     }
 
-    processNode(scene->mRootNode, scene, model);
+    processNode(scene->mRootNode, scene, model, material);
 
     return model;
 }
 
-void Importer::processNode(aiNode *node, const aiScene *scene, Model* model)
+void Importer::processNode(aiNode *node, const aiScene *scene, Model* model, bool material)
 {
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        Mesh* newMesh = new Mesh(processMesh(mesh, scene));
+        Mesh* newMesh = new Mesh(processMesh(mesh, scene, material));
         model->m_meshes.push_back(std::make_pair(std::string(mesh->mName.C_Str()), newMesh));
     }
 
     for (unsigned int i = 0; i < node->mNumChildren; i++)
     {
-        processNode(node->mChildren[i], scene, model);
+        processNode(node->mChildren[i], scene, model, material);
     }
 }
 
-VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene)
+VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene, bool material)
 {
     VertexIndexTuple m;
 
@@ -139,6 +139,9 @@ VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene)
             m.indices.push_back(face.mIndices[j]);
         }
     }
+
+    if (!material)
+        return m;
 
     // process material
     if (mesh->mMaterialIndex >= 0)

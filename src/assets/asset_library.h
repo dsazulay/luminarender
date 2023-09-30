@@ -27,7 +27,7 @@ public:
     Shader* loadShader(const char* name, const char* shaderPath);
     Material* createMaterial(const char* name, const char* shader);
     Material* createMaterial(const char* name, Shader*);
-    Model* loadModel(const char* name, const char* path);
+    Model* loadModel(const char* name, const char* path, bool material);
     Mesh* loadMesh(const char* name, MeshType basicModel);
     Texture* load2DTexture(const char* name, const std::string& file, const std::string& directory);
     Texture* loadHDRTexture(const char* name, const std::string& file, const std::string& directory);

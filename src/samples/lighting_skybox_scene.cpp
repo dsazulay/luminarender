@@ -14,7 +14,6 @@ void LightingSkyboxScene::loadScene(Scene &scene, AssetLibrary &assetLibrary, ec
     loadModels(assetLibrary);
     loadLights(scene, coordinator);
     loadSkybox(scene, assetLibrary);
-    loadObjects(scene, assetLibrary);
     loadObjects(scene, assetLibrary, coordinator);
 }
 
@@ -51,8 +50,8 @@ void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary)
 
 void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
 {
-    //assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
-    //assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj");
+    assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire, false);
+    assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
 }
 
 void LightingSkyboxScene::loadLights(Scene& scene, ecs::Coordinator& coordinator)
@@ -71,7 +70,6 @@ void LightingSkyboxScene::loadLights(Scene& scene, ecs::Coordinator& coordinator
 
 void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
 {
-    //Mesh* cubeMap = assetLibrary.getMesh("cubeMap");
     Mesh* cubeMap = assetLibrary.getMesh("triangleMap");
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 
@@ -84,10 +82,13 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
     Mesh* cube = assetLibrary.getMesh("cube");
     Mesh* quad = assetLibrary.getMesh("quad");
     Mesh* sphere = assetLibrary.getMesh("sphere");
+    Model* spitfire = assetLibrary.getModel("spitfireModel");
+    Model* sponza = assetLibrary.getModel("sponza");
 
     Material* greyMat = assetLibrary.getMaterial("greyMat");
     Material* blueMat = assetLibrary.getMaterial("blueMat");
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
+    Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
 
    auto sphereEntity = coordinator.createEntity();
    coordinator.addComponent(sphereEntity, ecs::MeshRenderer{
@@ -118,65 +119,48 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
         .scale = glm::vec3(10.0, 10.0, 10.0),
     });
 
+    auto spitfireEntity = coordinator.createEntity();
+    coordinator.addComponent(spitfireEntity, ecs::Transform{});
+
     auto transformSystem = coordinator.getSytem<TransformSystem>();
+
+    for (auto& mesh : spitfire->m_meshes)
+    {
+        auto newEntity = coordinator.createEntity();
+        coordinator.addComponent(newEntity, ecs::Transform{});
+        coordinator.addComponent(newEntity, ecs::MeshRenderer{
+            .mesh = mesh.second,
+            .material = spitfireMat,
+        });
+
+        transformSystem->addChild(spitfireEntity, newEntity);
+    }
+
+    auto& spitfireTransform = coordinator.getComponent<ecs::Transform>(spitfireEntity);
+    spitfireTransform.position = glm::vec3( 2.4f, -6.5f, -3.5f);
+    spitfireTransform.rotation = glm::vec3(-96.0, 0.0, 0.0);
+    spitfireTransform.scale = glm::vec3(0.05, 0.05, 0.05);
+
+    auto sponzaEntity = coordinator.createEntity();
+    coordinator.addComponent(sponzaEntity, ecs::Transform{});
+
+    for (auto& mesh : sponza->m_meshes)
+    {
+        auto newEntity = coordinator.createEntity();
+        coordinator.addComponent(newEntity, ecs::Transform{});
+        coordinator.addComponent(newEntity, ecs::MeshRenderer{
+            .mesh = mesh.second,
+            .material = AssetLibrary::instance().getMaterial(mesh.second->modelMat().c_str()),
+        });
+        transformSystem->addChild(sponzaEntity, newEntity);
+    }
+
+    auto& sponzaTransform = coordinator.getComponent<ecs::Transform>(sponzaEntity);
+    sponzaTransform.scale = glm::vec3(0.01, 0.01, 0.01);
+
     transformSystem->update();
     transformSystem->addChild(cubeEntity, sphereEntity);
     transformSystem->addChild(quadEntity, cubeEntity);
     transformSystem->updateHierarchically();
 }
-
-void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
-{
-    Mesh* cube = assetLibrary.getMesh("cube");
-    Mesh* quad = assetLibrary.getMesh("quad");
-    Mesh* sphere = assetLibrary.getMesh("sphere");
-    //Model* spitfire = assetLibrary.getModel("spitfireModel");
-    //Model* sponza = assetLibrary.getModel("sponza");
-
-    Material* greyMat = assetLibrary.getMaterial("greyMat");
-    Material* blueMat = assetLibrary.getMaterial("blueMat");
-    Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
-    Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
-
-    auto e = EntityFactory::createFromMesh("Quad",
-            SampleResources::object_positions[0], greyMat, quad);
-
-    auto transform = e->getComponent<Transform>();
-    transform->eulerAngles(glm::vec3(-90.0, 0.0, 0.0));
-    transform->scale(glm::vec3(10.0, 10.0, 10.0));
-    transform->updateModelMatrix();
-
-
-    auto sphereEntity = EntityFactory::createFromMesh("Sphere",
-            SampleResources::object_positions[1], blueMat, sphere);
-
-    auto cubeEntity = EntityFactory::createFromMesh("Cube",
-            SampleResources::object_positions[3], woodBoxMat, cube);
-
-    cubeEntity->addChild(std::move(sphereEntity));
-    e->addChild(std::move(cubeEntity));
-    e->updateSelfAndChild();
-    scene.addObject(std::move(e));
-
-    //auto spitfireEntity = EntityFactory::createFromModel("Spitfire",
-            //SampleResources::object_positions[4], spitfireMat, spitfire);
-
-    //auto t = spitfireEntity->getComponent<Transform>();
-    //t->scale(glm::vec3(0.05, 0.05, 0.05));
-    //t->eulerAngles(glm::vec3(-96, 0, 0));
-    //t->updateModelMatrix();
-    //spitfireEntity->updateSelfAndChild();
-
-    //scene.addObject(std::move(spitfireEntity));
-
-    //auto sponzaEntity = EntityFactory::createFromModel("Sponza", glm::vec3(0.0, 0.0, 0.0), sponza);
-
-    //auto t = sponzaEntity->getComponent<Transform>();
-    //t->scale(glm::vec3(0.01, 0.01, 0.01));
-    //t->updateModelMatrix();
-    //sponzaEntity->updateSelfAndChild();
-
-    //scene.addObject(std::move(sponzaEntity));
-}
-
 

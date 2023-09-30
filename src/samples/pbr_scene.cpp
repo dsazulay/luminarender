@@ -80,9 +80,9 @@ void PbrScene::loadMaterials(AssetLibrary &assetLibrary, unsigned int& skyboxTex
 
 void PbrScene::loadModels(AssetLibrary &assetLibrary)
 {
-    //assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire);
-    //assetLibrary.loadModel("cerberusModel", SampleResources::model_cerberus);
-    assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj");
+    //assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire, false);
+    //assetLibrary.loadModel("cerberusModel", SampleResources::model_cerberus, false);
+    assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
 }
 
 void PbrScene::loadLights(Scene& scene)

@@ -75,11 +75,8 @@ void Application::mainloop()
         m_window.processInput();
 
         m_renderer->setGlobalTextures(m_scene);
-
         m_renderer->updateTransformMatrices();
-
-        if (!m_scene.objects().empty())
-            m_renderer->render(m_scene);
+        m_renderer->render(m_scene);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, m_windowWidth, m_windowHeight);
