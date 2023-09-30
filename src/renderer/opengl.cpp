@@ -6,7 +6,7 @@
 
 id_t OpenGL::createTexture(TextureInfo info)
 {
-    LOG_INFO("OpenGL backend create texture: {}", info.debugName);
+    LOG(LogLevel::OPENGLAPI, "OpenGL backend create texture: {}", info.debugName);
     id_t id;
     GLenum format = getFormat(info.format);
     GLenum byteFormat = getByteFormat(info.byteFormat);
@@ -36,7 +36,7 @@ id_t OpenGL::createTexture(TextureInfo info)
 
 id_t OpenGL::createRenderBuffer(RenderBufferInfo info)
 {
-    LOG_INFO("OpenGL backend create render buffer: {}", info.debugName);
+    LOG(LogLevel::OPENGLAPI, "OpenGL backend create render buffer: {}", info.debugName);
     id_t id;
     GLenum byteFormat = getByteFormat(info.byteFormat);
 
@@ -50,7 +50,7 @@ id_t OpenGL::createRenderBuffer(RenderBufferInfo info)
 
 id_t OpenGL::createFrameBuffer(FrameBufferInfo info)
 {
-    LOG_INFO("OpenGL backend create frame buffer: {}", info.debugName);
+    LOG(LogLevel::OPENGLAPI, "OpenGL backend create frame buffer: {}", info.debugName);
     id_t id;
 
     glGenFramebuffers(1, &id);
@@ -67,25 +67,25 @@ id_t OpenGL::createFrameBuffer(FrameBufferInfo info)
 
 void OpenGL::deleteTexture(id_t texture)
 {
-    LOG_INFO("OpenGL backend delete texture");
+    LOG(LogLevel::OPENGLAPI, "OpenGL backend delete texture");
     glDeleteTextures(1, &texture);
 }
 
 void OpenGL::deleteRenderBuffer(id_t renderBuffer)
 {
-    LOG_INFO("OpenGL backend delete render buffer");
+    LOG(LogLevel::OPENGLAPI, "OpenGL backend delete render buffer");
     glDeleteRenderbuffers(1, &renderBuffer);
 }
 
 void OpenGL::deleteFrameBuffer(id_t frameBuffer)
 {
-    LOG_INFO("OpenGL backend delete frame buffer");
+    LOG(LogLevel::OPENGLAPI, "OpenGL backend delete frame buffer");
     glDeleteFramebuffers(1, &frameBuffer);
 }
 
 void OpenGL::attachTexture(id_t frameBuffer, FrameBufferAttachmentInfo info)
 {
-    LOG_INFO("OpenGL backend attach texture: {}", info.debugName);
+    LOG(LogLevel::OPENGLAPI, "OpenGL backend attach texture: {}", info.debugName);
     GLenum type = getAttachmentType(info.type);
     GLenum target = getAttachmentTarget(info.target);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -95,7 +95,7 @@ void OpenGL::attachTexture(id_t frameBuffer, FrameBufferAttachmentInfo info)
 
 void OpenGL::attachRenderBuffer(id_t frameBuffer, FrameBufferAttachmentInfo info)
 {
-    LOG_INFO("OpenGL backend attach render buffer: {}", info.debugName);
+    LOG(LogLevel::OPENGLAPI, "OpenGL backend attach render buffer: {}", info.debugName);
     GLenum type = getAttachmentType(info.type);
     GLenum target = getAttachmentTarget(info.target);
     glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
@@ -105,7 +105,7 @@ void OpenGL::attachRenderBuffer(id_t frameBuffer, FrameBufferAttachmentInfo info
 
 void OpenGL::setTargetBuffers(id_t frameBuffer, FrameBufferTargetInfo info)
 {
-    LOG_INFO("OpenGL backend set target buffers: {}", info.debugName);
+    LOG(LogLevel::OPENGLAPI, "OpenGL backend set target buffers: {}", info.debugName);
     // TODO: check if there's a better way to do this without using std::vector
     std::vector<GLenum> types;
     types.reserve(info.size);

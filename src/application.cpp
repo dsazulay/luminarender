@@ -13,6 +13,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
+int logLevel = LogLevel::ERROR | LogLevel::WARNING | LogLevel::INFO;
 float Application::deltaTime;
 
 Application::Application(const AppConfig& config)
