@@ -174,6 +174,8 @@ GLenum OpenGL::getFormat(Format format)
 {
     switch (format)
     {
+        case Format::RED:
+            return GL_RED;
         case Format::RGB:
             return GL_RGB;
         case Format::RGBA:
@@ -187,12 +189,16 @@ GLenum OpenGL::getByteFormat(ByteFormat format)
 {
     switch (format)
     {
+        case ByteFormat::RED:
+            return GL_RED;
         case ByteFormat::RGB:
             return GL_RGB;
         case ByteFormat::RGBA:
             return GL_RGBA;
         case ByteFormat::RGBA16F:
             return GL_RGBA16F;
+        case ByteFormat::RGBA32F:
+            return GL_RGBA32F;
         case ByteFormat::DEPTH:
             return GL_DEPTH_COMPONENT;
         case ByteFormat::DEPTH24_STENCIL8:

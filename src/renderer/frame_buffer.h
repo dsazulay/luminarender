@@ -38,6 +38,20 @@ private:
     id_t m_depthStencilAttachmentID;
 };
 
+class ColorBuffer : public FrameBuffer
+{
+public:
+    ColorBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
+    ~ColorBuffer();
+    id_t getColorAttachmentID();
+
+private:
+    void createBuffer() override;
+    void deleteBuffer() override;
+
+    id_t m_colorAttachmentID;
+};
+
 class DepthBuffer : public FrameBuffer
 {
 public:

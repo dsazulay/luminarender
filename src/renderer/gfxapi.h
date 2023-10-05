@@ -10,6 +10,7 @@ enum class Filtering
 
 enum class Format
 {
+    RED,
     RGB,
     RGBA,
     DEPTH,
@@ -17,9 +18,11 @@ enum class Format
 
 enum class ByteFormat
 {
+    RED,
     RGB,
     RGBA,
     RGBA16F,
+    RGBA32F,
     DEPTH,
     DEPTH24_STENCIL8,
 };
@@ -81,7 +84,7 @@ struct TextureInfo
     Filtering filtering = Filtering::BILINEAR;
     Wrap wrap = Wrap::REPEAT;
     TexType type = TexType::UBYTE;
-    unsigned char* initialData = nullptr;
+    void* initialData = nullptr;
 };
 
 struct RenderBufferInfo

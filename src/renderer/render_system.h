@@ -6,6 +6,8 @@
 #include "../assets/material.h"
 
 #include <memory>
+#include <array>
+#include <glm/vec3.hpp>
 
 class RenderSystem : public ecs::System
 {
@@ -17,9 +19,13 @@ public:
 private:
     void shadowPass(ecs::Coordinator& coordinator);
     void geometryPass(ecs::Coordinator& coordinator);
+    void ssaoPass();
+    void ssaoBlurPass();
     void lightingPass();
     void skyboxPass();
     void normalVisualizerPass(ecs::Coordinator& coordinator);
+
+    void generateSSAONoiseTexture();
 
 private:
     GPUResourceManager<OpenGL> m_gpurm{};
@@ -28,10 +34,15 @@ private:
     std::unique_ptr<ColorDepthStencilBuffer> m_mainTargetFrameBuffer;
     std::unique_ptr<DepthBuffer> m_shadowFrameBuffer;
     std::unique_ptr<GBuffer> m_gbuffer;
+    std::unique_ptr<ColorBuffer> m_ssaoBuffer;
+    std::unique_ptr<ColorBuffer> m_ssaoBlurBuffer;
 
     int m_width;
     int m_height;
 
     const int shadowMapSize = 1024;
+
+    id_t m_ssaoNoiseTex;
+    std::array<glm::vec3, 64> m_ssaoKernel;
 };
 

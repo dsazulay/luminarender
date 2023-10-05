@@ -8,7 +8,7 @@ void LightSystem::update(UniformBufferObject& lightUBO, ecs::Coordinator& coordi
     std::size_t offset = sizeof(glm::vec4);
     std::size_t uniformStructSize = sizeof(LightUniformStruct);
 
-    glm::vec4 nLights = glm::vec4(2, 1, 1, 0);
+    glm::vec4 nLights = glm::vec4(1, 0, 0, 0);
     lightUBO.setBufferData(0, sizeof(glm::vec4), &nLights);
     // TODO: temporarily using the first light as main light for shadow casting
     auto& mainLightTransform = coordinator.getComponent<ecs::Transform>(*m_entities.begin());

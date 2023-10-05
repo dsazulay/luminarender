@@ -1,6 +1,7 @@
 #include "frame_buffer.h"
 
 #include "../log.h"
+#include "gfxapi.h"
 
 /*
 void FrameBuffer::create3Dbuffer()
@@ -138,6 +139,53 @@ void ColorDepthStencilBuffer::deleteBuffer()
     m_rm.deleteFrameBuffer(m_frameBufferID);
 }
 
+ColorBuffer::ColorBuffer(int width, int height, GPUResourceManager<OpenGL> rm)
+    : FrameBuffer(width, height, rm)
+{
+    createBuffer();
+}
+
+ColorBuffer::~ColorBuffer()
+{
+    deleteBuffer();
+}
+
+id_t ColorBuffer::getColorAttachmentID()
+{
+    return m_colorAttachmentID;
+}
+
+void ColorBuffer::createBuffer()
+{ 
+    m_frameBufferID = m_rm.createFrameBuffer({
+        .debugName = "ColorFrameBuffer",
+    });
+    m_colorAttachmentID = m_rm.createTexture({
+        .width = m_width,
+        .height = m_height,
+        .format = Format::RED,
+        .byteFormat = ByteFormat::RED,
+        .filtering = Filtering::POINT,
+        .type = TexType::FLOAT,
+    });
+    m_rm.attachTexture(m_frameBufferID, {
+        .attachment = m_colorAttachmentID,
+        .type = AttachmentType::COLOR0,
+        .target = AttachmentTarget::TEX2D,
+    });
+
+    if (!m_rm.isFrameBufferComplete(m_frameBufferID))
+    {
+        LOG_ERROR("ColorBuffer is not complete!");
+    }
+}
+
+void ColorBuffer::deleteBuffer()
+{
+    m_rm.deleteTexture(m_colorAttachmentID);
+    m_rm.deleteFrameBuffer(m_frameBufferID);
+}
+
 DepthBuffer::DepthBuffer(int width, int height, GPUResourceManager<OpenGL> rm)
     : FrameBuffer(width, height, rm)
 {
@@ -222,22 +270,28 @@ void GBuffer::createBuffer()
         .debugName = "PositionTex",
         .width = m_width,
         .height = m_height,
-        .format = Format::RGB,
+        .format = Format::RGBA,
         .byteFormat = ByteFormat::RGBA16F,
+        .filtering = Filtering::POINT,
+        .wrap = Wrap::CLAMPEDGE,
+        .type = TexType::FLOAT,
     });
     m_normalAttachmentID = m_rm.createTexture({
         .debugName = "NormalTex",
         .width = m_width,
         .height = m_height,
-        .format = Format::RGB,
+        .format = Format::RGBA,
         .byteFormat = ByteFormat::RGBA16F,
+        .filtering = Filtering::POINT,
+        .type = TexType::FLOAT,
     });
     m_albedoSpecAttachmentID = m_rm.createTexture({
         .debugName = "AlbedoTex",
         .width = m_width,
         .height = m_height,
-        .format = Format::RGB,
-        .byteFormat = ByteFormat::RGBA16F,
+        .format = Format::RGBA,
+        .byteFormat = ByteFormat::RGBA,
+        .filtering = Filtering::POINT,
     });
     m_depthStencilAttachmentID = m_rm.createRenderBuffer({
         .debugName = "DepthStencilRB",
