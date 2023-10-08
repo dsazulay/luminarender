@@ -47,7 +47,9 @@ void RenderSystem::update(ecs::Coordinator& coordinator)
 
     // copy depth buffer from geometry pass
     m_gbuffer->bind(FrameBufferOp::READ);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer->getDepthAttachmentID(), 0);
     m_mainTargetFrameBuffer->bind(FrameBufferOp::WRITE); 
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_mainTargetFrameBuffer->getDepthAttachmentID(), 0);
     gpucommands.blit(m_width, m_height, ClearMask::DEPTH, Filtering::POINT);
 
     skyboxPass();
@@ -150,9 +152,9 @@ void RenderSystem::ssaoPass()
     for (unsigned int i = 0; i < 64; ++i)
         material->shader->setVec3("u_samples[" + std::to_string(i) + "]", m_ssaoKernel[i]);
 
-    material->shader->setInt("u_gposition", 0);
+    material->shader->setInt("u_depth", 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getPositionAttachmentID());
+    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getDepthAttachmentID());
 
     material->shader->setInt("u_normal", 1);
     glActiveTexture(GL_TEXTURE1);
@@ -194,8 +196,6 @@ void RenderSystem::ssaoBlurPass()
     m_ssaoBuffer->unbind();
 }
 
-
-
 void RenderSystem::lightingPass()
 {
     m_mainTargetFrameBuffer->bind();
@@ -207,9 +207,9 @@ void RenderSystem::lightingPass()
     Material* material = AssetLibrary::instance().getMaterial("LightingPass");
     material->shader->use();
 
-    material->shader->setInt("u_gposition", 0);
+    material->shader->setInt("u_depth", 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getPositionAttachmentID());
+    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getDepthAttachmentID());
 
     material->shader->setInt("u_normal", 1);
     glActiveTexture(GL_TEXTURE1);
@@ -225,8 +225,11 @@ void RenderSystem::lightingPass()
 
     material->shader->setInt("u_ssao", 4);
     glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, m_ssaoBuffer->getColorAttachmentID());
     glBindTexture(GL_TEXTURE_2D, m_ssaoBlurBuffer->getColorAttachmentID());
+
+    material->shader->setInt("u_gposition", 5);
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getPositionAttachmentID());
 
 
     glBindVertexArray(mesh->vao());

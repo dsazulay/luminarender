@@ -23,6 +23,7 @@ layout (std140) uniform Matrices
     mat4 u_view;
     mat4 u_projection;
     vec4 u_viewPos;
+    vec4 u_camForward;
 };
 
 uniform mat4 u_model;

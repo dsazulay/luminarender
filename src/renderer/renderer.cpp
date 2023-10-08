@@ -58,12 +58,13 @@ void Renderer::updateTransformMatrices()
 
     m_matricesUBO.setBufferData(0, sizeof(glm::mat4), glm::value_ptr(m_viewMatrix));
     m_matricesUBO.setBufferData(sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(m_projMatrix));
-    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4), sizeof(glm::vec4), glm::value_ptr(m_camera.position));
+    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4), sizeof(glm::vec4), glm::value_ptr(glm::vec4(m_camera.position, 1.0)));
+    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4) + sizeof(glm::vec4), sizeof(glm::vec4), glm::value_ptr(glm::vec4(m_camera.front, 1.0)));
 }
 
 Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos, ecs::Coordinator& coordinator) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
-    m_matricesUBO(2 * sizeof(glm::mat4) + sizeof(glm::vec4)),
+    m_matricesUBO(2 * sizeof(glm::mat4) + 2 * sizeof(glm::vec4)),
     m_lightUBO(2 * sizeof(glm::vec4) + sizeof(glm::mat4) + 12 * sizeof(LightUniformStruct)),
     m_camera(cameraPos),
     m_coordinator{coordinator}

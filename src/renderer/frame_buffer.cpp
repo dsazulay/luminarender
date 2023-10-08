@@ -99,6 +99,11 @@ id_t ColorDepthStencilBuffer::getColorAttachmentID()
     return m_colorAttachmentID;
 }
 
+id_t ColorDepthStencilBuffer::getDepthAttachmentID()
+{
+    return m_depthAttachmentID;
+}
+
 void ColorDepthStencilBuffer::createBuffer()
 { 
     m_frameBufferID = m_rm.createFrameBuffer({
@@ -110,10 +115,13 @@ void ColorDepthStencilBuffer::createBuffer()
         .format = Format::RGB,
         .byteFormat = ByteFormat::RGB,
     });
-    m_depthStencilAttachmentID = m_rm.createRenderBuffer({
+    m_depthAttachmentID = m_rm.createTexture({
         .width = m_width,
         .height = m_height,
-        .byteFormat = ByteFormat::DEPTH24_STENCIL8,
+        .format = Format::DEPTH,
+        .byteFormat = ByteFormat::DEPTH,
+        .filtering = Filtering::POINT,
+        .type = TexType::FLOAT,
     });
     m_rm.attachTexture(m_frameBufferID, {
         .attachment = m_colorAttachmentID,
@@ -121,9 +129,9 @@ void ColorDepthStencilBuffer::createBuffer()
         .target = AttachmentTarget::TEX2D,
     });
     m_rm.attachRenderBuffer(m_frameBufferID, {
-        .attachment = m_depthStencilAttachmentID,
-        .type = AttachmentType::DEPTHSTENCIL,
-        .target = AttachmentTarget::RENDERBUFFER,
+        .attachment = m_depthAttachmentID,
+        .type = AttachmentType::DEPTH,
+        .target = AttachmentTarget::TEX2D,
     });
 
     if (!m_rm.isFrameBufferComplete(m_frameBufferID))
@@ -135,7 +143,7 @@ void ColorDepthStencilBuffer::createBuffer()
 void ColorDepthStencilBuffer::deleteBuffer()
 {
     m_rm.deleteTexture(m_colorAttachmentID);
-    m_rm.deleteRenderBuffer(m_depthStencilAttachmentID);
+    m_rm.deleteRenderBuffer(m_depthAttachmentID);
     m_rm.deleteFrameBuffer(m_frameBufferID);
 }
 
@@ -261,6 +269,11 @@ id_t GBuffer::getAlbedoSpecAttachmentID()
     return m_albedoSpecAttachmentID;
 }
 
+id_t GBuffer::getDepthAttachmentID()
+{
+    return m_depthAttachmentID;
+}
+
 void GBuffer::createBuffer()
 {
     m_frameBufferID = m_rm.createFrameBuffer({
@@ -293,11 +306,14 @@ void GBuffer::createBuffer()
         .byteFormat = ByteFormat::RGBA,
         .filtering = Filtering::POINT,
     });
-    m_depthStencilAttachmentID = m_rm.createRenderBuffer({
-        .debugName = "DepthStencilRB",
+    m_depthAttachmentID = m_rm.createTexture({
+        .debugName = "DepthTexture",
         .width = m_width,
         .height = m_height,
-        .byteFormat = ByteFormat::DEPTH24_STENCIL8,
+        .format = Format::DEPTH,
+        .byteFormat = ByteFormat::DEPTH,
+        .filtering = Filtering::POINT,
+        .type = TexType::FLOAT,
     });
     m_rm.attachTexture(m_frameBufferID, {
         .attachment = m_positionAttachmentID,
@@ -314,10 +330,10 @@ void GBuffer::createBuffer()
         .type = AttachmentType::COLOR2,
         .target = AttachmentTarget::TEX2D,
     });
-    m_rm.attachRenderBuffer(m_frameBufferID, {
-        .attachment = m_depthStencilAttachmentID,
-        .type = AttachmentType::DEPTHSTENCIL,
-        .target = AttachmentTarget::RENDERBUFFER,
+    m_rm.attachTexture(m_frameBufferID, {
+        .attachment = m_depthAttachmentID,
+        .type = AttachmentType::DEPTH,
+        .target = AttachmentTarget::TEX2D,
     });
 
     AttachmentType types[3] = { AttachmentType::COLOR0, AttachmentType::COLOR1, AttachmentType::COLOR2 };
@@ -337,7 +353,7 @@ void GBuffer::deleteBuffer()
     m_rm.deleteTexture(m_positionAttachmentID);
     m_rm.deleteTexture(m_normalAttachmentID);
     m_rm.deleteTexture(m_albedoSpecAttachmentID);
-    m_rm.deleteRenderBuffer(m_depthStencilAttachmentID);
+    m_rm.deleteRenderBuffer(m_depthAttachmentID);
     m_rm.deleteFrameBuffer(m_frameBufferID);
 }
 

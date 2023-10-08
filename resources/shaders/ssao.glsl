@@ -6,17 +6,27 @@ layout (location = 1) in vec3 a_normal;
 layout (location = 2) in vec2 a_uv;
 
 out vec2 v_uv;
+out vec3 v_viewRay;
+
+const float aspectRatio = 999.0 / 676.0;
+const float tanHalfFov = tan(radians(45.0 * 0.5));
 
 void main()
 {
     v_uv = a_uv;
-    gl_Position = vec4(a_position * 2.0, 1.0);
+    vec4 posCS = vec4(a_position * 2.0, 1.0);
+    v_viewRay.x = posCS.x * aspectRatio * tanHalfFov;
+    v_viewRay.y = posCS.y * tanHalfFov;
+    v_viewRay.z = -1.0;
+    gl_Position = posCS;
+
 }
 
 #shader fragment
 #version 410 core
 
 in vec2 v_uv;
+in vec3 v_viewRay;
 
 out float fragColor;
 
@@ -25,9 +35,10 @@ layout (std140) uniform Matrices
     mat4 u_view;
     mat4 u_projection;
     vec4 u_viewPos;
+    vec4 u_camForward;
 };
 
-uniform sampler2D u_gposition;
+uniform sampler2D u_depth;
 uniform sampler2D u_normal;
 uniform sampler2D u_noise;
 uniform vec3 u_samples[64];
@@ -40,10 +51,19 @@ float bias = 0.025;
 // tile noise texture over screen based on screen dimensions divided by noise size
 const vec2 noiseScale = vec2(800.0/4.0, 600.0/4.0); 
 
+const float near = 0.1;
+const float far = 100.0;
+
+float sampleLinearDepth(vec2 uv)
+{
+    float depth = texture(u_depth, uv).r * 2.0 - 1.0;
+    return (2.0 * near * far) / (far + near - depth * (far - near));
+}
+
 void main()
 {
     // get input for SSAO algorithm
-    vec3 fragPos = vec3(u_view * vec4(texture(u_gposition, v_uv).xyz, 1.0));
+    vec3 fragPos = v_viewRay * sampleLinearDepth(v_uv);
     vec3 normal = transpose(inverse(mat3(u_view))) * texture(u_normal, v_uv).rgb;
     normal = normalize(normal);
     vec3 randomVec = normalize(texture(u_noise, v_uv * noiseScale).xyz);
@@ -66,8 +86,7 @@ void main()
         offset.xyz = offset.xyz * 0.5 + 0.5; // transform to range 0.0 - 1.0
         
         // get sample depth
-        float sampleDepth = vec3(u_view * vec4(texture(u_gposition, offset.xy).xyz, 1.0)).z; // get depth value of kernel sample
-        
+        float sampleDepth = -sampleLinearDepth(offset.xy); // get depth value of kernel sample
         // range check & accumulate
         float rangeCheck = smoothstep(0.0, 1.0, radius / abs(fragPos.z - sampleDepth));
         occlusion += (sampleDepth >= samplePos.z + bias ? 1.0 : 0.0) * rangeCheck;           

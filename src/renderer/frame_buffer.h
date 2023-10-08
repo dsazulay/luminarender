@@ -29,13 +29,14 @@ public:
     ColorDepthStencilBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
     ~ColorDepthStencilBuffer();
     id_t getColorAttachmentID();
+    id_t getDepthAttachmentID();
 
 private:
     void createBuffer() override;
     void deleteBuffer() override;
 
     id_t m_colorAttachmentID;
-    id_t m_depthStencilAttachmentID;
+    id_t m_depthAttachmentID;
 };
 
 class ColorBuffer : public FrameBuffer
@@ -75,6 +76,7 @@ public:
     id_t getPositionAttachmentID();
     id_t getNormalAttachmentID();
     id_t getAlbedoSpecAttachmentID();
+    id_t getDepthAttachmentID();
 
 private:
     void createBuffer() override;
@@ -83,6 +85,6 @@ private:
     id_t m_positionAttachmentID;
     id_t m_normalAttachmentID;
     id_t m_albedoSpecAttachmentID;
-    id_t m_depthStencilAttachmentID;
+    id_t m_depthAttachmentID;
 };
 
