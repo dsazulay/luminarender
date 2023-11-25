@@ -202,6 +202,14 @@ public:
     }
 
     template<typename T>
+    bool hasComponent(Entity entity)
+    {
+        Mask componentMask;
+        componentMask.set(m_componentManager->getComponentType<T>());
+        return (m_enityManager->getMask(entity) & componentMask) == componentMask;
+    }
+
+    template<typename T>
     void registerComponent()
     {
         m_componentManager->registerComponent<T>();

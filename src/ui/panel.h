@@ -19,6 +19,9 @@ public:
 private:
     void draw(ecs::Transform& tranform);
     void draw(ecs::MeshRenderer& meshRenderer);
+
+    ecs::Coordinator* m_coordinator;
+    std::optional<ecs::Entity>* m_selected;
 };
 
 namespace ui

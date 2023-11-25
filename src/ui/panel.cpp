@@ -207,45 +207,58 @@ void ui::mainmenu::drawMenuEdit()
  
 namespace ui::properties
 {
-    void draw(Transform* transform);
-    void draw(MeshRenderer* renderer);
     void draw(Material* mat);
 }
 
-void ui::properties::draw(Entity* entity)
+
+void PropertiesSystem::init(ecs::Coordinator* coordinator,
+        std::optional<ecs::Entity>* selected)
+{
+    m_coordinator = coordinator;
+    m_selected = selected;
+}
+
+void PropertiesSystem::update()
 {
     ImGui::Begin("Properties");
-    if (entity == nullptr)
+    if (!m_selected->has_value())
     {
         ImGui::End();
         return;
     }
     
+    auto& tag = m_coordinator->getComponent<ecs::Tag>(m_selected->value());
     static const int bufferSize = 256;
     static char renameBuffer[bufferSize] = "";
-    strncpy(renameBuffer, entity->name().c_str(), bufferSize);
+    strncpy(renameBuffer, tag.name.c_str(), bufferSize);
     ImGui::InputText("Name", renameBuffer, bufferSize);
     if (ImGui::IsItemDeactivated())
     {
         if (strncmp(renameBuffer, "", bufferSize) != 0)
-            entity->name(renameBuffer);
+            tag.name = renameBuffer;
     }
 
-    auto transform = entity->getComponent<Transform>();
-    ui::properties::draw(transform.get());
-    entity->updateSelfAndChild();
-    
-    auto meshRenderer = entity->getComponent<MeshRenderer>();
-    ui::properties::draw(meshRenderer.get());
+    auto& transform = m_coordinator->getComponent<ecs::Transform>(
+            m_selected->value());
+    draw(transform);
+    // TODO: update tranform
+ 
+
+    if (m_coordinator->hasComponent<ecs::MeshRenderer>(m_selected->value()))
+    {
+        auto& meshRenderer = m_coordinator->getComponent<ecs::MeshRenderer>(
+                m_selected->value());
+        draw(meshRenderer);
+    }
 
     if (ImGui::BeginPopupContextWindow("Add Comp Popup"))
     {
         if (ImGui::Selectable("Mesh"))
         {
-            MeshRenderer m;
+            /*MeshRenderer m;
             m.mesh = nullptr;
             m.material = nullptr;
-            entity->addComponent(m);
+            entity->addComponent(m);*/
         }
         if (ImGui::Selectable("Light"))
         {
@@ -262,41 +275,31 @@ void ui::properties::draw(Entity* entity)
     ImGui::End();
 }
 
-void ui::properties::draw(Transform* transform)
+void PropertiesSystem::draw(ecs::Transform& transform)
 {
     if (ImGui::TreeNodeEx("transform", ImGuiTreeNodeFlags_DefaultOpen, "Transform"))
     {
-        glm::vec3 pos = transform->position();
-        ImGui::DragFloat3("Position", &pos.x, 0.1f);
-        glm::vec3 rot = transform->eulerAngles();
-        ImGui::DragFloat3("Rotation", &rot.x, 0.1f);
-        glm::vec3 scale = transform->scale();
-        ImGui::DragFloat3("Scale", &scale.x, 0.1f);
+        ImGui::DragFloat3("Position", &transform.position.x, 0.1f);
+        ImGui::DragFloat3("Rotation", &transform.rotation.x, 0.1f);
+        ImGui::DragFloat3("Scale", &transform.scale.x, 0.1f);
 
-        transform->position(pos);
-        transform->eulerAngles(rot);
-        transform->scale(scale);
-
-        transform->updateModelMatrix();
+        // Update transform model matrix
 
         ImGui::TreePop();
     }
 }
 
-void ui::properties::draw(MeshRenderer* renderer)
+void PropertiesSystem::draw(ecs::MeshRenderer& renderer)
 {
-    if (renderer == nullptr)
-        return;
-    
     if (ImGui::TreeNodeEx("meshRenderer", ImGuiTreeNodeFlags_DefaultOpen, "Mesh Renderer"))
     {
         const char* items[] = { "None", "Quad", "Cube", "Sphere", "Custom" };
-        int currentItem = (int) renderer->meshType();
+        int currentItem = (int) renderer.mesh->meshType();
         ImGui::Combo("Mesh Type", &currentItem, items, 4);
 
-        if (((int) renderer->meshType()) == currentItem)
+        if (((int) renderer.mesh->meshType()) == currentItem)
         {
-            draw(renderer->material);
+            ui::properties::draw(renderer.material);
             ImGui::TreePop();
             return;
         }
@@ -304,27 +307,27 @@ void ui::properties::draw(MeshRenderer* renderer)
         switch (currentItem)
         {
             case 0:
-                renderer->mesh = nullptr;
+                renderer.mesh = nullptr;
                 break;
             case 1:
-                renderer->mesh = AssetLibrary::instance().getMesh("quad");
-                renderer->mesh->meshType(MeshType::Quad);
-                renderer->material = AssetLibrary::instance().getMaterial("defaultPbr");
+                renderer.mesh = AssetLibrary::instance().getMesh("quad");
+                renderer.mesh->meshType(MeshType::Quad);
+                renderer.material = AssetLibrary::instance().getMaterial("defaultPbr");
                 break;
             case 2:
-                renderer->mesh = AssetLibrary::instance().getMesh("cube");
-                renderer->mesh->meshType(MeshType::Cube);
-                renderer->material = AssetLibrary::instance().getMaterial("defaultPbr");
+                renderer.mesh = AssetLibrary::instance().getMesh("cube");
+                renderer.mesh->meshType(MeshType::Cube);
+                renderer.material = AssetLibrary::instance().getMaterial("defaultPbr");
                 break;
             case 3:
-                renderer->mesh = AssetLibrary::instance().getMesh("sphere");
-                renderer->mesh->meshType(MeshType::Sphere);
-                renderer->material = AssetLibrary::instance().getMaterial("defaultPbr");
+                renderer.mesh = AssetLibrary::instance().getMesh("sphere");
+                renderer.mesh->meshType(MeshType::Sphere);
+                renderer.material = AssetLibrary::instance().getMaterial("defaultPbr");
                 break;
  
         }
 
-        draw(renderer->material);
+        //draw(renderer.material);
         ImGui::TreePop();
     }
 }

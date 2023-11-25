@@ -30,4 +30,5 @@ private:
 
     ecs::Coordinator& m_coordinator;
     ui::HierarchySystem* m_hierarchySystem;
+    PropertiesSystem* m_properiesSystem;
 };

@@ -32,6 +32,8 @@ void UiRenderer::init()
         m_coordinator.setSystemMask<ui::HierarchySystem>(mask);
     }
     m_hierarchySystem->init(&m_coordinator, &m_selected);
+    m_properiesSystem = new PropertiesSystem();
+    m_properiesSystem->init(&m_coordinator, &m_selected);
 
     Dispatcher::instance().subscribe(KeyPressEvent::descriptor,
         std::bind(&UiRenderer::onKeyPress, this, std::placeholders::_1));
@@ -39,6 +41,8 @@ void UiRenderer::init()
 
 void UiRenderer::terminate() 
 {
+    delete m_properiesSystem;
+
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -55,7 +59,7 @@ void UiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm::m
     ui::mainmenu::draw(&scene);
     ui::viewport::draw(frameBufferTexcolorID, viewportWidth, viewportHeight, scene.selected(), viewMatrix, projMatrix, m_guizmoType);
     m_hierarchySystem->update();
-    ui::properties::draw(scene.selected());
+    m_properiesSystem->update();
 
     // ImGui::ShowDemoWindow();
 
