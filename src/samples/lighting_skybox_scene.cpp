@@ -95,8 +95,11 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
         .mesh = sphere,
         .material = blueMat,
     });
-   coordinator.addComponent(sphereEntity, ecs::Transform{
+    coordinator.addComponent(sphereEntity, ecs::Transform{
         .position = SampleResources::object_positions[1],
+    });
+    coordinator.addComponent(sphereEntity, ecs::Tag{
+        .name = "Sphere",
     });
  
     auto cubeEntity = coordinator.createEntity();
@@ -106,6 +109,9 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
     });
     coordinator.addComponent(cubeEntity, ecs::Transform{
         .position = SampleResources::object_positions[3],
+    });
+    coordinator.addComponent(cubeEntity, ecs::Tag{
+        .name = "Cube",
     });
     
     auto quadEntity = coordinator.createEntity();
@@ -118,9 +124,15 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
         .rotation = glm::vec3(-90.0, 0.0, 0.0),
         .scale = glm::vec3(10.0, 10.0, 10.0),
     });
+    coordinator.addComponent(quadEntity, ecs::Tag{
+        .name = "Quad",
+    });
 
     auto spitfireEntity = coordinator.createEntity();
     coordinator.addComponent(spitfireEntity, ecs::Transform{});
+    coordinator.addComponent(spitfireEntity, ecs::Tag{
+        .name = "Spitfire",
+    });
 
     auto transformSystem = coordinator.getSytem<TransformSystem>();
 
@@ -131,6 +143,9 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
         coordinator.addComponent(newEntity, ecs::MeshRenderer{
             .mesh = mesh.second,
             .material = spitfireMat,
+        });
+        coordinator.addComponent(newEntity, ecs::Tag{
+            .name = mesh.first,
         });
 
         transformSystem->addChild(spitfireEntity, newEntity);
@@ -143,6 +158,9 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
 
     auto sponzaEntity = coordinator.createEntity();
     coordinator.addComponent(sponzaEntity, ecs::Transform{});
+    coordinator.addComponent(sponzaEntity, ecs::Tag{
+        .name = "Sponza",
+    });
 
     for (auto& mesh : sponza->m_meshes)
     {
@@ -151,6 +169,9 @@ void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, 
         coordinator.addComponent(newEntity, ecs::MeshRenderer{
             .mesh = mesh.second,
             .material = AssetLibrary::instance().getMaterial(mesh.second->modelMat().c_str()),
+        });
+        coordinator.addComponent(newEntity, ecs::Tag{
+            .name = mesh.first,
         });
         transformSystem->addChild(sponzaEntity, newEntity);
     }

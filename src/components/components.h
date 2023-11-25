@@ -47,5 +47,10 @@ struct MeshRenderer
     Mesh* mesh;
     Material* material;
 };
+
+struct Tag
+{
+    std::string name;
+};
 }
 

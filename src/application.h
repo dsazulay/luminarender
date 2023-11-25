@@ -35,7 +35,7 @@ private:
 
     Window m_window{};
     Renderer* m_renderer;
-    UiRenderer m_uiRenderer{};
+    UiRenderer* m_uiRenderer;
     Scene m_scene;
     ecs::Coordinator m_coordinator;
 

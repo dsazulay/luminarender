@@ -38,13 +38,15 @@ Application::Application(const AppConfig& config)
 
     m_coordinator.init();
     m_coordinator.registerComponent<ecs::Transform>();
+    m_coordinator.registerComponent<ecs::Tag>();
     m_coordinator.registerComponent<ecs::MeshRenderer>();
     m_coordinator.registerComponent<ecs::Light>();
 
-    m_uiRenderer.init();
-    m_uiRenderer.setBackendImplementation(m_window.glfwWindow());
-    m_uiRenderer.viewportWidth = (float) config.viewportWidth;
-    m_uiRenderer.viewportHeight = (float) config.viewportHeight;
+    m_uiRenderer = new UiRenderer(m_coordinator);
+    m_uiRenderer->init();
+    m_uiRenderer->setBackendImplementation(m_window.glfwWindow());
+    m_uiRenderer->viewportWidth = (float) config.viewportWidth;
+    m_uiRenderer->viewportHeight = (float) config.viewportHeight;
 
     TransformSystem* transformSystem = m_coordinator.registerSystem<TransformSystem>().get();
     {
@@ -55,8 +57,6 @@ Application::Application(const AppConfig& config)
     transformSystem->init(&m_coordinator);
 
     m_renderer = new Renderer((float) config.viewportWidth, (float) config.viewportHeight, glm::vec3(0.0, 0.0, 8.0f), m_coordinator);
-    // create shaders, materials, and objects and add them to the scene
-//    UnlitScene::loadScene(m_scene, AssetLibrary::instance());
     LightingSkyboxScene::loadScene(m_scene, AssetLibrary::instance(), m_coordinator);
 //    PbrScene::loadScene(m_scene, AssetLibrary::instance());
 
@@ -83,7 +83,7 @@ void Application::mainloop()
         glClearColor(0.4f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        m_uiRenderer.update(m_renderer->getTexcolorBufferID(), m_scene, m_renderer->viewMatrix(), m_renderer->projMatrix());
+        m_uiRenderer->update(m_renderer->getTexcolorBufferID(), m_scene, m_renderer->viewMatrix(), m_renderer->projMatrix());
 
         m_window.swapBuffers();
         m_window.pollEvents();
@@ -104,7 +104,7 @@ void Application::run()
 
 void Application::terminate()
 {
-    m_uiRenderer.terminate();
+    m_uiRenderer->terminate();
     m_window.terminate();
 }
 

@@ -24,6 +24,14 @@ void UiRenderer::init()
     ImFont* robotoFont = io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Medium.ttf", 16.0f);
     io.FontDefault = robotoFont;
 
+    m_hierarchySystem = m_coordinator.registerSystem<ui::HierarchySystem>().get();
+    {
+        ecs::Mask mask;
+        mask.set(m_coordinator.getComponentType<ecs::Transform>());
+        mask.set(m_coordinator.getComponentType<ecs::Tag>());
+        m_coordinator.setSystemMask<ui::HierarchySystem>(mask);
+    }
+
     Dispatcher::instance().subscribe(KeyPressEvent::descriptor,
         std::bind(&UiRenderer::onKeyPress, this, std::placeholders::_1));
 }
@@ -45,7 +53,8 @@ void UiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm::m
 
     ui::mainmenu::draw(&scene);
     ui::viewport::draw(frameBufferTexcolorID, viewportWidth, viewportHeight, scene.selected(), viewMatrix, projMatrix, m_guizmoType);
-    ui::hierarchy::draw(&scene);
+    //ui::hierarchy::draw(&scene);
+    m_hierarchySystem->update(m_coordinator);
     ui::properties::draw(scene.selected());
 
     // ImGui::ShowDemoWindow();

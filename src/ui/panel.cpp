@@ -12,9 +12,104 @@
 #include "../log.h"
 
 #include "../tinyfiledialogs.h"
-#include "imgui.h"
 
 #include <string>
+
+std::string ui::HierarchySystem::rename = "";
+char ui::HierarchySystem::renameBuffer[ui::HierarchySystem::bufferSize] = "";
+
+void ui::HierarchySystem::update(ecs::Coordinator& coordinator)
+{
+    ImGui::Begin("Hierarchy");
+
+    if ((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && ImGui::IsWindowHovered())
+    {
+        //scene->selected(nullptr);
+    }
+
+    if (ImGui::BeginPopupContextWindow("Scene Hierarchy Popup"))
+    {
+        if (ImGui::Selectable("Create Empty"))
+        {
+             //UiCreateEmptyEvent e{scene->selected()};
+             //Dispatcher::instance().post(e);
+        }
+        ImGui::EndPopup();
+    }
+
+    for (auto entity : m_entities)
+    {
+        auto& tag = coordinator.getComponent<ecs::Tag>(entity);
+        draw(tag);
+    }
+
+    // Render light entities
+
+    ImGui::End();
+}
+
+void ui::HierarchySystem::draw(ecs::Tag& tag)
+{
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+    /*
+    // TODO: change this to use entity's ID instead of name
+    if (scene->selected() != nullptr && tag.name == scene->selected()->name())
+    {
+        flags |= ImGuiTreeNodeFlags_Selected;
+    }*/
+
+    if (tag.name == rename)
+    {
+        ImVec2 p = ImGui::GetCursorScreenPos();
+
+        ImGui::SetKeyboardFocusHere(0);
+        ImGui::InputText("##rename", renameBuffer, bufferSize);
+        if (ImGui::IsItemDeactivated())
+        {
+            if (strncmp(renameBuffer, "", bufferSize) != 0)
+            {
+                tag.name = renameBuffer;
+            }
+            renameBuffer[0] = '\0';
+            rename = "";
+        }
+
+        ImGui::SetCursorPos(p);
+    }
+
+    //if (entity->getChildren().empty())
+   // {
+        flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
+        drawTreeNode(tag.name, flags);
+
+        return;
+    //}
+
+ /*   if (drawTreeNode(tag.name, flags))
+    {
+        for (auto& child : entity->getChildren())
+        {
+            draw(scene, child.get());
+        }
+        ImGui::TreePop();
+    }*/
+}
+
+bool ui::HierarchySystem::drawTreeNode(std::string& name, ImGuiTreeNodeFlags flags)
+{
+    bool shouldExpand = ImGui::TreeNodeEx(name.c_str(), flags, "%s", name.c_str());
+
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
+    {
+        rename = name;
+    }
+    if (ImGui::IsItemClicked() || ImGui::IsItemClicked(1))
+    {
+        //scene->selected(entity);
+    }
+
+    return shouldExpand;
+}
 
 namespace ui::mainmenu
 {
@@ -85,12 +180,10 @@ void ui::mainmenu::drawMenuEdit()
     if (ImGui::MenuItem("Copy", "CTRL+C")) {}
     if (ImGui::MenuItem("Paste", "CTRL+V")) {}
 }
-
+/*
 namespace ui::hierarchy
 {
-    static const int bufferSize = 256;
-    static std::string rename = "";
-    static char renameBuffer[bufferSize] = "";   
+
     void draw(Scene* scene, Entity* entity);
     bool drawTreeNode(Scene* scene, Entity* entity, ImGuiTreeNodeFlags flags);
 }
@@ -184,7 +277,7 @@ bool ui::hierarchy::drawTreeNode(Scene* scene, Entity* entity, ImGuiTreeNodeFlag
     }
 
     return shouldExpand;
-}
+}*/
 
 namespace ui::properties
 {
