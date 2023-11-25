@@ -18,13 +18,21 @@
 std::string ui::HierarchySystem::rename = "";
 char ui::HierarchySystem::renameBuffer[ui::HierarchySystem::bufferSize] = "";
 
-void ui::HierarchySystem::update(ecs::Coordinator& coordinator)
+void ui::HierarchySystem::init(ecs::Coordinator* coordinator, 
+        std::optional<ecs::Entity>* selected)
+{
+    m_coordinator = coordinator;
+    m_selected = selected;
+}
+
+void ui::HierarchySystem::update()
 {
     ImGui::Begin("Hierarchy");
 
-    if ((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && ImGui::IsWindowHovered())
+    if ((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) 
+            && ImGui::IsWindowHovered())
     {
-        //scene->selected(nullptr);
+        m_selected->reset();
     }
 
     if (ImGui::BeginPopupContextWindow("Scene Hierarchy Popup"))
@@ -37,27 +45,28 @@ void ui::HierarchySystem::update(ecs::Coordinator& coordinator)
         ImGui::EndPopup();
     }
 
-    updateRootEntities(coordinator);
+    updateRootEntities();
     for (auto entity : m_rootEntities)
     {
-        draw(entity, coordinator);
+        draw(entity);
     }
 
     ImGui::End();
 }
 
-void ui::HierarchySystem::draw(ecs::Entity entity, ecs::Coordinator& coordinator)
+void ui::HierarchySystem::draw(ecs::Entity entity)
 {
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-    /*
-    // TODO: change this to use entity's ID instead of name
-    if (scene->selected() != nullptr && tag.name == scene->selected()->name())
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow 
+        | ImGuiTreeNodeFlags_SpanAvailWidth;
+    
+    auto& tag = m_coordinator->getComponent<ecs::Tag>(entity);
+    auto& transform = m_coordinator->getComponent<ecs::Transform>(entity);
+
+    if (m_selected->has_value() && entity == m_selected->value())
     {
         flags |= ImGuiTreeNodeFlags_Selected;
-    }*/
+    }
 
-    auto& tag = coordinator.getComponent<ecs::Tag>(entity);
-    auto& transform = coordinator.getComponent<ecs::Transform>(entity);
     if (tag.name == rename)
     {
         ImVec2 p = ImGui::GetCursorScreenPos();
@@ -80,22 +89,23 @@ void ui::HierarchySystem::draw(ecs::Entity entity, ecs::Coordinator& coordinator
     if (transform.children.size() == 0)
     {
         flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        drawTreeNode(tag.name, flags);
+        drawTreeNode(entity, tag.name, flags);
 
         return;
     }
 
-    if (drawTreeNode(tag.name, flags))
+    if (drawTreeNode(entity, tag.name, flags))
     {
         for (auto child : transform.children)
         {
-            draw(child, coordinator);
+            draw(child);
         }
         ImGui::TreePop();
     }
 }
 
-bool ui::HierarchySystem::drawTreeNode(std::string& name, ImGuiTreeNodeFlags flags)
+bool ui::HierarchySystem::drawTreeNode(ecs::Entity entity, 
+        std::string& name, ImGuiTreeNodeFlags flags)
 {
     bool shouldExpand = ImGui::TreeNodeEx(name.c_str(), flags, "%s", name.c_str());
 
@@ -105,19 +115,19 @@ bool ui::HierarchySystem::drawTreeNode(std::string& name, ImGuiTreeNodeFlags fla
     }
     if (ImGui::IsItemClicked() || ImGui::IsItemClicked(1))
     {
-        //scene->selected(entity);
+        *m_selected = entity;
     }
 
     return shouldExpand;
 }
 
-void ui::HierarchySystem::updateRootEntities(ecs::Coordinator& coordinator)
+void ui::HierarchySystem::updateRootEntities()
 {
     m_rootEntities.clear();
 
     for (auto entity : m_entities)
     {
-        auto& transform = coordinator.getComponent<ecs::Transform>(entity);
+        auto& transform = m_coordinator->getComponent<ecs::Transform>(entity);
         if (auto parent = transform.parent)
             continue;    
 

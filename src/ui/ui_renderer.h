@@ -4,8 +4,11 @@
 #include "../events/event.h"
 #include "../scene.h"
 #include "panel.h"
+#include "../ecs.h"
 
 #include <glm/mat4x4.hpp>
+
+#include <optional>
 
 class UiRenderer
 {
@@ -23,6 +26,7 @@ public:
 
 private:
     int m_guizmoType;
+    std::optional<ecs::Entity> m_selected;
 
     ecs::Coordinator& m_coordinator;
     ui::HierarchySystem* m_hierarchySystem;
