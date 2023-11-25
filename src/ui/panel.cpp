@@ -37,18 +37,16 @@ void ui::HierarchySystem::update(ecs::Coordinator& coordinator)
         ImGui::EndPopup();
     }
 
-    for (auto entity : m_entities)
+    updateRootEntities(coordinator);
+    for (auto entity : m_rootEntities)
     {
-        auto& tag = coordinator.getComponent<ecs::Tag>(entity);
-        draw(tag);
+        draw(entity, coordinator);
     }
-
-    // Render light entities
 
     ImGui::End();
 }
 
-void ui::HierarchySystem::draw(ecs::Tag& tag)
+void ui::HierarchySystem::draw(ecs::Entity entity, ecs::Coordinator& coordinator)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
     /*
@@ -58,6 +56,8 @@ void ui::HierarchySystem::draw(ecs::Tag& tag)
         flags |= ImGuiTreeNodeFlags_Selected;
     }*/
 
+    auto& tag = coordinator.getComponent<ecs::Tag>(entity);
+    auto& transform = coordinator.getComponent<ecs::Transform>(entity);
     if (tag.name == rename)
     {
         ImVec2 p = ImGui::GetCursorScreenPos();
@@ -77,22 +77,22 @@ void ui::HierarchySystem::draw(ecs::Tag& tag)
         ImGui::SetCursorPos(p);
     }
 
-    //if (entity->getChildren().empty())
-   // {
+    if (transform.children.size() == 0)
+    {
         flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
         drawTreeNode(tag.name, flags);
 
         return;
-    //}
+    }
 
- /*   if (drawTreeNode(tag.name, flags))
+    if (drawTreeNode(tag.name, flags))
     {
-        for (auto& child : entity->getChildren())
+        for (auto child : transform.children)
         {
-            draw(scene, child.get());
+            draw(child, coordinator);
         }
         ImGui::TreePop();
-    }*/
+    }
 }
 
 bool ui::HierarchySystem::drawTreeNode(std::string& name, ImGuiTreeNodeFlags flags)
@@ -109,6 +109,20 @@ bool ui::HierarchySystem::drawTreeNode(std::string& name, ImGuiTreeNodeFlags fla
     }
 
     return shouldExpand;
+}
+
+void ui::HierarchySystem::updateRootEntities(ecs::Coordinator& coordinator)
+{
+    m_rootEntities.clear();
+
+    for (auto entity : m_entities)
+    {
+        auto& transform = coordinator.getComponent<ecs::Transform>(entity);
+        if (auto parent = transform.parent)
+            continue;    
+
+        m_rootEntities.push_back(entity);
+    }
 }
 
 namespace ui::mainmenu
@@ -180,105 +194,7 @@ void ui::mainmenu::drawMenuEdit()
     if (ImGui::MenuItem("Copy", "CTRL+C")) {}
     if (ImGui::MenuItem("Paste", "CTRL+V")) {}
 }
-/*
-namespace ui::hierarchy
-{
-
-    void draw(Scene* scene, Entity* entity);
-    bool drawTreeNode(Scene* scene, Entity* entity, ImGuiTreeNodeFlags flags);
-}
-
-void ui::hierarchy::draw(Scene* scene)
-{
-    ImGui::Begin("Hierarchy");
-
-    if ((ImGui::IsMouseClicked(0) || ImGui::IsMouseClicked(1)) && ImGui::IsWindowHovered())
-    {
-        scene->selected(nullptr);
-    }
-
-    if (ImGui::BeginPopupContextWindow("Scene Hierarchy Popup"))
-    {
-        if (ImGui::Selectable("Create Empty"))
-        {
-             UiCreateEmptyEvent e{scene->selected()};
-             Dispatcher::instance().post(e);
-        }
-        ImGui::EndPopup();
-    }
-
-    for (auto& entity : scene->objects())
-    {
-        draw(scene, entity.get());
-    }
-
-    // Render light entities
-
-    ImGui::End();
-}
-
-void ui::hierarchy::draw(Scene* scene, Entity* entity)
-{
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
-
-    // TODO: change this to use entity's ID instead of name
-    if (scene->selected() != nullptr && entity->name() == scene->selected()->name())
-    {
-        flags |= ImGuiTreeNodeFlags_Selected;
-    }
-
-    if (entity->name() == rename)
-    {
-        ImVec2 p = ImGui::GetCursorScreenPos();
-
-        ImGui::SetKeyboardFocusHere(0);
-        ImGui::InputText("##rename", renameBuffer, bufferSize);
-        if (ImGui::IsItemDeactivated())
-        {
-            if (strncmp(renameBuffer, "", bufferSize) != 0)
-            {
-                entity->name(renameBuffer);
-            }
-            renameBuffer[0] = '\0';
-            rename = "";
-        }
-
-        ImGui::SetCursorPos(p);
-    }
-
-    if (entity->getChildren().empty())
-    {
-        flags |= ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_NoTreePushOnOpen;
-        drawTreeNode(scene, entity, flags);
-        return;
-    }
-
-    if (drawTreeNode(scene, entity, flags))
-    {
-        for (auto& child : entity->getChildren())
-        {
-            draw(scene, child.get());
-        }
-        ImGui::TreePop();
-    }
-}
-
-bool ui::hierarchy::drawTreeNode(Scene* scene, Entity* entity, ImGuiTreeNodeFlags flags)
-{
-    bool shouldExpand = ImGui::TreeNodeEx(entity->name().c_str(), flags, "%s", entity->name().c_str());
-
-    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(0))
-    {
-        rename = entity->name();
-    }
-    if (ImGui::IsItemClicked() || ImGui::IsItemClicked(1))
-    {
-        scene->selected(entity);
-    }
-
-    return shouldExpand;
-}*/
-
+ 
 namespace ui::properties
 {
     void draw(Transform* transform);

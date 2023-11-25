@@ -15,12 +15,16 @@ namespace ui
     public:
         void update(ecs::Coordinator& coordinator);
     private:
-        void draw(ecs::Tag& tag);
+        void draw(ecs::Entity entity, ecs::Coordinator& coordinator);
         bool drawTreeNode(std::string& name, ImGuiTreeNodeFlags flags);
+
+        void updateRootEntities(ecs::Coordinator& coordinator);
 
         static const int bufferSize = 256;
         static std::string rename;
-        static char renameBuffer[bufferSize];   
+        static char renameBuffer[bufferSize];
+
+        std::vector<ecs::Entity> m_rootEntities;
     };
 
     namespace mainmenu

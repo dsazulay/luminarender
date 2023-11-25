@@ -66,6 +66,9 @@ void LightingSkyboxScene::loadLights(Scene& scene, ecs::Coordinator& coordinator
         .rotation = glm::vec3(-45.0, 20.0, 0.0),
         .quaternion =  glm::quat(glm::radians(glm::vec3(-45.0, 20.0, 0.0))),
     });
+    coordinator.addComponent(light, ecs::Tag{
+        .name = "Directional Light"
+    });
 }
 
 void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
