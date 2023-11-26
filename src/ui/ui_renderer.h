@@ -1,11 +1,14 @@
 #pragma once
 
-#include <GLFW/glfw3.h>
-#include "../events/event.h"
-#include "panel.h"
 #include "../ecs.h"
+#include "mainmenu_system.h"
+#include "viewport_system.h"
+#include "hierarchy_system.h"
+#include "properties_system.h"
+#include "../events/event.h"
 
 #include <glm/mat4x4.hpp>
+#include <GLFW/glfw3.h>
 
 #include <optional>
 
@@ -20,14 +23,16 @@ public:
 
     void onKeyPress(const Event& e);
 
-    float viewportHeight;
-    float viewportWidth;
+    float viewportHeight{};
+    float viewportWidth{};
 
 private:
-    int m_guizmoType;
+    int m_guizmoType{};
     std::optional<ecs::Entity> m_selected;
 
     ecs::Coordinator* m_coordinator;
-    HierarchySystem* m_hierarchySystem;
-    PropertiesSystem* m_properiesSystem;
+    MainMenuSystem* m_mainMenuSystem{};
+    ViewportSystem* m_viewportSystem{};
+    HierarchySystem* m_hierarchySystem{};
+    PropertiesSystem* m_properiesSystem{};
 };

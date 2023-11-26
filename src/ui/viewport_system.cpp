@@ -1,7 +1,5 @@
-#include "viewport.h"
+#include "viewport_system.h"
 
-#include "../entity.h"
-#include "../components/transform.h"
 #include "../events/event.h"
 #include "../events/dispatcher.h"
 
@@ -9,12 +7,25 @@
 #include <ImGuizmo.h>
 #include <glm/gtc/type_ptr.hpp>
 
-namespace ui::viewport
+
+void ViewportSystem::init(ecs::Coordinator* coordinator)
 {
-    void drawGuizmo(std::optional<ecs::Entity> selected, glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType);
+    m_coordinator = coordinator;
 }
 
-void ui::viewport::draw(unsigned int frameBufferTexcolorID, float& viewportWidth, float& viewportHeight, std::optional<ecs::Entity> selected, glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType)
+void ViewportSystem::update(unsigned int frameBufferTexcolorID, 
+        float& viewportWidth, float& viewportHeight, 
+        std::optional<ecs::Entity> selected, 
+        glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType)
+{
+    draw(frameBufferTexcolorID, viewportWidth, viewportHeight,
+            selected, viewMatrix, projMatrix, guizmoType);
+}
+
+void ViewportSystem::draw(unsigned int frameBufferTexcolorID, 
+        float& viewportWidth, float& viewportHeight, 
+        std::optional<ecs::Entity> selected, 
+        glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
     ImGui::Begin("Viewport");
@@ -35,7 +46,8 @@ void ui::viewport::draw(unsigned int frameBufferTexcolorID, float& viewportWidth
     ImGui::End();
 }
 
-void ui::viewport::drawGuizmo(std::optional<ecs::Entity> selected, glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType)
+void ViewportSystem::drawGuizmo(std::optional<ecs::Entity> selected, 
+        glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType)
 {
     if (!selected.has_value())
     {

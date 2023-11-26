@@ -1,7 +1,5 @@
 #include "ui_renderer.h"
 
-#include "panel.h"
-#include "viewport.h"
 #include "../events/event.h"
 #include "../events/dispatcher.h"
 
@@ -24,6 +22,12 @@ void UiRenderer::init()
     ImFont* robotoFont = io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Medium.ttf", 16.0f);
     io.FontDefault = robotoFont;
 
+    m_mainMenuSystem = m_coordinator->registerSystem<MainMenuSystem>().get();
+    m_mainMenuSystem->init(m_coordinator);
+
+    m_viewportSystem = m_coordinator->registerSystem<ViewportSystem>().get();
+    m_viewportSystem->init(m_coordinator);
+
     m_hierarchySystem = m_coordinator->registerSystem<HierarchySystem>().get();
     {
         ecs::Mask mask;
@@ -32,8 +36,10 @@ void UiRenderer::init()
         m_coordinator->setSystemMask<HierarchySystem>(mask);
     }
     m_hierarchySystem->init(m_coordinator, &m_selected);
-    m_properiesSystem = new PropertiesSystem();
+    
+    m_properiesSystem = m_coordinator->registerSystem<PropertiesSystem>().get();
     m_properiesSystem->init(m_coordinator, &m_selected);
+
 
     Dispatcher::instance().subscribe(KeyPressEvent::descriptor,
         std::bind(&UiRenderer::onKeyPress, this, std::placeholders::_1));
@@ -41,8 +47,6 @@ void UiRenderer::init()
 
 void UiRenderer::terminate() 
 {
-    delete m_properiesSystem;
-
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
@@ -56,8 +60,8 @@ void UiRenderer::update(unsigned int frameBufferTexcolorID, glm::mat4& viewMatri
 
     ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-    ui::mainmenu::draw();
-    ui::viewport::draw(frameBufferTexcolorID, viewportWidth, viewportHeight, m_selected, viewMatrix, projMatrix, m_guizmoType);
+    m_mainMenuSystem->update();
+    m_viewportSystem->update(frameBufferTexcolorID, viewportWidth, viewportHeight, m_selected, viewMatrix, projMatrix, m_guizmoType);
     m_hierarchySystem->update();
     m_properiesSystem->update();
 
