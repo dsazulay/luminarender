@@ -1,5 +1,6 @@
 #include "viewport_system.h"
 
+#include "../components/components.h"
 #include "../events/event.h"
 #include "../events/dispatcher.h"
 
@@ -60,8 +61,6 @@ void ViewportSystem::drawGuizmo(std::optional<ecs::Entity> selected,
     glm::vec2 viewportMinBound = { viewportMinRegion.x + viewportPos.x, viewportMinRegion.y + viewportPos.y };
     glm::vec2 viewportMaxBound = { viewportMaxRegion.x + viewportPos.x, viewportMaxRegion.y + viewportPos.y };
 
-    /*
-    auto t = selected->getComponent<Transform>();
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::SetDrawlist();
     ImGuizmo::SetRect(viewportMinBound.x, viewportMinBound.y,
@@ -69,7 +68,9 @@ void ViewportSystem::drawGuizmo(std::optional<ecs::Entity> selected,
             viewportMaxBound.y - viewportMinBound.y);
 
 
-    glm::mat4 modelMatrix = t->modelMatrix();
+    auto& transform = m_coordinator->getComponent<ecs::Transform>(
+            selected.value());
+    glm::mat4 modelMatrix = transform.modelMatrix;
     ImGuizmo::Manipulate(glm::value_ptr(viewMatrix), glm::value_ptr(projMatrix),
             (ImGuizmo::OPERATION) guizmoType, ImGuizmo::LOCAL,
             const_cast<float *>(glm::value_ptr(modelMatrix)));
@@ -81,16 +82,19 @@ void ViewportSystem::drawGuizmo(std::optional<ecs::Entity> selected,
         glm::vec3 scale;
 
         glm::mat4 localMatrix = modelMatrix;
-        if (selected->getParent() != nullptr)
+        if (auto parent = transform.parent)
         {
-            localMatrix = glm::inverse(selected->getParent()->getComponent<Transform>()->modelMatrix()) * modelMatrix;
+            auto& parentTransform = m_coordinator
+                ->getComponent<ecs::Transform>(*parent);
+            localMatrix = glm::inverse(parentTransform.modelMatrix) * modelMatrix;
         }
 
-        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localMatrix), glm::value_ptr(translation), glm::value_ptr(rotation), glm::value_ptr(scale));
-        t->position(translation);
-        glm::vec3 deltaRotation = rotation - t->eulerAngles();
-        t->eulerAngles(t->eulerAngles() + deltaRotation);
-        t->scale(scale);
+        ImGuizmo::DecomposeMatrixToComponents(glm::value_ptr(localMatrix),
+                glm::value_ptr(translation), glm::value_ptr(rotation),
+                glm::value_ptr(scale));
+        transform.position = translation;
+        glm::vec3 deltaRotation = rotation - transform.rotation;
+        transform.rotation = transform.rotation + deltaRotation;
+        transform.scale = scale;
     }
-    */
 }
