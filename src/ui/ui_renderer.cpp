@@ -24,12 +24,12 @@ void UiRenderer::init()
     ImFont* robotoFont = io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Medium.ttf", 16.0f);
     io.FontDefault = robotoFont;
 
-    m_hierarchySystem = m_coordinator.registerSystem<ui::HierarchySystem>().get();
+    m_hierarchySystem = m_coordinator.registerSystem<HierarchySystem>().get();
     {
         ecs::Mask mask;
         mask.set(m_coordinator.getComponentType<ecs::Transform>());
         mask.set(m_coordinator.getComponentType<ecs::Tag>());
-        m_coordinator.setSystemMask<ui::HierarchySystem>(mask);
+        m_coordinator.setSystemMask<HierarchySystem>(mask);
     }
     m_hierarchySystem->init(&m_coordinator, &m_selected);
     m_properiesSystem = new PropertiesSystem();

@@ -29,6 +29,6 @@ private:
     std::optional<ecs::Entity> m_selected;
 
     ecs::Coordinator& m_coordinator;
-    ui::HierarchySystem* m_hierarchySystem;
+    HierarchySystem* m_hierarchySystem;
     PropertiesSystem* m_properiesSystem;
 };

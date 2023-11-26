@@ -13,19 +13,20 @@
 
 #include "../tinyfiledialogs.h"
 
+#include <optional>
 #include <string>
 
-std::string ui::HierarchySystem::rename = "";
-char ui::HierarchySystem::renameBuffer[ui::HierarchySystem::bufferSize] = "";
+std::string HierarchySystem::rename = "";
+char HierarchySystem::renameBuffer[HierarchySystem::bufferSize] = "";
 
-void ui::HierarchySystem::init(ecs::Coordinator* coordinator, 
+void HierarchySystem::init(ecs::Coordinator* coordinator, 
         std::optional<ecs::Entity>* selected)
 {
     m_coordinator = coordinator;
     m_selected = selected;
 }
 
-void ui::HierarchySystem::update()
+void HierarchySystem::update()
 {
     ImGui::Begin("Hierarchy");
 
@@ -39,8 +40,22 @@ void ui::HierarchySystem::update()
     {
         if (ImGui::Selectable("Create Empty"))
         {
-             //UiCreateEmptyEvent e{scene->selected()};
-             //Dispatcher::instance().post(e);
+            //UiCreateEmptyEvent e{scene->selected()};
+            //Dispatcher::instance().post(e);
+            auto newEntity = m_coordinator->createEntity();
+            m_coordinator->addComponent(newEntity, ecs::Tag {
+                .name = "New Object",
+            });
+            m_coordinator->addComponent(newEntity, ecs::Transform {
+                    .parent = *m_selected,
+            });
+
+            if (m_selected->has_value())
+            {
+                auto& parent = m_coordinator->getComponent<ecs::Transform>(
+                        m_selected->value());
+                parent.children.push_back(newEntity);
+            }
         }
         ImGui::EndPopup();
     }
@@ -54,7 +69,7 @@ void ui::HierarchySystem::update()
     ImGui::End();
 }
 
-void ui::HierarchySystem::draw(ecs::Entity entity)
+void HierarchySystem::draw(ecs::Entity entity)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow 
         | ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -104,7 +119,7 @@ void ui::HierarchySystem::draw(ecs::Entity entity)
     }
 }
 
-bool ui::HierarchySystem::drawTreeNode(ecs::Entity entity, 
+bool HierarchySystem::drawTreeNode(ecs::Entity entity, 
         std::string& name, ImGuiTreeNodeFlags flags)
 {
     bool shouldExpand = ImGui::TreeNodeEx(name.c_str(), flags, "%s", name.c_str());
@@ -121,7 +136,7 @@ bool ui::HierarchySystem::drawTreeNode(ecs::Entity entity,
     return shouldExpand;
 }
 
-void ui::HierarchySystem::updateRootEntities()
+void HierarchySystem::updateRootEntities()
 {
     m_rootEntities.clear();
 
@@ -255,10 +270,10 @@ void PropertiesSystem::update()
     {
         if (ImGui::Selectable("Mesh"))
         {
-            /*MeshRenderer m;
-            m.mesh = nullptr;
-            m.material = nullptr;
-            entity->addComponent(m);*/
+            m_coordinator->addComponent(m_selected->value(), ecs::MeshRenderer{
+                .mesh = AssetLibrary::instance().getMesh("sphere"),
+                .material = AssetLibrary::instance().getMaterial("greyMat"),
+            });
         }
         if (ImGui::Selectable("Light"))
         {
@@ -293,13 +308,16 @@ void PropertiesSystem::draw(ecs::MeshRenderer& renderer)
 {
     if (ImGui::TreeNodeEx("meshRenderer", ImGuiTreeNodeFlags_DefaultOpen, "Mesh Renderer"))
     {
-        const char* items[] = { "None", "Quad", "Cube", "Sphere", "Custom" };
-        int currentItem = (int) renderer.mesh->meshType();
-        ImGui::Combo("Mesh Type", &currentItem, items, 4);
+        // TODO: add mesh renderer without mesh
+        const char* items[] = { "Quad", "Cube", "Sphere" };
+        // TODO: remove -1 when able to have mesh renderer without mesh
+        int currentItem = ((int) renderer.mesh->meshType()) - 1;
+        LOG_WARN("{}", currentItem);
+        ImGui::Combo("Mesh Type", &currentItem, items, 3);
 
-        if (((int) renderer.mesh->meshType()) == currentItem)
+        if (((int) renderer.mesh->meshType() - 1) == currentItem)
         {
-            ui::properties::draw(renderer.material);
+            draw(renderer.material);
             ImGui::TreePop();
             return;
         }
@@ -307,27 +325,35 @@ void PropertiesSystem::draw(ecs::MeshRenderer& renderer)
         switch (currentItem)
         {
             case 0:
-                renderer.mesh = nullptr;
-                break;
-            case 1:
                 renderer.mesh = AssetLibrary::instance().getMesh("quad");
                 renderer.mesh->meshType(MeshType::Quad);
-                renderer.material = AssetLibrary::instance().getMaterial("defaultPbr");
+                renderer.material = AssetLibrary::instance().getMaterial("greyMat");
                 break;
-            case 2:
+            case 1:
                 renderer.mesh = AssetLibrary::instance().getMesh("cube");
                 renderer.mesh->meshType(MeshType::Cube);
-                renderer.material = AssetLibrary::instance().getMaterial("defaultPbr");
+                renderer.material = AssetLibrary::instance().getMaterial("greyMat");
                 break;
-            case 3:
+            case 2:
                 renderer.mesh = AssetLibrary::instance().getMesh("sphere");
                 renderer.mesh->meshType(MeshType::Sphere);
-                renderer.material = AssetLibrary::instance().getMaterial("defaultPbr");
+                renderer.material = AssetLibrary::instance().getMaterial("greyMat");
                 break;
- 
         }
 
-        //draw(renderer.material);
+        draw(renderer.material);
+        ImGui::TreePop();
+    }
+}
+
+void PropertiesSystem::draw(Material* mat)
+{
+    if (mat == nullptr)
+        return;
+
+    if (ImGui::TreeNodeEx("material", ImGuiTreeNodeFlags_DefaultOpen, "Material"))
+    {
+        ImGui::Text("%s", mat->name().c_str());
         ImGui::TreePop();
     }
 }
@@ -357,14 +383,4 @@ void PropertiesSystem::updateSeflAndChilren(ecs::Entity entity)
     }
 }
 
-void ui::properties::draw(Material* mat)
-{
-    if (mat == nullptr)
-        return;
 
-    if (ImGui::TreeNodeEx("material", ImGuiTreeNodeFlags_DefaultOpen, "Material"))
-    {
-        ImGui::Text("%s", mat->name().c_str());
-        ImGui::TreePop();
-    }
-}
