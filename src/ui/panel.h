@@ -20,6 +20,10 @@ private:
     void draw(ecs::Transform& tranform);
     void draw(ecs::MeshRenderer& meshRenderer);
 
+
+    void updateModelMatrix(ecs::Transform& transform);
+    void updateSeflAndChilren(ecs::Entity entity);
+
     ecs::Coordinator* m_coordinator;
     std::optional<ecs::Entity>* m_selected;
 };
