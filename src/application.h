@@ -1,13 +1,11 @@
 #pragma once
 
-#include "renderer/light_system.h"
+#include "ecs.h"
 #include "window.h"
-#include "scene.h"
 #include "renderer/renderer.h"
 #include "ui/ui_renderer.h"
-#include "ecs.h"
 
-#include <glm/glm.hpp>
+#include <memory>
 
 struct AppConfig
 {
@@ -21,9 +19,7 @@ struct AppConfig
 class Application
 {
 public:
-    explicit Application(const AppConfig& config);
-    void onUiCreateEmptyEvent(const Event& e);
-    ~Application();
+    explicit Application(AppConfig& config);
     void init();
     void run();
 
@@ -33,14 +29,13 @@ private:
     void mainloop();
     void terminate();
 
-    Window m_window{};
-    Renderer* m_renderer;
-    UiRenderer* m_uiRenderer;
-    Scene m_scene;
-    ecs::Coordinator m_coordinator;
+    std::unique_ptr<ecs::Coordinator> m_coordinator;
+    std::unique_ptr<Window> m_window;
+    std::unique_ptr<Renderer> m_renderer;
+    std::unique_ptr<UiRenderer> m_uiRenderer;
 
-    int m_windowWidth{};
-    int m_windowHeight{};
+    AppConfig m_config;
+    // TODO: move this to a time class
     float m_deltaTime{};
     float m_lastFrame{};
 };

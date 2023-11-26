@@ -24,16 +24,16 @@ void UiRenderer::init()
     ImFont* robotoFont = io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Medium.ttf", 16.0f);
     io.FontDefault = robotoFont;
 
-    m_hierarchySystem = m_coordinator.registerSystem<HierarchySystem>().get();
+    m_hierarchySystem = m_coordinator->registerSystem<HierarchySystem>().get();
     {
         ecs::Mask mask;
-        mask.set(m_coordinator.getComponentType<ecs::Transform>());
-        mask.set(m_coordinator.getComponentType<ecs::Tag>());
-        m_coordinator.setSystemMask<HierarchySystem>(mask);
+        mask.set(m_coordinator->getComponentType<ecs::Transform>());
+        mask.set(m_coordinator->getComponentType<ecs::Tag>());
+        m_coordinator->setSystemMask<HierarchySystem>(mask);
     }
-    m_hierarchySystem->init(&m_coordinator, &m_selected);
+    m_hierarchySystem->init(m_coordinator, &m_selected);
     m_properiesSystem = new PropertiesSystem();
-    m_properiesSystem->init(&m_coordinator, &m_selected);
+    m_properiesSystem->init(m_coordinator, &m_selected);
 
     Dispatcher::instance().subscribe(KeyPressEvent::descriptor,
         std::bind(&UiRenderer::onKeyPress, this, std::placeholders::_1));
@@ -48,7 +48,7 @@ void UiRenderer::terminate()
     ImGui::DestroyContext();
 }
 
-void UiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm::mat4& viewMatrix, glm::mat4& projMatrix)
+void UiRenderer::update(unsigned int frameBufferTexcolorID, glm::mat4& viewMatrix, glm::mat4& projMatrix)
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
@@ -56,8 +56,8 @@ void UiRenderer::update(unsigned int frameBufferTexcolorID, Scene& scene, glm::m
 
     ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-    ui::mainmenu::draw(&scene);
-    ui::viewport::draw(frameBufferTexcolorID, viewportWidth, viewportHeight, scene.selected(), viewMatrix, projMatrix, m_guizmoType);
+    ui::mainmenu::draw();
+    ui::viewport::draw(frameBufferTexcolorID, viewportWidth, viewportHeight, m_selected, viewMatrix, projMatrix, m_guizmoType);
     m_hierarchySystem->update();
     m_properiesSystem->update();
 

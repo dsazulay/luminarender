@@ -1,19 +1,17 @@
 #pragma once
 
-#include "irenderable.h"
-
 class Camera;
 class Material;
 
-class NormalVisualizerPass : IRenderable
+class NormalVisualizerPass 
 {
 public:
     NormalVisualizerPass();
-    void render(Scene& scene) override;
+    void render();
     void camera(Camera* camera);
 
 private:
-    void renderNormalVectorOfEntity(Entity &entity);
+    void renderNormalVectorOfEntity();
 
     Camera* m_camera{};
     Material* m_material;

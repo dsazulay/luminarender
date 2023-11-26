@@ -6,17 +6,17 @@
 #include "../irradiance_map_factory.h"
 
 
-void PbrScene::loadScene(Scene &scene, AssetLibrary &assetLibrary)
+void PbrScene::loadScene(AssetLibrary &assetLibrary)
 {
     unsigned int skyboxTex;
 
     loadTextures(assetLibrary);
-    loadIrradianceTextures(scene, assetLibrary, skyboxTex);
+    loadIrradianceTextures(assetLibrary, skyboxTex);
     loadMaterials(assetLibrary, skyboxTex);
     loadModels(assetLibrary);
-    loadLights(scene);
-    loadSkybox(scene, assetLibrary);
-    loadObjects(scene, assetLibrary);
+    loadLights();
+    loadSkybox(assetLibrary);
+    loadObjects(assetLibrary);
 }
 
 void PbrScene::loadTextures(AssetLibrary& assetLibrary)
@@ -37,14 +37,11 @@ void PbrScene::loadTextures(AssetLibrary& assetLibrary)
     assetLibrary.loadHDRTexture("hdrSkybox", SampleResources::texture_tiber, SampleResources::texture_skybox_dir);
 }
 
-void PbrScene::loadIrradianceTextures(Scene& scene, AssetLibrary& assetLibrary, unsigned int& skyboxTex)
+void PbrScene::loadIrradianceTextures(AssetLibrary& assetLibrary, unsigned int& skyboxTex)
 {
 
     IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(assetLibrary.getTexture("hdrSkybox")->ID());
 
-    scene.irradianceMap = maps.irradianceMap;
-    scene.prefilterMap = maps.prefilterMap;
-    scene.brdfLUT = maps.brdfLUTMap;
     skyboxTex = maps.cubeMap;
 }
 
@@ -85,20 +82,18 @@ void PbrScene::loadModels(AssetLibrary &assetLibrary)
     assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
 }
 
-void PbrScene::loadLights(Scene& scene)
+void PbrScene::loadLights()
 {
 }
 
-void PbrScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
+void PbrScene::loadSkybox(AssetLibrary &assetLibrary)
 {
     Mesh* cubeMap = assetLibrary.getMesh("cubeMap");
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 
-    scene.addSkybox(EntityFactory::createFromMesh("Skybox",
-            glm::vec3(0.0, 0.0, 0.0), skyboxMat, cubeMap));
 }
 
-void PbrScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
+void PbrScene::loadObjects(AssetLibrary& assetLibrary)
 {
     Mesh* cube = assetLibrary.getMesh("cube");
     Mesh* quad = assetLibrary.getMesh("quad");
@@ -121,13 +116,6 @@ void PbrScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     transform->scale(glm::vec3(10.0, 10.0, 10.0));
     transform->updateModelMatrix();
 
-    scene.addObject(std::move(e));
-
-    scene.addObject(EntityFactory::createFromMesh("Sphere",
-            SampleResources::object_positions[1], blueMat, sphere));
-
-    scene.addObject(EntityFactory::createFromMesh("Cube",
-            SampleResources::object_positions[3], woodBoxMat, cube));
 
     //auto spitfireEntity = EntityFactory::createFromModel("Spitfire",
     //        SampleResources::object_positions[4], spitfireMat,spitfire);
@@ -159,5 +147,4 @@ void PbrScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary)
     t->updateModelMatrix();
     sponzaEntity->updateSelfAndChild();
 
-    scene.addObject(std::move(sponzaEntity));
 }

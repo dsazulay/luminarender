@@ -55,6 +55,6 @@ namespace ui
 {
     namespace mainmenu
     {
-        void draw(Scene* scene);
+        void draw();
     }
 }

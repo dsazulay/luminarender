@@ -37,7 +37,7 @@ void RenderSystem::init(int width, int height)
     generateSSAONoiseTexture();
 }
 
-void RenderSystem::update(ecs::Coordinator& coordinator)
+void RenderSystem::update(ecs::Coordinator* coordinator)
 {
     shadowPass(coordinator);
     geometryPass(coordinator);
@@ -70,7 +70,7 @@ id_t RenderSystem::getFinalRenderTexID()
     return m_mainTargetFrameBuffer->getColorAttachmentID();
 }
 
-void RenderSystem::shadowPass(ecs::Coordinator& coordinator)
+void RenderSystem::shadowPass(ecs::Coordinator* coordinator)
 {
     m_shadowFrameBuffer->bind();
     gpucommands.setViewportSize(0, 0, shadowMapSize, shadowMapSize);
@@ -78,8 +78,8 @@ void RenderSystem::shadowPass(ecs::Coordinator& coordinator)
     
     for (auto entity : m_entities)
     {
-        auto& transform = coordinator.getComponent<ecs::Transform>(entity);
-        auto& meshRenderer = coordinator.getComponent<ecs::MeshRenderer>(entity);
+        auto& transform = coordinator->getComponent<ecs::Transform>(entity);
+        auto& meshRenderer = coordinator->getComponent<ecs::MeshRenderer>(entity);
 
         Material *material = AssetLibrary::instance().getMaterial("shadowMat");
         material->shader->use();
@@ -96,7 +96,7 @@ void RenderSystem::shadowPass(ecs::Coordinator& coordinator)
     m_shadowFrameBuffer->unbind();
 }
 
-void RenderSystem::geometryPass(ecs::Coordinator& coordinator)
+void RenderSystem::geometryPass(ecs::Coordinator* coordinator)
 {
     m_gbuffer->bind();
     gpucommands.setViewportSize(0, 0, m_width, m_height);
@@ -105,8 +105,8 @@ void RenderSystem::geometryPass(ecs::Coordinator& coordinator)
 
     for (auto entity : m_entities)
     {
-        auto& transform = coordinator.getComponent<ecs::Transform>(entity);
-        auto& meshRenderer = coordinator.getComponent<ecs::MeshRenderer>(entity);
+        auto& transform = coordinator->getComponent<ecs::Transform>(entity);
+        auto& meshRenderer = coordinator->getComponent<ecs::MeshRenderer>(entity);
 
         Material* origMaterial = meshRenderer.material;
         Material* material = AssetLibrary::instance().getMaterial("GBuffer");

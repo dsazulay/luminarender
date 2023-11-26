@@ -6,7 +6,7 @@
 #include "../assets/shader.h"
 
 #include <glad/glad.h>
-
+/*
 void ForwardPass::render(Scene& scene)
 {
     for (auto& entity : scene.objects())
@@ -99,4 +99,4 @@ void ForwardPass::renderSkybox(Entity &skybox)
     glDrawElements(GL_TRIANGLES, (int)mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 }
-
+*/

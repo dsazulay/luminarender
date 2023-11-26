@@ -1,7 +1,6 @@
 #include "panel.h"
 
 #include "../assets/asset_library.h"
-#include "../scene.h"
 #include "../components/transform.h"
 #include "../components/mesh_renderer.h"
 #include "../assets/mesh.h"
@@ -152,17 +151,17 @@ void HierarchySystem::updateRootEntities()
 
 namespace ui::mainmenu
 {
-    void drawMenuFile(Scene* scene);
+    void drawMenuFile();
     void drawMenuEdit();
 }
 
-void ui::mainmenu::draw(Scene* scene)
+void ui::mainmenu::draw()
 {
     if (ImGui::BeginMainMenuBar())
     {
         if (ImGui::BeginMenu("File"))
         {
-            drawMenuFile(scene);
+            drawMenuFile();
             ImGui::EndMenu();
         }
         if (ImGui::BeginMenu("Edit"))
@@ -174,7 +173,7 @@ void ui::mainmenu::draw(Scene* scene)
     }
 }
 
-void ui::mainmenu::drawMenuFile(Scene* scene)
+void ui::mainmenu::drawMenuFile()
 {
     if (ImGui::MenuItem("New")) {}
     if (ImGui::MenuItem("Open", "Ctrl+O")) {}
@@ -204,8 +203,7 @@ void ui::mainmenu::drawMenuFile(Scene* scene)
         {
             // TODO: extract file name + check for name repetition
             auto model = AssetLibrary::instance().loadModel(selection, selection, true);
-            auto entity = EntityFactory::createFromModel("name", model);
-            scene->addObject(std::move(entity));
+            // TODO: create entity and add to the scene
         }
     }
 }

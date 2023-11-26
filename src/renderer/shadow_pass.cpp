@@ -6,7 +6,7 @@
 #include "../assets/material.h"
 
 #include <glad/glad.h>
-
+/*
 ShadowPass::ShadowPass()
 {
     Shader* s = AssetLibrary::instance().loadShader("simpleShadowMap", "resources/shaders/simple_shadow_depth.glsl");
@@ -58,3 +58,4 @@ void ShadowPass::renderEntity(Entity &entity)
         renderEntity(*childEntity);
     }
 }
+*/

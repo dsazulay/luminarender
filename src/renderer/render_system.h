@@ -13,12 +13,12 @@ class RenderSystem : public ecs::System
 {
 public:
     void init(int width, int height);
-    void update(ecs::Coordinator& coordinator);
+    void update(ecs::Coordinator* coordinator);
     void resizeBuffers(int width, int height);
     id_t getFinalRenderTexID();
 private:
-    void shadowPass(ecs::Coordinator& coordinator);
-    void geometryPass(ecs::Coordinator& coordinator);
+    void shadowPass(ecs::Coordinator* coordinator);
+    void geometryPass(ecs::Coordinator* coordinator);
     void ssaoPass();
     void ssaoBlurPass();
     void lightingPass();

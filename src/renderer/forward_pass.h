@@ -1,13 +1,11 @@
 #pragma once
 
-#include "irenderable.h"
-
 #include <glm/glm.hpp>
 
-class ForwardPass : public IRenderable
+class ForwardPass
 {
 public:
-    void render(Scene& scene) override;
+    void render();
 
     glm::mat4 lightSpaceMatrix;
 
@@ -18,6 +16,6 @@ public:
 
 
 private:
-    void renderEntity(Entity& entity, Entity* mainLight);
-    void renderSkybox(Entity& skybox);
+    void renderEntity();
+    void renderSkybox();
 };

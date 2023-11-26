@@ -7,14 +7,14 @@
 #include "../renderer/transform_system.h"
 
 
-void LightingSkyboxScene::loadScene(Scene &scene, AssetLibrary &assetLibrary, ecs::Coordinator& coordinator)
+void LightingSkyboxScene::loadScene(AssetLibrary &assetLibrary, ecs::Coordinator& coordinator)
 {
     loadTextures(assetLibrary);
     loadMaterials(assetLibrary);
     loadModels(assetLibrary);
-    loadLights(scene, coordinator);
-    loadSkybox(scene, assetLibrary);
-    loadObjects(scene, assetLibrary, coordinator);
+    loadLights(coordinator);
+    loadSkybox(assetLibrary);
+    loadObjects(assetLibrary, coordinator);
 }
 
 void LightingSkyboxScene::loadTextures(AssetLibrary& assetLibrary)
@@ -54,7 +54,7 @@ void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
     assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
 }
 
-void LightingSkyboxScene::loadLights(Scene& scene, ecs::Coordinator& coordinator)
+void LightingSkyboxScene::loadLights(ecs::Coordinator& coordinator)
 {
     // scene.addLight(EntityFactory::createPointLight("Point Light", glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(0.7f, 0.8f, 0.5f), 1.0f));
     // scene.addLight(EntityFactory::createSpotLight("Spot Light", glm::vec3(-1.0f, -2.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.8f, 0.5f, 0.2f), 1.0f, glm::cos(glm::radians(12.5f)), glm::cos(glm::radians(15.0f))));
@@ -71,16 +71,13 @@ void LightingSkyboxScene::loadLights(Scene& scene, ecs::Coordinator& coordinator
     });
 }
 
-void LightingSkyboxScene::loadSkybox(Scene &scene, AssetLibrary &assetLibrary)
+void LightingSkyboxScene::loadSkybox(AssetLibrary &assetLibrary)
 {
     Mesh* cubeMap = assetLibrary.getMesh("triangleMap");
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
-
-    scene.addSkybox(EntityFactory::createFromMesh("Skybox",
-            glm::vec3(0.0, 0.0, 0.0), skyboxMat, cubeMap));
 }
 
-void LightingSkyboxScene::loadObjects(Scene& scene, AssetLibrary& assetLibrary, ecs::Coordinator& coordinator)
+void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinator& coordinator)
 {
     Mesh* cube = assetLibrary.getMesh("cube");
     Mesh* quad = assetLibrary.getMesh("quad");

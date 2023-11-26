@@ -14,7 +14,7 @@
 
 
 
-void Renderer::render(Scene& scene)
+void Renderer::render()
 {
     /*
     if (scene.mainLight() != nullptr)
@@ -62,36 +62,33 @@ void Renderer::updateTransformMatrices()
     m_matricesUBO.setBufferData(2 * sizeof(glm::mat4) + sizeof(glm::vec4), sizeof(glm::vec4), glm::value_ptr(glm::vec4(m_camera.front, 1.0)));
 }
 
-Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos, ecs::Coordinator& coordinator) :
+Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos, ecs::Coordinator* coordinator) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
     m_matricesUBO(2 * sizeof(glm::mat4) + 2 * sizeof(glm::vec4)),
     m_lightUBO(2 * sizeof(glm::vec4) + sizeof(glm::mat4) + 12 * sizeof(LightUniformStruct)),
     m_camera(cameraPos),
     m_coordinator{coordinator}
 {
-
     m_matricesUBO.bindBufferToIndex(0);
     m_lightUBO.bindBufferToIndex(1);
 
     Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
      std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
 
-    m_normalVisualizerPass.camera(&m_camera);
-
-    m_lightSystem = m_coordinator.registerSystem<LightSystem>().get();
+    m_lightSystem = m_coordinator->registerSystem<LightSystem>().get();
     {
         ecs::Mask mask;
-        mask.set(m_coordinator.getComponentType<ecs::Transform>());
-        mask.set(m_coordinator.getComponentType<ecs::Light>());
-        m_coordinator.setSystemMask<LightSystem>(mask);
+        mask.set(m_coordinator->getComponentType<ecs::Transform>());
+        mask.set(m_coordinator->getComponentType<ecs::Light>());
+        m_coordinator->setSystemMask<LightSystem>(mask);
     }
 
-    m_renderSystem = m_coordinator.registerSystem<RenderSystem>().get();
+    m_renderSystem = m_coordinator->registerSystem<RenderSystem>().get();
     {
         ecs::Mask mask;
-        mask.set(m_coordinator.getComponentType<ecs::Transform>());
-        mask.set(m_coordinator.getComponentType<ecs::MeshRenderer>());
-        m_coordinator.setSystemMask<RenderSystem>(mask);
+        mask.set(m_coordinator->getComponentType<ecs::Transform>());
+        mask.set(m_coordinator->getComponentType<ecs::MeshRenderer>());
+        m_coordinator->setSystemMask<RenderSystem>(mask);
     }
     m_renderSystem->init(viewportWidth, viewportHeight);
 }
@@ -111,13 +108,6 @@ void Renderer::onViewportResize(const Event& e)
     LOG_INFO("{} {}", m_viewportWidth, m_viewportHeight);
 }
 
-void Renderer::setGlobalTextures(Scene& scene)
-{
-    m_forwardPass.irradianceMap = scene.irradianceMap;
-    m_forwardPass.prefilterMap = scene.prefilterMap;
-    m_forwardPass.brdfLUT = scene.brdfLUT;
-    m_forwardPass.shadowMap = getShadowMapTextureID();
-}
 
 unsigned int Renderer::getShadowMapTextureID()
 {

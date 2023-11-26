@@ -11,10 +11,10 @@
 
 namespace ui::viewport
 {
-    void drawGuizmo(Entity* selected, glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType);
+    void drawGuizmo(std::optional<ecs::Entity> selected, glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType);
 }
 
-void ui::viewport::draw(unsigned int frameBufferTexcolorID, float& viewportWidth, float& viewportHeight, Entity* selected, glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType)
+void ui::viewport::draw(unsigned int frameBufferTexcolorID, float& viewportWidth, float& viewportHeight, std::optional<ecs::Entity> selected, glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType)
 {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0, 0});
     ImGui::Begin("Viewport");
@@ -35,9 +35,9 @@ void ui::viewport::draw(unsigned int frameBufferTexcolorID, float& viewportWidth
     ImGui::End();
 }
 
-void ui::viewport::drawGuizmo(Entity* selected, glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType)
+void ui::viewport::drawGuizmo(std::optional<ecs::Entity> selected, glm::mat4& viewMatrix, glm::mat4& projMatrix, int guizmoType)
 {
-    if (selected == nullptr)
+    if (!selected.has_value())
     {
         return;
     }
@@ -48,6 +48,7 @@ void ui::viewport::drawGuizmo(Entity* selected, glm::mat4& viewMatrix, glm::mat4
     glm::vec2 viewportMinBound = { viewportMinRegion.x + viewportPos.x, viewportMinRegion.y + viewportPos.y };
     glm::vec2 viewportMaxBound = { viewportMaxRegion.x + viewportPos.x, viewportMaxRegion.y + viewportPos.y };
 
+    /*
     auto t = selected->getComponent<Transform>();
     ImGuizmo::SetOrthographic(false);
     ImGuizmo::SetDrawlist();
@@ -79,4 +80,5 @@ void ui::viewport::drawGuizmo(Entity* selected, glm::mat4& viewMatrix, glm::mat4
         t->eulerAngles(t->eulerAngles() + deltaRotation);
         t->scale(scale);
     }
+    */
 }

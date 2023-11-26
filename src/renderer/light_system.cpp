@@ -3,7 +3,7 @@
 #include "../components/components.h"
 #include "../log.h"
 
-void LightSystem::update(UniformBufferObject& lightUBO, ecs::Coordinator& coordinator)
+void LightSystem::update(UniformBufferObject& lightUBO, ecs::Coordinator* coordinator)
 {
     std::size_t offset = sizeof(glm::vec4);
     std::size_t uniformStructSize = sizeof(LightUniformStruct);
@@ -11,7 +11,7 @@ void LightSystem::update(UniformBufferObject& lightUBO, ecs::Coordinator& coordi
     glm::vec4 nLights = glm::vec4(1, 0, 0, 0);
     lightUBO.setBufferData(0, sizeof(glm::vec4), &nLights);
     // TODO: temporarily using the first light as main light for shadow casting
-    auto& mainLightTransform = coordinator.getComponent<ecs::Transform>(*m_entities.begin());
+    auto& mainLightTransform = coordinator->getComponent<ecs::Transform>(*m_entities.begin());
     glm::vec4 shadowLightPos = getShadowLightPos(mainLightTransform);
     lightUBO.setBufferData(offset, sizeof(glm::vec4), &shadowLightPos);
     offset += sizeof(glm::vec4);
@@ -21,8 +21,8 @@ void LightSystem::update(UniformBufferObject& lightUBO, ecs::Coordinator& coordi
 
     for (auto entity : m_entities)
     {
-        auto& transform = coordinator.getComponent<ecs::Transform>(entity);
-        auto& light = coordinator.getComponent<ecs::Light>(entity);
+        auto& transform = coordinator->getComponent<ecs::Transform>(entity);
+        auto& light = coordinator->getComponent<ecs::Light>(entity);
 
         LightUniformStruct lightUniform;
         lightUniform.posAndCutoff = glm::vec4(transform.position, light.cutoff);

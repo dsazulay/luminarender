@@ -7,7 +7,7 @@
 #include "../camera.h"
 
 #include <glad/glad.h>
-
+/*
 void NormalVisualizerPass::render(Scene &scene)
 {
     for (auto& entity : scene.objects())
@@ -54,4 +54,4 @@ NormalVisualizerPass::NormalVisualizerPass()
     Shader* s = AssetLibrary::instance().loadShader("normalVector", "resources/shaders/normal_vector.glsl");
     m_material = AssetLibrary::instance().createMaterial("normalVector", s);
 }
-
+*/

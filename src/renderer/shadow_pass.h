@@ -1,22 +1,20 @@
 #pragma once
 
-#include "irenderable.h"
-
 #include <glm/glm.hpp>
 
 class Material;
 
-class ShadowPass : public IRenderable
+class ShadowPass 
 {
 public:
     ShadowPass();
-    void render(Scene& scene) override;
+    void render();
 
     glm::mat4 lightSpaceMatrix{};
 
 private:
-    void updateLightMatrices(Entity* mainLight);
-    void renderEntity(Entity& entity);
+    void updateLightMatrices();
+    void renderEntity();
 
     Material* m_shadowMat;
 };

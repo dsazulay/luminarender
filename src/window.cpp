@@ -33,7 +33,8 @@ void Window::createWindow(int width, int height, const char *name)
     }
     glfwMakeContextCurrent(m_window);
     glfwSetFramebufferSizeCallback(m_window, frameBufferCallback);
-    glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xPos, double yPos)
+    glfwSetCursorPosCallback(m_window, 
+            [](GLFWwindow* window, double xPos, double yPos)
     {
         if (glfwGetKey(window, GLFW_KEY_LEFT_ALT))
         {
@@ -45,7 +46,8 @@ void Window::createWindow(int width, int height, const char *name)
         lastY = yPos;
     });
 
-    glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xOffset, double yOffset)
+    glfwSetScrollCallback(m_window, 
+            [](GLFWwindow* window, double xOffset, double yOffset)
     {
         if (glfwGetKey(window, GLFW_KEY_LEFT_ALT))
         {
@@ -63,6 +65,8 @@ void Window::createWindow(int width, int height, const char *name)
 //            Dispatcher::instance().post(e);
 //        }
     });
+
+    ASSERT(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Failed to initialize GLAD");
 }
 
 bool Window::windowShouldClose() const
