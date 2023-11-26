@@ -3,7 +3,7 @@
 int main()
 {
     AppConfig config{};
-    config.windowName = "Interactive Graphics";
+    config.windowName = "Lumina Render";
     config.windowWidth = 1280;
     config.windowHeight = 720;
     config.viewportWidth = 960;
