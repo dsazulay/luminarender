@@ -13,6 +13,9 @@
 #include "../components/components.h"
 
 
+const int MATRICESUBO_SIZE = 2 * sizeof(glm::mat4) + 2 * sizeof(glm::vec4);
+const int LIGHTUBO_SIZE = (2 * sizeof(glm::vec4) + sizeof(glm::mat4) 
+        + 12 * sizeof(LightUniformStruct));
 
 void Renderer::render()
 {
@@ -36,8 +39,10 @@ void Renderer::render()
     m_mainTargetFrameBuffer.unbind();
     */
 
-    m_lightSystem->update(m_lightUBO, m_coordinator);
-    m_renderSystem->update(m_coordinator);
+    updateTransformMatrices();
+
+    m_lightSystem->update(m_lightUBO);
+    m_renderSystem->update();
 }
 
 glm::mat4& Renderer::viewMatrix()
@@ -53,27 +58,30 @@ glm::mat4& Renderer::projMatrix()
 void Renderer::updateTransformMatrices()
 {
     m_viewMatrix = m_camera.getViewMatrix();
-    m_projMatrix = glm::perspective(glm::radians(m_camera.zoom),
-                                            (float) m_viewportWidth / (float) m_viewportHeight, 0.1f, 100.0f);
+    m_projMatrix = glm::perspective(glm::radians(m_camera.zoom), 
+            (float) m_viewportWidth / (float) m_viewportHeight, 0.1f, 100.0f);
 
     m_matricesUBO.setBufferData(0, sizeof(glm::mat4), glm::value_ptr(m_viewMatrix));
-    m_matricesUBO.setBufferData(sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(m_projMatrix));
-    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4), sizeof(glm::vec4), glm::value_ptr(glm::vec4(m_camera.position, 1.0)));
-    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4) + sizeof(glm::vec4), sizeof(glm::vec4), glm::value_ptr(glm::vec4(m_camera.front, 1.0)));
+    m_matricesUBO.setBufferData(sizeof(glm::mat4), sizeof(glm::mat4), 
+            glm::value_ptr(m_projMatrix));
+    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4), sizeof(glm::vec4), 
+            glm::value_ptr(glm::vec4(m_camera.position, 1.0)));
+    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4) + sizeof(glm::vec4), 
+            sizeof(glm::vec4), glm::value_ptr(glm::vec4(m_camera.front, 1.0)));
 }
 
-Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos, ecs::Coordinator* coordinator) :
+Renderer::Renderer(float viewportWidth, float viewportHeight, 
+        glm::vec3 cameraPos, ecs::Coordinator* coordinator) : 
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
-    m_matricesUBO(2 * sizeof(glm::mat4) + 2 * sizeof(glm::vec4)),
-    m_lightUBO(2 * sizeof(glm::vec4) + sizeof(glm::mat4) + 12 * sizeof(LightUniformStruct)),
-    m_camera(cameraPos),
-    m_coordinator{coordinator}
+    m_matricesUBO(MATRICESUBO_SIZE), m_lightUBO(LIGHTUBO_SIZE),
+    m_camera(cameraPos), m_coordinator(coordinator)
+{
+}
+
+void Renderer::init()
 {
     m_matricesUBO.bindBufferToIndex(0);
     m_lightUBO.bindBufferToIndex(1);
-
-    Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
-     std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
 
     m_lightSystem = m_coordinator->registerSystem<LightSystem>().get();
     {
@@ -82,6 +90,7 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
         mask.set(m_coordinator->getComponentType<ecs::Light>());
         m_coordinator->setSystemMask<LightSystem>(mask);
     }
+    m_lightSystem->init(m_coordinator);
 
     m_renderSystem = m_coordinator->registerSystem<RenderSystem>().get();
     {
@@ -90,7 +99,11 @@ Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPo
         mask.set(m_coordinator->getComponentType<ecs::MeshRenderer>());
         m_coordinator->setSystemMask<RenderSystem>(mask);
     }
-    m_renderSystem->init(viewportWidth, viewportHeight);
+    m_renderSystem->init((int) m_viewportWidth, (int) m_viewportHeight, 
+            m_coordinator);
+    
+    Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
+        std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
 }
 
 unsigned int Renderer::getTexcolorBufferID()
@@ -108,12 +121,6 @@ void Renderer::onViewportResize(const Event& e)
     LOG_INFO("{} {}", m_viewportWidth, m_viewportHeight);
 }
 
-
-unsigned int Renderer::getShadowMapTextureID()
-{
-    //return m_shadowFrameBuffer.getDepthAttachmentID();
-    return 0;
-}
 
 //std::vector<glm::vec4> Renderer::getFrustumCornersWorldSpace(const glm::mat4 &proj, const glm::mat4 &view)
 //{

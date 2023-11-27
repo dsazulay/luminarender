@@ -12,7 +12,9 @@
 
 class Renderer {
 public:
-    Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos, ecs::Coordinator* coordinator);
+    Renderer(float viewportWidth, float viewportHeight, 
+            glm::vec3 cameraPos, ecs::Coordinator* coordinator);
+    void init();
     void updateTransformMatrices();
     void render();
 
@@ -20,13 +22,14 @@ public:
     std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
 
     unsigned int getTexcolorBufferID();
-    unsigned int getShadowMapTextureID();
 
     glm::mat4& viewMatrix();
     glm::mat4& projMatrix();
 
 private:
-    GPUCommands<OpenGL> gpucommands;
+    void onViewportResize(const Event& e);
+
+    GPUCommands<OpenGL> gpucommands{};
 
     UniformBufferObject m_matricesUBO;
     UniformBufferObject m_lightUBO;
@@ -34,16 +37,13 @@ private:
     float m_viewportWidth;
     float m_viewportHeight;
 
-    glm::mat4 lightSpaceMatrix;
-
-    ecs::Coordinator* m_coordinator;
-    LightSystem* m_lightSystem;
-    RenderSystem* m_renderSystem;
+    ecs::Coordinator* m_coordinator{};
+    LightSystem* m_lightSystem{};
+    RenderSystem* m_renderSystem{};
 
     Camera m_camera;
 
-    glm::mat4 m_viewMatrix;
-    glm::mat4 m_projMatrix;
-
-    void onViewportResize(const Event& e);
+    glm::mat4 m_viewMatrix{};
+    glm::mat4 m_projMatrix{};
+    glm::mat4 lightSpaceMatrix{};
 };

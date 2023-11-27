@@ -25,7 +25,6 @@ void Application::mainloop()
 
         m_window->processInput();
 
-        m_renderer->updateTransformMatrices();
         m_renderer->render();
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -67,7 +66,7 @@ void Application::init()
     m_renderer = std::make_unique<Renderer>((float) m_config.viewportWidth, 
             (float) m_config.viewportHeight, 
             glm::vec3(0.0, 0.0, 8.0f), m_coordinator.get());
-    //m_renderer->init();
+    m_renderer->init();
 
 
     m_uiRenderer = std::make_unique<UiRenderer>(m_coordinator.get());

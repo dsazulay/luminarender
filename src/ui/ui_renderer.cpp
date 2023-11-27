@@ -19,7 +19,8 @@ void UiRenderer::init()
 
     ImGui::StyleColorsDark();
 
-    ImFont* robotoFont = io.Fonts->AddFontFromFileTTF("resources/fonts/Roboto-Medium.ttf", 16.0f);
+    ImFont* robotoFont = io.Fonts->AddFontFromFileTTF(
+            "resources/fonts/Roboto-Medium.ttf", 16.0f);
     io.FontDefault = robotoFont;
 
     m_mainMenuSystem = m_coordinator->registerSystem<MainMenuSystem>().get();
@@ -61,7 +62,8 @@ void UiRenderer::update(unsigned int frameBufferTexcolorID, glm::mat4& viewMatri
     ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
     m_mainMenuSystem->update();
-    m_viewportSystem->update(frameBufferTexcolorID, viewportWidth, viewportHeight, m_selected, viewMatrix, projMatrix, m_guizmoType);
+    m_viewportSystem->update(frameBufferTexcolorID, viewportWidth, 
+            viewportHeight, m_selected, viewMatrix, projMatrix, m_guizmoType);
     m_hierarchySystem->update();
     m_properiesSystem->update();
 

@@ -12,13 +12,13 @@
 class RenderSystem : public ecs::System
 {
 public:
-    void init(int width, int height);
-    void update(ecs::Coordinator* coordinator);
+    void init(int width, int height, ecs::Coordinator* coordinator);
+    void update();
     void resizeBuffers(int width, int height);
     id_t getFinalRenderTexID();
 private:
-    void shadowPass(ecs::Coordinator* coordinator);
-    void geometryPass(ecs::Coordinator* coordinator);
+    void shadowPass();
+    void geometryPass();
     void ssaoPass();
     void ssaoBlurPass();
     void lightingPass();
@@ -44,5 +44,7 @@ private:
 
     id_t m_ssaoNoiseTex;
     std::array<glm::vec3, 64> m_ssaoKernel;
+
+    ecs::Coordinator* m_coordinator;
 };
 

@@ -13,10 +13,11 @@ float lerp(float a, float b, float f)
     return a + f * (b - a);
 }  
 
-void RenderSystem::init(int width, int height)
+void RenderSystem::init(int width, int height, ecs::Coordinator* coordinator)
 {
     m_width = width;
     m_height = height;
+    m_coordinator = coordinator;
     m_mainTargetFrameBuffer = std::make_unique<ColorDepthStencilBuffer>(width, height, m_gpurm);
     m_shadowFrameBuffer = std::make_unique<DepthBuffer>(shadowMapSize, shadowMapSize, m_gpurm);
     m_gbuffer = std::make_unique<GBuffer>(width, height, m_gpurm);
@@ -37,10 +38,10 @@ void RenderSystem::init(int width, int height)
     generateSSAONoiseTexture();
 }
 
-void RenderSystem::update(ecs::Coordinator* coordinator)
+void RenderSystem::update()
 {
-    shadowPass(coordinator);
-    geometryPass(coordinator);
+    shadowPass();
+    geometryPass();
     ssaoPass();
     ssaoBlurPass();
     lightingPass();
@@ -70,7 +71,7 @@ id_t RenderSystem::getFinalRenderTexID()
     return m_mainTargetFrameBuffer->getColorAttachmentID();
 }
 
-void RenderSystem::shadowPass(ecs::Coordinator* coordinator)
+void RenderSystem::shadowPass()
 {
     m_shadowFrameBuffer->bind();
     gpucommands.setViewportSize(0, 0, shadowMapSize, shadowMapSize);
@@ -78,8 +79,9 @@ void RenderSystem::shadowPass(ecs::Coordinator* coordinator)
     
     for (auto entity : m_entities)
     {
-        auto& transform = coordinator->getComponent<ecs::Transform>(entity);
-        auto& meshRenderer = coordinator->getComponent<ecs::MeshRenderer>(entity);
+        auto& transform = m_coordinator->getComponent<ecs::Transform>(entity);
+        auto& meshRenderer = m_coordinator->getComponent<ecs::MeshRenderer>(
+                entity);
 
         Material *material = AssetLibrary::instance().getMaterial("shadowMat");
         material->shader->use();
@@ -96,7 +98,7 @@ void RenderSystem::shadowPass(ecs::Coordinator* coordinator)
     m_shadowFrameBuffer->unbind();
 }
 
-void RenderSystem::geometryPass(ecs::Coordinator* coordinator)
+void RenderSystem::geometryPass()
 {
     m_gbuffer->bind();
     gpucommands.setViewportSize(0, 0, m_width, m_height);
@@ -105,8 +107,9 @@ void RenderSystem::geometryPass(ecs::Coordinator* coordinator)
 
     for (auto entity : m_entities)
     {
-        auto& transform = coordinator->getComponent<ecs::Transform>(entity);
-        auto& meshRenderer = coordinator->getComponent<ecs::MeshRenderer>(entity);
+        auto& transform = m_coordinator->getComponent<ecs::Transform>(entity);
+        auto& meshRenderer = m_coordinator->getComponent<ecs::MeshRenderer>(
+                entity);
 
         Material* origMaterial = meshRenderer.material;
         Material* material = AssetLibrary::instance().getMaterial("GBuffer");
