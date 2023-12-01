@@ -13,11 +13,14 @@ float lerp(float a, float b, float f)
     return a + f * (b - a);
 }  
 
-void RenderSystem::init(int width, int height, ecs::Coordinator* coordinator)
+void RenderSystem::init(int width, int height, ecs::Coordinator* coordinator, 
+        Camera* camera)
 {
     m_width = width;
     m_height = height;
     m_coordinator = coordinator;
+    m_camera = camera;
+
     m_mainTargetFrameBuffer = std::make_unique<ColorDepthStencilBuffer>(width, height, m_gpurm);
     m_shadowFrameBuffer = std::make_unique<DepthBuffer>(shadowMapSize, shadowMapSize, m_gpurm);
     m_gbuffer = std::make_unique<GBuffer>(width, height, m_gpurm);
@@ -36,6 +39,8 @@ void RenderSystem::init(int width, int height, ecs::Coordinator* coordinator)
     s = AssetLibrary::instance().loadShader("ssaoBlur", "resources/shaders/ssao_blur.glsl");
     AssetLibrary::instance().createMaterial("ssaoBlurMat", s);
     generateSSAONoiseTexture();
+    s = AssetLibrary::instance().loadShader("normalVector", "resources/shaders/normal_vector.glsl");
+    AssetLibrary::instance().createMaterial("normalVector", s);
 }
 
 void RenderSystem::update()
@@ -54,6 +59,7 @@ void RenderSystem::update()
     gpucommands.blit(m_width, m_height, ClearMask::DEPTH, Filtering::POINT);
 
     skyboxPass();
+    //normalVisualizerPass();
 }
 
 void RenderSystem::resizeBuffers(int width, int height)
@@ -261,6 +267,34 @@ void RenderSystem::skyboxPass()
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int)mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
+
+    m_mainTargetFrameBuffer->unbind();
+}
+
+void RenderSystem::normalVisualizerPass()
+{
+    m_mainTargetFrameBuffer->bind();
+
+    for (auto entity : m_entities)
+    {
+        auto& transform = m_coordinator->getComponent<ecs::Transform>(entity);
+        auto& meshRenderer = m_coordinator->getComponent<ecs::MeshRenderer>(
+                entity);
+
+        Material* material = AssetLibrary::instance().getMaterial("normalVector");
+        material->shader->use();
+
+        material->shader->setMat4("u_model", transform.modelMatrix);
+        material->shader->setMat3("u_normalMatrix", glm::transpose(
+            glm::inverse(glm::mat3(m_camera->getViewMatrix() * 
+                    transform.modelMatrix))));
+
+        material->setUniformData();
+
+        glBindVertexArray(meshRenderer.mesh->vao());
+        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(0);
+    }
 
     m_mainTargetFrameBuffer->unbind();
 }

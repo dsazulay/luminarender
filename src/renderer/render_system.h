@@ -4,6 +4,7 @@
 #include "gpucommands.h"
 #include "frame_buffer.h"
 #include "../assets/material.h"
+#include "../camera.h"
 
 #include <memory>
 #include <array>
@@ -12,7 +13,7 @@
 class RenderSystem : public ecs::System
 {
 public:
-    void init(int width, int height, ecs::Coordinator* coordinator);
+    void init(int width, int height, ecs::Coordinator* coordinator, Camera* camera);
     void update();
     void resizeBuffers(int width, int height);
     id_t getFinalRenderTexID();
@@ -23,7 +24,7 @@ private:
     void ssaoBlurPass();
     void lightingPass();
     void skyboxPass();
-    void normalVisualizerPass(ecs::Coordinator& coordinator);
+    void normalVisualizerPass();
 
     void generateSSAONoiseTexture();
 
@@ -46,5 +47,6 @@ private:
     std::array<glm::vec3, 64> m_ssaoKernel;
 
     ecs::Coordinator* m_coordinator;
+    Camera* m_camera;
 };
 
