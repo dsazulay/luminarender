@@ -1,6 +1,11 @@
 #properties
-Color u_color = 1,1,1,1
-2D u_mainTex = white
+Color u_albedo = 1,1,1,1
+Float u_metallic = 0.0
+Float u_roughness = 1.0
+2D u_albedoTex = white
+2D u_metallicTex = white
+2D u_roughnessTex = white
+2D u_aoTex = white
 #endproperties
 
 #shader vertex
@@ -42,7 +47,7 @@ void main()
 
 layout (location = 0) out vec3 g_position;
 layout (location = 1) out vec3 g_normal;
-layout (location = 2) out vec4 g_albedoSpec;
+layout (location = 2) out vec4 g_albedo;
 
 in Varyings
 {
@@ -51,14 +56,22 @@ in Varyings
     vec2 uv;
 } v_in;
 
-uniform vec4 u_color;
-uniform sampler2D u_mainTex;
+uniform vec4 u_albedo;
+uniform float u_metallic;
+uniform float u_roughness;
+
+uniform sampler2D u_albedoTex;
+uniform sampler2D u_metallicTex;
+uniform sampler2D u_roughnessTex;
+uniform sampler2D u_aoTex;
 
 void main()
 {
-    g_position = v_in.worldPos;
+    vec4 albedo = texture(u_albedoTex, v_in.uv) * u_albedo;
+    float ao = texture(u_aoTex, v_in.uv).r;
+    float roughness = texture(u_roughnessTex, v_in.uv).r * u_roughness;
+    float metallic = texture(u_metallicTex, v_in.uv).r * u_metallic;
+    g_albedo = albedo;
     g_normal = normalize(v_in.normal);
-    vec4 mainTex = texture(u_mainTex, v_in.uv) * u_color;
-    g_albedoSpec.rgb = mainTex.rgb;
-    g_albedoSpec.w = 1;
+    g_position = vec3(ao, roughness, metallic);
 }

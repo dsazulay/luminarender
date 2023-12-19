@@ -83,8 +83,9 @@ void Application::init()
     // enable seamless cubemap sampling for lower mip levels in the pre-filter map.
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-    LightingSkyboxScene::loadScene(AssetLibrary::instance(), *m_coordinator);
+    PbrScene::loadScene(AssetLibrary::instance(), *m_coordinator);
 //    PbrScene::loadScene(m_scene, AssetLibrary::instance());
+    m_renderer->updateIrradianceMaps();
 }
 
 void Application::run()

@@ -45,6 +45,7 @@ private:
     AssetLibrary();
     void loadDefaultResources();
     void setMaterialDefaultResources();
+    void generateSSAONoiseTexture();
 
     bool isShaderLoaded(const char* name);
     bool isMaterialCreated(const char* name);

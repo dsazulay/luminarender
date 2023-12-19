@@ -35,6 +35,11 @@ glm::mat4& Renderer::projMatrix()
     return m_projMatrix;
 }
 
+void Renderer::updateIrradianceMaps()
+{
+    m_renderSystem->updateIrradianceMaps();
+}
+
 void Renderer::updateTransformMatrices()
 {
     m_viewMatrix = m_camera.getViewMatrix();

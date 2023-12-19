@@ -148,8 +148,8 @@ VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene, bool 
     {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
         aiString matName = material->GetName();
-        Material* mat = AssetLibrary::instance().createMaterial(matName.C_Str(), "lambert");
-        mat->setProperty("u_color", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        Material* mat = AssetLibrary::instance().createMaterial(matName.C_Str(), "pbr");
+        mat->setProperty("u_albedo", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
         
         for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i)
         {
@@ -159,7 +159,7 @@ VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene, bool 
             correctName.replace(8, 1, "/");
             
             Texture* tex = AssetLibrary::instance().load2DTexture(correctName.c_str(), correctName.c_str(), "resources/sponza");
-            mat->setTexture("u_mainTex", tex->ID(), 0);
+            mat->setTexture("u_albedoTex", tex->ID(), 0);
         }
         m.material = matName.C_Str();
     }

@@ -1,8 +1,6 @@
 #include "lighting_skybox_scene.h"
 
 #include "sample_resources.h"
-#include "../entity_factory.h"
-#include "../components/transform.h"
 #include "../components/components.h"
 #include "../renderer/transform_system.h"
 
@@ -90,8 +88,8 @@ void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinat
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
     Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
 
-   auto sphereEntity = coordinator.createEntity();
-   coordinator.addComponent(sphereEntity, ecs::MeshRenderer{
+    auto sphereEntity = coordinator.createEntity();
+    coordinator.addComponent(sphereEntity, ecs::MeshRenderer{
         .mesh = sphere,
         .material = blueMat,
     });

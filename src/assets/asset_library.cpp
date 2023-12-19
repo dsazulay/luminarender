@@ -79,7 +79,7 @@ Material* AssetLibrary::getMaterial(const char* name)
     if (isMaterialCreated(name))
         return m_materials[name];
 
-    LOG_WARN("There is no material with this name in library");
+    LOG_WARN("There is no material with \"{}\" name in library", name);
     return nullptr;
 }
 
@@ -218,6 +218,8 @@ void AssetLibrary::loadDefaultResources()
     loadMesh("triangleMap", MeshType::TriangleMap);
 
     load2DTexture(DefaultResources::texWhite, texture_defaultWhite, texture_dir);
+
+    generateSSAONoiseTexture();
 }
 
 void AssetLibrary::createDefaultResources()
@@ -230,4 +232,9 @@ void AssetLibrary::createDefaultResources()
 void AssetLibrary::setMaterialDefaultResources()
 {
     Material::setDefaultTexWhite(getTexture(DefaultResources::texWhite)->ID());
+}
+
+void AssetLibrary::generateSSAONoiseTexture()
+{
+    // TODO: implement
 }

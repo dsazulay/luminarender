@@ -15,6 +15,7 @@ class RenderSystem : public ecs::System
 public:
     void init(int width, int height, ecs::Coordinator* coordinator, Camera* camera);
     void update();
+    void updateIrradianceMaps();
     void resizeBuffers(int width, int height);
     id_t getFinalRenderTexID();
 private:
@@ -44,6 +45,9 @@ private:
     const int shadowMapSize = 1024;
 
     id_t m_ssaoNoiseTex;
+    id_t m_irradianceMap;
+    id_t m_prefilterMap;
+    id_t m_brdfLUT;
     std::array<glm::vec3, 64> m_ssaoKernel;
 
     ecs::Coordinator* m_coordinator;

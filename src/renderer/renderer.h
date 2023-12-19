@@ -16,6 +16,7 @@ public:
             glm::vec3 cameraPos, ecs::Coordinator* coordinator);
     void init();
     void updateTransformMatrices();
+    void updateIrradianceMaps();
     void render();
 
     glm::mat4 cascadeShadows(glm::vec3 lightDir);

@@ -3,6 +3,7 @@
 #include "../components/components.h"
 #include "../assets/shader.h"
 #include "../assets/asset_library.h"
+#include "../irradiance_map_factory.h"
 #include "../log.h"
 
 #include <random>
@@ -60,6 +61,14 @@ void RenderSystem::update()
 
     skyboxPass();
     //normalVisualizerPass();
+}
+
+void RenderSystem::updateIrradianceMaps()
+{
+    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(AssetLibrary::instance().getTexture("hdrSkybox")->ID());
+    m_irradianceMap = maps.irradianceMap;
+    m_prefilterMap = maps.prefilterMap;
+    m_brdfLUT = maps.brdfLUTMap;
 }
 
 void RenderSystem::resizeBuffers(int width, int height)
@@ -135,8 +144,8 @@ void RenderSystem::geometryPass()
         }
 
         glm::vec4 color = std::any_cast<glm::vec4>(origMaterial->getUniformData()
-                .find("u_color")->second);
-        material->setProperty("u_color", color);
+                .find("u_albedo")->second);
+        material->setProperty("u_albedo", color);
         material->setUniformData();
 
         glBindVertexArray(meshRenderer.mesh->vao());
@@ -224,7 +233,7 @@ void RenderSystem::lightingPass()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getNormalAttachmentID());
 
-    material->shader->setInt("u_albedospec", 2);
+    material->shader->setInt("u_albedo", 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getAlbedoSpecAttachmentID());
 
@@ -236,10 +245,22 @@ void RenderSystem::lightingPass()
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, m_ssaoBlurBuffer->getColorAttachmentID());
 
-    material->shader->setInt("u_gposition", 5);
+    material->shader->setInt("u_orm", 5);
     glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getPositionAttachmentID());
 
+    // bind global illumination textures
+    material->shader->setInt("u_irradianceTex", 10);
+    glActiveTexture(GL_TEXTURE10);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_irradianceMap);
+
+    material->shader->setInt("u_prefilterMap", 11);
+    glActiveTexture(GL_TEXTURE11);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, m_prefilterMap);
+
+    material->shader->setInt("u_brdfLUT", 12);
+    glActiveTexture(GL_TEXTURE12);
+    glBindTexture(GL_TEXTURE_2D, m_brdfLUT);
 
     glBindVertexArray(mesh->vao());
     glDrawElements(GL_TRIANGLES, (int) mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
