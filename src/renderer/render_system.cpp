@@ -272,7 +272,7 @@ void RenderSystem::lightingPass()
 void RenderSystem::skyboxPass()
 {
     m_mainTargetFrameBuffer->bind();
-    
+
     auto mesh = AssetLibrary::instance().getMesh("triangleMap");
     Material* material = AssetLibrary::instance().getMaterial("skyboxMat");
     material->shader->use();

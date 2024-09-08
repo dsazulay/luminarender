@@ -20,7 +20,6 @@ class Application
 {
 public:
     explicit Application(AppConfig& config);
-    void init();
     void run();
 
     static float deltaTime;
@@ -28,6 +27,11 @@ public:
 private:
     void mainloop();
     void terminate();
+
+    void initEcs();
+    void initWindow();
+    void initRenderer();
+    void initUiRenderer();
 
     std::unique_ptr<ecs::Coordinator> m_coordinator;
     std::unique_ptr<Window> m_window;

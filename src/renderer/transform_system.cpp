@@ -63,7 +63,7 @@ void TransformSystem::updateRootEntities()
     {
         auto& transform = m_coordinator->getComponent<ecs::Transform>(entity);
         if (auto parent = transform.parent)
-            continue;    
+            continue;
 
         m_rootEntities.push_back(entity);
     }

@@ -8,7 +8,7 @@ layout (location = 2) in vec2 a_uv;
 out vec2 v_uv;
 out vec3 v_viewRay;
 
-const float aspectRatio = 999.0 / 676.0;
+const float aspectRatio = 956.0 / 676.0;
 const float tanHalfFov = tan(radians(45.0 * 0.5));
 
 void main()

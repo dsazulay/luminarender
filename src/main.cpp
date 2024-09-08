@@ -2,12 +2,13 @@
 
 int main()
 {
-    AppConfig config{};
-    config.windowName = "Lumina Render";
-    config.windowWidth = 1280;
-    config.windowHeight = 720;
-    config.viewportWidth = 960;
-    config.viewportHeight = 540;
+    AppConfig config{
+        .windowName = "Lumina",
+        .windowWidth= 1280,
+        .windowHeight = 720,
+        .viewportWidth = 960,
+        .viewportHeight = 540,
+    };
 
     Application app(config);
     app.run();

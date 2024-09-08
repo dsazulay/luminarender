@@ -3,6 +3,7 @@
 #include "event.h"
 
 #include <unordered_map>
+#include <functional>
 
 class Dispatcher
 {
