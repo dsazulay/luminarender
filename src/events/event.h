@@ -26,7 +26,8 @@ private:
 class MouseScrollEvent : public Event
 {
 public:
-    MouseScrollEvent(double xOffset, double yOffset) : m_xOffset(xOffset), m_yOffset(yOffset) {}
+    MouseScrollEvent(double xOffset, double yOffset) : m_xOffset(xOffset),
+        m_yOffset(yOffset) {}
     const char* type() const override { return descriptor; }
     double xOffset() const { return m_xOffset; }
     double yOffset() const { return m_yOffset; }
@@ -59,7 +60,8 @@ private:
 class ViewportResizeEvent : public Event
 {
 public:
-    ViewportResizeEvent(float width, float height) : m_width(width), m_height(height) {}
+    ViewportResizeEvent(float width, float height) : m_width(width),
+        m_height(height) {}
     const char* type() const override { return descriptor; }
     float width() const { return m_width; }
     float height() const { return m_height; }
@@ -73,12 +75,28 @@ private:
 class KeyPressEvent : public Event
 {
 public:
-    KeyPressEvent(int keyCode, int modifier) : m_keyCode(keyCode), m_modifier(modifier) {}
+    KeyPressEvent(int keyCode, int modifier) : m_keyCode(keyCode),
+        m_modifier(modifier) {}
     const char* type() const override { return descriptor; }
     int keyCode() const { return m_keyCode; }
     int modifier() const { return m_modifier; }
 
     static constexpr char* descriptor = (char*) "KeyPressEvent";
+private:
+    int m_keyCode;
+    int m_modifier;
+};
+
+class KeySinglePressEvent : public Event
+{
+public:
+    KeySinglePressEvent(int keyCode, int modifier) : m_keyCode(keyCode),
+        m_modifier(modifier) {}
+    const char* type() const override { return descriptor; }
+    int keyCode() const { return m_keyCode; }
+    int modifier() const { return m_modifier; }
+
+    static constexpr char* descriptor = (char*) "KeySinglePressEvent";
 private:
     int m_keyCode;
     int m_modifier;

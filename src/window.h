@@ -6,7 +6,7 @@
 class Window
 {
 public:
-    void init();
+    Window();
     void terminate();
     void createWindow(int width, int height, const char* name);
     bool windowShouldClose() const;
@@ -22,5 +22,4 @@ private:
     inline static float lastY = 0;
 
     static void frameBufferCallback(GLFWwindow* window, int width, int height);
-    static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 };

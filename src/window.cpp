@@ -1,11 +1,13 @@
 #include "window.h"
 
+#include "GLFW/glfw3.h"
 #include "events/event.h"
 #include "events/dispatcher.h"
 #include "log.h"
+#include <cmath>
 
 
-void Window::init()
+Window::Window()
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -22,7 +24,7 @@ void Window::terminate()
     glfwTerminate();
 }
 
-void Window::createWindow(int width, int height, const char *name)
+void Window::createWindow(int width, int height, const char* name)
 {
     m_window = glfwCreateWindow(width, height, name, nullptr, nullptr);
     if (m_window == nullptr)
@@ -33,7 +35,7 @@ void Window::createWindow(int width, int height, const char *name)
     }
     glfwMakeContextCurrent(m_window);
     glfwSetFramebufferSizeCallback(m_window, frameBufferCallback);
-    glfwSetCursorPosCallback(m_window, 
+    glfwSetCursorPosCallback(m_window,
             [](GLFWwindow* window, double xPos, double yPos)
     {
         if (glfwGetKey(window, GLFW_KEY_LEFT_ALT))
@@ -46,7 +48,7 @@ void Window::createWindow(int width, int height, const char *name)
         lastY = yPos;
     });
 
-    glfwSetScrollCallback(m_window, 
+    glfwSetScrollCallback(m_window,
             [](GLFWwindow* window, double xOffset, double yOffset)
     {
         if (glfwGetKey(window, GLFW_KEY_LEFT_ALT))
@@ -56,14 +58,15 @@ void Window::createWindow(int width, int height, const char *name)
         }
     });
 
-    glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode,
+                                    int action, int mods)
     {
         // TODO: make this work with multiple keys pressed
-//        if (action == GLFW_PRESS || action == GLFW_REPEAT)
-//        {
-//            KeyPressEvent e(key);
-//            Dispatcher::instance().post(e);
-//        }
+        if (action == GLFW_PRESS)
+        {
+            KeySinglePressEvent e(key, mods);
+            Dispatcher::instance().post(e);
+        }
     });
 
     ASSERT(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Failed to initialize GLAD");

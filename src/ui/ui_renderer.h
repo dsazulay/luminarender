@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../ecs.h"
+#include "debug_view.h"
 #include "mainmenu_system.h"
 #include "viewport_system.h"
 #include "hierarchy_system.h"
@@ -22,11 +23,13 @@ public:
     void setBackendImplementation(GLFWwindow* window);
 
     void onKeyPress(const Event& e);
+    void onKeySinglePress(const Event& e);
 
     float viewportHeight{};
     float viewportWidth{};
 
 private:
+    bool m_showDebugMenu{};
     int m_guizmoType{};
     std::optional<ecs::Entity> m_selected;
 
@@ -34,5 +37,6 @@ private:
     MainMenuSystem* m_mainMenuSystem{};
     ViewportSystem* m_viewportSystem{};
     HierarchySystem* m_hierarchySystem{};
-    PropertiesSystem* m_properiesSystem{};
+    PropertiesSystem* m_propertiesSystem{};
+    DebugView m_debugView{};
 };

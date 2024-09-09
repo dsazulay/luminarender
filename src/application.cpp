@@ -44,20 +44,18 @@ void Application::initEcs()
 
     TransformSystem* transformSystem =
         m_coordinator->registerSystem<TransformSystem>().get();
-
-    ecs::Mask mask;
-    mask.set(m_coordinator->getComponentType<ecs::Transform>());
-    m_coordinator->setSystemMask<TransformSystem>(mask);
-
+    {
+        ecs::Mask mask;
+        mask.set(m_coordinator->getComponentType<ecs::Transform>());
+        m_coordinator->setSystemMask<TransformSystem>(mask);
+    }
     transformSystem->init(m_coordinator.get());
 }
 
 void Application::initWindow()
 {
-    m_window = std::make_unique<Window>();
-    m_window->init();
-    m_window->createWindow(m_config.windowWidth, m_config.windowHeight,
-                           m_config.windowName.c_str());
+    m_window.createWindow(m_config.windowWidth, m_config.windowHeight,
+                          m_config.windowName.c_str());
 }
 
 void Application::initRenderer()
@@ -73,21 +71,21 @@ void Application::initUiRenderer()
 {
     m_uiRenderer = std::make_unique<UiRenderer>(m_coordinator.get());
     m_uiRenderer->init();
-    m_uiRenderer->setBackendImplementation(m_window->glfwWindow());
+    m_uiRenderer->setBackendImplementation(m_window.glfwWindow());
     m_uiRenderer->viewportWidth = (float) m_config.viewportWidth;
     m_uiRenderer->viewportHeight = (float) m_config.viewportHeight;
 }
 
 void Application::mainloop()
 {
-    while (!m_window->windowShouldClose())
+    while (!m_window.windowShouldClose())
     {
         auto currentFrame = (float) glfwGetTime();
         m_deltaTime = currentFrame - m_lastFrame;
         m_lastFrame = currentFrame;
         deltaTime = m_deltaTime;
 
-        m_window->processInput();
+        m_window.processInput();
 
         m_renderer->render();
 
@@ -98,8 +96,8 @@ void Application::mainloop()
 
         m_uiRenderer->update(m_renderer->getTexcolorBufferID(), m_renderer->viewMatrix(), m_renderer->projMatrix());
 
-        m_window->swapBuffers();
-        m_window->pollEvents();
+        m_window.swapBuffers();
+        m_window.pollEvents();
     }
 }
 
@@ -115,7 +113,7 @@ void Application::terminate()
 {
     m_uiRenderer->terminate();
 //    m_renderer->terminate();
-    m_window->terminate();
+    m_window.terminate();
 //    m_coordinator->terminate();
 }
 
