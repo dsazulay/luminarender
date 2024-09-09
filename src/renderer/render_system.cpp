@@ -12,7 +12,7 @@
 float lerp(float a, float b, float f)
 {
     return a + f * (b - a);
-}  
+}
 
 void RenderSystem::init(int width, int height, ecs::Coordinator* coordinator, 
         Camera* camera)
@@ -48,8 +48,10 @@ void RenderSystem::update()
 {
     shadowPass();
     geometryPass();
-    ssaoPass();
-    ssaoBlurPass();
+    if (m_ssaoEnabled) {
+        ssaoPass();
+        ssaoBlurPass();
+    }
     lightingPass();
 
     // copy depth buffer from geometry pass
@@ -81,6 +83,11 @@ void RenderSystem::resizeBuffers(int width, int height)
     m_ssaoBlurBuffer->resizeBuffer(width, height);
 }
 
+void RenderSystem::toggleSSAO(bool enabled)
+{
+    m_ssaoEnabled = enabled;
+}
+
 id_t RenderSystem::getFinalRenderTexID()
 {
     return m_mainTargetFrameBuffer->getColorAttachmentID();
@@ -91,7 +98,7 @@ void RenderSystem::shadowPass()
     m_shadowFrameBuffer->bind();
     gpucommands.setViewportSize(0, 0, shadowMapSize, shadowMapSize);
     gpucommands.clear(ClearMask::DEPTH);
-    
+
     for (auto entity : m_entities)
     {
         auto& transform = m_coordinator->getComponent<ecs::Transform>(entity);
@@ -243,7 +250,13 @@ void RenderSystem::lightingPass()
 
     material->shader->setInt("u_ssao", 4);
     glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, m_ssaoBlurBuffer->getColorAttachmentID());
+    if (m_ssaoEnabled)
+        glBindTexture(GL_TEXTURE_2D, m_ssaoBlurBuffer->getColorAttachmentID());
+    else
+    {
+        glBindTexture(GL_TEXTURE_2D, AssetLibrary::instance().getTexture(
+            AssetLibrary::DefaultResources::texWhite)->ID());
+    }
 
     material->shader->setInt("u_orm", 5);
     glActiveTexture(GL_TEXTURE5);
@@ -325,7 +338,7 @@ void RenderSystem::generateSSAONoiseTexture()
 {
     std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // generates random floats between 0.0 and 1.0
     std::default_random_engine generator;
-    
+
     for (unsigned int i = 0; i < 64; ++i)
     {
         glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));

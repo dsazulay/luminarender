@@ -113,3 +113,15 @@ public:
 private:
     Entity* m_entity;
 };
+
+class UiToggleSSAOEvent : public Event
+{
+public:
+    UiToggleSSAOEvent(bool enabled) : m_enabled(enabled) {}
+    const char* type() const override { return descriptor; }
+    bool enabled() const { return m_enabled; }
+
+    static constexpr char* descriptor =  (char*) "UiToggleSSAOEvent";
+private:
+    bool m_enabled;
+};

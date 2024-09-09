@@ -29,6 +29,7 @@ public:
 
 private:
     void onViewportResize(const Event& e);
+    void onUiToggleSSAO(const Event& e);
 
     GPUCommands<OpenGL> gpucommands{};
 
@@ -48,3 +49,4 @@ private:
     glm::mat4 m_projMatrix{};
     glm::mat4 lightSpaceMatrix{};
 };
+

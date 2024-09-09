@@ -4,7 +4,6 @@
 #include "events/event.h"
 #include "events/dispatcher.h"
 #include "log.h"
-#include <cmath>
 
 
 Window::Window()

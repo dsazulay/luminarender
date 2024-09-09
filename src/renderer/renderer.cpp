@@ -86,9 +86,11 @@ void Renderer::init()
     }
     m_renderSystem->init((int) m_viewportWidth, (int) m_viewportHeight, 
             m_coordinator, &m_camera);
-    
+
     Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
         std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
+    Dispatcher::instance().subscribe(UiToggleSSAOEvent::descriptor,
+        [&] (const auto& arg) { Renderer::onUiToggleSSAO(arg); });
 }
 
 unsigned int Renderer::getTexcolorBufferID()
@@ -102,8 +104,14 @@ void Renderer::onViewportResize(const Event& e)
     m_viewportWidth = event.width();
     m_viewportHeight = event.height();
     m_renderSystem->resizeBuffers(m_viewportWidth, m_viewportHeight);
-    
+
     LOG_INFO("{} {}", m_viewportWidth, m_viewportHeight);
+}
+
+void Renderer::onUiToggleSSAO(const Event& e)
+{
+    const auto& event = static_cast<const UiToggleSSAOEvent&>(e);
+    m_renderSystem->toggleSSAO(event.enabled());
 }
 
 

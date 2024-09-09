@@ -17,6 +17,7 @@ public:
     void update();
     void updateIrradianceMaps();
     void resizeBuffers(int width, int height);
+    void toggleSSAO(bool enabled);
     id_t getFinalRenderTexID();
 private:
     void shadowPass();
@@ -32,7 +33,7 @@ private:
 private:
     GPUResourceManager<OpenGL> m_gpurm{};
     GPUCommands<OpenGL> gpucommands{};
-    
+
     std::unique_ptr<ColorDepthStencilBuffer> m_mainTargetFrameBuffer;
     std::unique_ptr<DepthBuffer> m_shadowFrameBuffer;
     std::unique_ptr<GBuffer> m_gbuffer;
@@ -49,6 +50,8 @@ private:
     id_t m_prefilterMap;
     id_t m_brdfLUT;
     std::array<glm::vec3, 64> m_ssaoKernel;
+
+    bool m_ssaoEnabled = true;
 
     ecs::Coordinator* m_coordinator;
     Camera* m_camera;
