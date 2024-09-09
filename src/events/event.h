@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../entity.h"
-
 class Event
 {
 public:
@@ -100,18 +98,6 @@ public:
 private:
     int m_keyCode;
     int m_modifier;
-};
-
-class UiCreateEmptyEvent : public Event
-{
-public:
-    UiCreateEmptyEvent(Entity* entity) : m_entity(entity) {}
-    const char* type() const override { return descriptor; }
-    Entity* entity() const { return m_entity; }
-
-    static constexpr char* descriptor =  (char*) "UiCreateEmptyEvent";
-private:
-    Entity* m_entity;
 };
 
 class UiToggleSSAOEvent : public Event

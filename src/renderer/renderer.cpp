@@ -1,7 +1,5 @@
 #include "renderer.h"
 
-#include "../components/mesh_renderer.h"
-#include "../components/transform.h"
 #include "../events/dispatcher.h"
 
 #include <glad/glad.h>
