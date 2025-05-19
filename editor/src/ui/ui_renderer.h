@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../ecs.h"
+#include "ecs.h"
 #include "debug_view.h"
 #include "mainmenu_system.h"
 #include "viewport_system.h"
 #include "hierarchy_system.h"
 #include "properties_system.h"
-#include "../events/event.h"
+#include "events/event.h"
 
 #include <glm/mat4x4.hpp>
 #include <GLFW/glfw3.h>

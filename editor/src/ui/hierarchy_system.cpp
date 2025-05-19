@@ -1,12 +1,12 @@
 #include "hierarchy_system.h"
 
-#include "../assets/asset_library.h"
-#include "../assets/mesh.h"
-#include "../assets/material.h"
-#include "../renderer/transform_system.h"
-#include "../log.h"
+#include "assets/asset_library.h"
+#include "assets/mesh.h"
+#include "assets/material.h"
+#include "renderer/transform_system.h"
+#include "log.h"
 
-#include "../tinyfiledialogs.h"
+#include "tinyfiledialogs.h"
 
 #include <string>
 

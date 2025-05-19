@@ -1,6 +1,6 @@
 #include "asset_library.h" 
 
-#include "../samples/sample_resources.h"
+#include "../sample_resources.h"
 #include "importer.h"
 #include "../log.h"
 

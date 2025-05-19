@@ -1,8 +1,8 @@
 #include "debug_view.h"
 
 #include "imgui.h"
-#include "../events/event.h"
-#include "../events/dispatcher.h"
+#include "events/event.h"
+#include "events/dispatcher.h"
 
 
 void DebugView::draw()

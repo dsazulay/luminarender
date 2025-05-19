@@ -1,8 +1,8 @@
 #include "viewport_system.h"
 
-#include "../components/components.h"
-#include "../events/event.h"
-#include "../events/dispatcher.h"
+#include "components/components.h"
+#include "events/event.h"
+#include "events/dispatcher.h"
 
 #include <imgui.h>
 #include <ImGuizmo.h>

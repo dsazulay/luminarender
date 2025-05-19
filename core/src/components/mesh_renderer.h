@@ -1,11 +1,10 @@
 #pragma once
 
-#include "icomponent.h"
 #include "../assets/mesh.h"
 
 class Material;
 
-struct MeshRenderer : public IComponent
+struct MeshRenderer
 {
     int indicesCount() const;
     unsigned int vao() const;

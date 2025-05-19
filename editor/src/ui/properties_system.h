@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../ecs.h"
-#include "../components/components.h"
+#include "ecs.h"
+#include "components/components.h"
 
 #include <optional>
 
