@@ -3,25 +3,16 @@ project(LuminaRenderEditor)
 
 set(CMAKE_CXX_STANDARD 20)
 
-
-# =============================================================
-
 # Dependencies
 
-# ImGui
-message(STATUS "Installing imgui")
-add_subdirectory(../external/imgui ../build/imgui)
-set_property(TARGET ImGui PROPERTY FOLDER "Dependencies")
-
-# ImGui
+# ImGuizmo
 message(STATUS "Installing imguizmo")
-add_subdirectory(../external/imguizmo ../build/imguizmo)
+add_subdirectory(../external/imguizmo imguizmo)
 set_property(TARGET ImGuizmo PROPERTY FOLDER "Dependencies")
-
 
 # LuminaRenderCore
 message(STATUS "Installing luminarendercore")
-add_subdirectory(../core ../build/core)
+add_subdirectory(../core core)
 set_property(TARGET LuminaRenderCore PROPERTY FOLDER "Dependencies")
 
 # =============================================================
@@ -36,16 +27,8 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
 
 add_executable(${PROJECT_NAME} ${FILE_SOURCES})
 
-target_link_directories(${PROJECT_NAME} PUBLIC lib/assimp)
-
 target_link_libraries(${PROJECT_NAME}
-    Glad
-    ImGui
     ImGuizmo
-    glfw
-    glm_static
-    fmt
-    assimp
     LuminaRenderCore
 )
 

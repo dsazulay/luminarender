@@ -5,13 +5,16 @@ project(ImGuizmo
         LANGUAGES C CXX
 )
 
+# ImGui
+message(STATUS "Installing imgui")
+add_subdirectory(../imgui imgui)
+set_property(TARGET ImGui PROPERTY FOLDER "Dependencies")
 
 file(GLOB_RECURSE IMGUIZMO_SOURCES RELATIVE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/*.h
 )
-
 
 add_library(
   ${PROJECT_NAME}
@@ -25,14 +28,13 @@ target_link_libraries(
 
 target_include_directories(
   ${PROJECT_NAME}
-  PUBLIC external/imgui
+  PUBLIC ../imgui
 )
 
 add_dependencies(
     ${PROJECT_NAME}
     ImGui
 )
-
 
 target_include_directories(
   ImGuizmo
