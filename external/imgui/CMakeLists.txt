@@ -1,5 +1,4 @@
-cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
-cmake_policy(VERSION 3.6)
+cmake_minimum_required(VERSION 3.11)
 project(ImGui
         VERSION 1.0.0.0
         LANGUAGES C CXX
@@ -24,15 +23,9 @@ target_link_libraries(
 )
 
 target_include_directories(
-  ${PROJECT_NAME}
-  PUBLIC external/glfw
+  ImGui
+  PUBLIC ../glfw/
 )
-
-add_dependencies(
-    ${PROJECT_NAME}
-    glfw
-)
-
 
 target_include_directories(
   ImGui

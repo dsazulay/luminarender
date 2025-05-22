@@ -1,6 +1,6 @@
 #include "texture.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 Texture::Texture(TextureType type, int width, int height, int nrChannels, unsigned char* data)
 {

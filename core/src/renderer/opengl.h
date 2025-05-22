@@ -2,7 +2,7 @@
 
 #include "gfxapi.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 class OpenGL
 {

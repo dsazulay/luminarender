@@ -1,6 +1,6 @@
 #include "uniform_buffer_object.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 
 UniformBufferObject::UniformBufferObject(const std::size_t bufferSize)

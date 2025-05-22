@@ -68,7 +68,7 @@ void Window::createWindow(int width, int height, const char* name)
         }
     });
 
-    ASSERT(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress), "Failed to initialize GLAD");
+    ASSERT(gladLoadGL(glfwGetProcAddress), "Failed to initialize GLAD");
 }
 
 bool Window::windowShouldClose() const

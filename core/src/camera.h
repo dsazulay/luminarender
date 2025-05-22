@@ -2,7 +2,7 @@
 
 #include "events/event.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <glm/glm.hpp>
 
 

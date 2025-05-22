@@ -2,7 +2,7 @@
 
 #include "../events/dispatcher.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 

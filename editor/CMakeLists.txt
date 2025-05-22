@@ -1,21 +1,3 @@
-cmake_minimum_required(VERSION 3.21)
-project(LuminaRenderEditor)
-
-set(CMAKE_CXX_STANDARD 20)
-
-# Dependencies
-
-# ImGuizmo
-message(STATUS "Installing imguizmo")
-add_subdirectory(../external/imguizmo imguizmo)
-set_property(TARGET ImGuizmo PROPERTY FOLDER "Dependencies")
-
-# LuminaRenderCore
-message(STATUS "Installing luminarendercore")
-add_subdirectory(../core core)
-set_property(TARGET LuminaRenderCore PROPERTY FOLDER "Dependencies")
-
-# =============================================================
 
 # Sources
 file(GLOB_RECURSE FILE_SOURCES RELATIVE
@@ -25,19 +7,15 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
 )
 
-add_executable(${PROJECT_NAME} ${FILE_SOURCES})
+add_executable(LuminaEditor ${FILE_SOURCES})
 
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(LuminaEditor
     ImGuizmo
-    LuminaRenderCore
+    LuminaCore
 )
 
-target_include_directories(${PROJECT_NAME}
-    PUBLIC ../external/glfw
-    PUBLIC ../external/glm
-    PUBLIC ../external/fmt
-    PUBLIC ../include
-    PUBLIC ../core/src
+target_include_directories(LuminaEditor
+    PRIVATE ../core/src
 )
 
 

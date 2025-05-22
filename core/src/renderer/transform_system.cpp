@@ -4,6 +4,7 @@
 
 #include <glm/gtc/quaternion.hpp>
 #include <glm/mat4x4.hpp>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/matrix_decompose.hpp>
 
 void TransformSystem::init(ecs::Coordinator* coordinator)

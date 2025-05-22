@@ -3,7 +3,7 @@
 #include "assets/mesh.h"
 #include "components/mesh_renderer.h"
 #include <glm/glm.hpp>
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 
