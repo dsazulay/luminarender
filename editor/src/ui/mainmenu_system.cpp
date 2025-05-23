@@ -5,7 +5,7 @@
 #include "assets/material.h"
 #include "log.h"
 
-#include "tinyfiledialogs.h"
+#include <tinyfiledialogs.h>
 
 #include <optional>
 #include <string>

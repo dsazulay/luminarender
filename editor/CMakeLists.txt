@@ -7,15 +7,20 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
 )
 
-add_executable(LuminaEditor ${FILE_SOURCES})
+add_executable(LuminaEditor
+    ${FILE_SOURCES}
+    vendor/tinyfiledialogs/tinyfiledialogs.c
+)
+
+target_include_directories(LuminaEditor
+    PRIVATE
+    ../core/src
+    vendor/tinyfiledialogs
+)
 
 target_link_libraries(LuminaEditor
     imgui
     imguizmo
     LuminaCore
-)
-
-target_include_directories(LuminaEditor
-    PRIVATE ../core/src
 )
 

@@ -5,8 +5,7 @@
 #include "asset_library.h"
 #include "../log.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "../stb_image.h"
+#include <stb_image.h>
 
 Texture* Importer::loadTextureFromFile(const std::string& file, const std::string &directory) {
     std::string filename = directory + '/' + file;

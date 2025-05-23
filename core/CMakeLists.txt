@@ -7,7 +7,16 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h
 )
 
-add_library(LuminaCore ${FILE_SOURCES})
+add_library(LuminaCore
+    ${FILE_SOURCES}
+    vendor/stb/stb_image.cpp
+)
+
+target_include_directories(
+    LuminaCore
+    PUBLIC
+    vendor/stb
+)
 
 target_link_libraries(LuminaCore
     glad
