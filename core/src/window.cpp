@@ -5,6 +5,7 @@
 #include "events/dispatcher.h"
 #include "log.h"
 
+int logLevel = LogLevel::ERROR | LogLevel::WARNING | LogLevel::INFO;
 
 Window::Window()
 {

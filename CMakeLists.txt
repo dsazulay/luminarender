@@ -30,12 +30,21 @@ FetchContent_MakeAvailable(glfw)
 
 # glm
 FetchContent_Declare(
-        glm
-        GIT_REPOSITORY https://github.com/g-truc/glm.git
-        GIT_TAG 1.0.1
-        FIND_PACKAGE_ARGS
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG 1.0.1
+    FIND_PACKAGE_ARGS
 )
 FetchContent_MakeAvailable(glm)
+
+# assimp
+FetchContent_Declare(
+    assimp
+    GIT_REPOSITORY https://github.com/assimp/assimp.git
+    GIT_TAG v5.4.3
+    FIND_PACKAGE_ARGS
+)
+FetchContent_MakeAvailable(assimp)
 
 # fmt
 message(STATUS "Installing fmt via submodule")

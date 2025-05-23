@@ -9,18 +9,11 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
 
 add_library(LuminaCore ${FILE_SOURCES})
 
-target_link_directories(LuminaCore PUBLIC ../lib/assimp)
-
 target_link_libraries(LuminaCore
     glad
     glfw
     glm
-    fmt
     assimp
+    fmt
 )
-
-target_include_directories(LuminaCore
-    PUBLIC ../include
-)
-
 

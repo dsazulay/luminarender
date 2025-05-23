@@ -9,7 +9,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 
-int logLevel = LogLevel::ERROR | LogLevel::WARNING | LogLevel::INFO;
+int logLevel = LogLevel::ERROR | LogLevel::WARNING | LogLevel::OPENGLAPI;
 float Application::deltaTime;
 
 Application::Application(AppConfig& config) : m_config(config)
