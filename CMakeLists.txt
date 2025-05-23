@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 # Dependencies
 #
 
-# Glad
+# glad
 FetchContent_Declare(
     glad
     GIT_REPOSITORY https://github.com/Dav1dde/glad.git
@@ -19,7 +19,7 @@ FetchContent_MakeAvailable(glad)
 add_subdirectory("${glad_SOURCE_DIR}/cmake" glad_cmake)
 glad_add_library(glad REPRODUCIBLE EXCLUDE_FROM_ALL LOADER API gl:core=4.1)
 
-# GLFW
+# glfw
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -28,7 +28,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
-# GLM
+# glm
 FetchContent_Declare(
         glm
         GIT_REPOSITORY https://github.com/g-truc/glm.git
@@ -51,3 +51,4 @@ add_subdirectory(external/imguizmo)
 add_subdirectory(core)
 add_subdirectory(editor)
 # add_subdirectory(runtime)
+
