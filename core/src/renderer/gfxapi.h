@@ -1,6 +1,15 @@
 #pragma once
 
+#include <vector>
+
 typedef unsigned int id_t;
+
+struct MeshHandles
+{
+    id_t vao;
+    id_t vbo;
+    id_t ebo;
+};
 
 enum class Filtering
 {
@@ -72,6 +81,15 @@ enum class FrameBufferOp
     READ,
     WRITE,
     READWRITE,
+};
+
+template <typename T>
+struct MeshInfo
+{
+    const char* debugName = "Mesh";
+    std::vector<T> vertices;
+    std::vector<unsigned int> indices;
+    std::vector<std::pair<int, unsigned long>> amountAndOffset;
 };
 
 struct TextureInfo

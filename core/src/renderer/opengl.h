@@ -7,6 +7,8 @@
 class OpenGL
 {
 public:
+    template <typename T>
+    MeshHandles createMesh(MeshInfo<T> info);
     id_t createTexture(TextureInfo info);
     id_t createRenderBuffer(RenderBufferInfo info);
     id_t createFrameBuffer(FrameBufferInfo info);
@@ -40,4 +42,39 @@ private:
     GLbitfield getClearMask(ClearMask mask);
     GLenum getFrameBufferOp(FrameBufferOp op);
 };
+
+template <typename T>
+MeshHandles OpenGL::createMesh(MeshInfo<T> info)
+{
+    MeshHandles mesh;
+
+    glGenVertexArrays(1, &mesh.vao);
+    glGenBuffers(1, &mesh.vbo);
+    glGenBuffers(1, &mesh.ebo);
+
+    glBindVertexArray(mesh.vao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.vbo);
+    glBufferData(GL_ARRAY_BUFFER, info.vertices.size() * sizeof(T),
+                 info.vertices.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 info.indices.size() * sizeof(unsigned int),
+                 info.indices.data(), GL_STATIC_DRAW);
+
+
+    int index = 0;
+    for (auto& pair : info.amountAndOffset)
+    {
+        glEnableVertexAttribArray(index);
+        glVertexAttribPointer(index, pair.first, GL_FLOAT, GL_FALSE,
+                              sizeof(T), (void*)pair.second);
+        ++index;
+    }
+
+    glBindVertexArray(0);
+
+    return mesh;
+}
 

@@ -210,10 +210,10 @@ void AssetLibrary::loadDefaultResources()
     loadShader("unlit", SampleResources::shader_unlit);
     loadShader("lambert", SampleResources::shader_lambert);
     loadShader("pbr", SampleResources::shader_pbr);
-    
+
     loadMesh("quad", MeshType::Quad);
-    loadMesh("cube", MeshType::Cube);
-    loadMesh("sphere", MeshType::Sphere);
+    //loadMesh("cube", MeshType::Cube);
+    //loadMesh("sphere", MeshType::Sphere);
     loadMesh("cubeMap", MeshType::CubeMap);
     loadMesh("triangleMap", MeshType::TriangleMap);
 

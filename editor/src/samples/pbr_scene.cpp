@@ -1,14 +1,23 @@
 #include "pbr_scene.h"
 
+#include "assets/asset_catalog.h"
+#include "assets/model.h"
+#include "log.h"
 #include "sample_resources.h"
 #include "irradiance_map_factory.h"
 #include "components/components.h"
 #include "renderer/transform_system.h"
 
 
-void PbrScene::loadScene(AssetLibrary &assetLibrary, ecs::Coordinator& coordinator)
+void PbrScene::loadScene(AssetLibrary &assetLibrary,
+                         AssetCatalog& assetCatalog,
+                         ecs::Coordinator& coordinator)
 {
     unsigned int skyboxTex;
+
+    assetCatalog.getModel(MeshType::Cube);
+    assetCatalog.getModel(MeshType::Quad);
+    assetCatalog.getModel(MeshType::Sphere);
 
     loadTextures(assetLibrary);
     loadIrradianceTextures(assetLibrary, skyboxTex);
@@ -16,7 +25,7 @@ void PbrScene::loadScene(AssetLibrary &assetLibrary, ecs::Coordinator& coordinat
     loadModels(assetLibrary);
     loadLights(coordinator);
     loadSkybox(assetLibrary);
-    loadObjects(assetLibrary, coordinator);
+    loadObjects(assetLibrary, assetCatalog, coordinator);
 }
 
 void PbrScene::loadTextures(AssetLibrary& assetLibrary)
@@ -80,7 +89,7 @@ void PbrScene::loadModels(AssetLibrary &assetLibrary)
 {
     assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire, false);
     assetLibrary.loadModel("cerberusModel", SampleResources::model_cerberus, false);
-    assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
+    //assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
 }
 
 void PbrScene::loadLights(ecs::Coordinator& coordinator)
@@ -105,14 +114,17 @@ void PbrScene::loadSkybox(AssetLibrary &assetLibrary)
 
 }
 
-void PbrScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinator& coordinator)
+void PbrScene::loadObjects(AssetLibrary& assetLibrary,
+                           AssetCatalog& assetCatalog,
+                           ecs::Coordinator& coordinator)
 {
-    Mesh* cube = assetLibrary.getMesh("cube");
-    Mesh* quad = assetLibrary.getMesh("quad");
-    Mesh* sphere = assetLibrary.getMesh("sphere");
+
+    Mesh* cube = assetCatalog.getModel(MeshType::Cube);
+    Mesh* quad = assetCatalog.getModel(MeshType::Quad);
+    Mesh* sphere = assetCatalog.getModel(MeshType::Sphere);
     Model* spitfire = assetLibrary.getModel("spitfireModel");
     Model* cerberus = assetLibrary.getModel("cerberusModel");
-    Model* sponza = assetLibrary.getModel("sponza");
+    //Model* sponza = assetLibrary.getModel("sponza");
 
     Material* greyMat = assetLibrary.getMaterial("greyMat");
     Material* blueMat = assetLibrary.getMaterial("blueMat");
@@ -214,7 +226,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinator& coordin
     cerberusTransform.rotation = glm::vec3(-96.0, 0.0, 0.0);
     cerberusTransform.scale = glm::vec3(0.05);
 
-
+    /*
     auto sponzaEntity = coordinator.createEntity();
     coordinator.addComponent(sponzaEntity, ecs::Transform{});
     coordinator.addComponent(sponzaEntity, ecs::Tag{
@@ -237,6 +249,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinator& coordin
 
     auto& sponzaTransform = coordinator.getComponent<ecs::Transform>(sponzaEntity);
     sponzaTransform.scale = glm::vec3(0.01, 0.01, 0.01);
+    */
 
     transformSystem->update();
     transformSystem->addChild(cubeEntity, sphereEntity);

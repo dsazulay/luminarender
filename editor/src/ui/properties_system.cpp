@@ -26,7 +26,7 @@ void PropertiesSystem::update()
         ImGui::End();
         return;
     }
-    
+
     auto& tag = m_coordinator->getComponent<ecs::Tag>(m_selected->value());
     static const int bufferSize = 256;
     static char renameBuffer[bufferSize] = "";

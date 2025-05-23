@@ -124,7 +124,7 @@ VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene, bool 
         glm::vec2 uv;
         uv.x = mesh->mTextureCoords[0][i].x;
         uv.y = mesh->mTextureCoords[0][i].y;
-        vert.texCoords = uv;
+        vert.texcoord = uv;
 
         m.vertices.push_back(vert);
     }

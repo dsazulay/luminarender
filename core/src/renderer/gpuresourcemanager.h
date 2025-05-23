@@ -1,11 +1,17 @@
 #pragma once
 
-#include "opengl.h"
+#include "gfxapi.h"
 
 template <class T>
 class GPUResourceManager
 {
 public:
+    template <typename U>
+    MeshHandles createMesh(MeshInfo<U> info)
+    {
+        return m_backend.createMesh(info);
+    }
+
     id_t createTexture(TextureInfo info)
     {
         return m_backend.createTexture(info);

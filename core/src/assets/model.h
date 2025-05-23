@@ -1,10 +1,17 @@
 #pragma once
 
+#include "../renderer/gfxapi.h"
+
 #include <vector>
 #include <string>
 #include <utility>
 
 class Mesh;
+
+class TmpModel
+{
+    MeshHandles handles;
+};
 
 class Model
 {

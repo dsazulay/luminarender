@@ -14,6 +14,7 @@ FetchContent_Declare(
     glad
     GIT_REPOSITORY https://github.com/Dav1dde/glad.git
     GIT_TAG v2.0.8
+    GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(glad)
 add_subdirectory("${glad_SOURCE_DIR}/cmake" glad_cmake)
@@ -24,6 +25,7 @@ FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
     GIT_TAG 3.4
+    GIT_SHALLOW TRUE
     FIND_PACKAGE_ARGS NAMES glfw3
 )
 FetchContent_MakeAvailable(glfw)
@@ -33,6 +35,7 @@ FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
     GIT_TAG 1.0.1
+    GIT_SHALLOW TRUE
     FIND_PACKAGE_ARGS
 )
 FetchContent_MakeAvailable(glm)
@@ -42,6 +45,7 @@ FetchContent_Declare(
     assimp
     GIT_REPOSITORY https://github.com/assimp/assimp.git
     GIT_TAG v5.4.3
+    GIT_SHALLOW TRUE
     FIND_PACKAGE_ARGS
 )
 FetchContent_MakeAvailable(assimp)
@@ -51,6 +55,7 @@ FetchContent_Declare(
     fmt
     GIT_REPOSITORY https://github.com/fmtlib/fmt
     GIT_TAG 11.2.0
+    GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(fmt)
 
@@ -59,6 +64,7 @@ FetchContent_Declare(
     imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
     GIT_TAG docking
+    GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(imgui)
 
@@ -88,6 +94,7 @@ FetchContent_Declare(
     imguizmo
     GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
     GIT_TAG master
+    GIT_SHALLOW TRUE
 )
 FetchContent_MakeAvailable(imguizmo)
 
