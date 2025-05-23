@@ -47,13 +47,64 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(assimp)
 
 # fmt
-message(STATUS "Installing fmt via submodule")
-add_subdirectory(external/fmt)
-set_property(TARGET fmt PROPERTY FOLDER "Dependencies")
+FetchContent_Declare(
+    fmt
+    GIT_REPOSITORY https://github.com/fmtlib/fmt
+    GIT_TAG 11.2.0
+)
+FetchContent_MakeAvailable(fmt)
 
-# ImGuizmo
-message(STATUS "Installing imguizmo")
-add_subdirectory(external/imguizmo)
+# imgui
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG docking
+)
+FetchContent_MakeAvailable(imgui)
+
+add_library(imgui)
+target_include_directories(
+    imgui
+    PUBLIC
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+)
+target_sources(
+    imgui
+    PUBLIC
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_demo.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+)
+
+target_link_libraries(imgui glfw)
+
+# imguizmo
+FetchContent_Declare(
+    imguizmo
+    GIT_REPOSITORY https://github.com/CedricGuillemet/ImGuizmo.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(imguizmo)
+
+add_library(imguizmo)
+target_include_directories(
+    imguizmo
+    PUBLIC
+    ${imguizmo_SOURCE_DIR}
+)
+
+target_sources(
+    imguizmo
+    PUBLIC
+    ${imguizmo_SOURCE_DIR}/imguizmo.cpp
+)
+
+target_link_libraries(imguizmo imgui)
 
 # =============================================================
 

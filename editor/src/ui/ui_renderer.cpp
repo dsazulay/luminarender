@@ -61,7 +61,7 @@ void UiRenderer::update(unsigned int frameBufferTexcolorID, glm::mat4& viewMatri
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+    ImGui::DockSpaceOverViewport(0, ImGui::GetMainViewport());
 
     m_mainMenuSystem->update();
     m_viewportSystem->update(frameBufferTexcolorID, viewportWidth, 

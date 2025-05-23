@@ -10,7 +10,8 @@ file(GLOB_RECURSE FILE_SOURCES RELATIVE
 add_executable(LuminaEditor ${FILE_SOURCES})
 
 target_link_libraries(LuminaEditor
-    ImGuizmo
+    imgui
+    imguizmo
     LuminaCore
 )
 
