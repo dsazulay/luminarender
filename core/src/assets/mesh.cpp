@@ -1,19 +1,8 @@
 #include "mesh.h"
 
-#include "primitives.h"
-
 #include <glad/gl.h>
 #include <glm/trigonometric.hpp>
 
-Mesh::Mesh(MeshType meshType)
-{
-    VertexIndexTuple m = getNativeMeshByType(meshType);
-    m_meshType = meshType;
-    m_vertices = m.vertices;
-    m_indices = m.indices;
-
-    initMesh();
-}
 
 Mesh::Mesh(VertexIndexTuple m)
 {

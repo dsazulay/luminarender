@@ -4,6 +4,7 @@
 #include "gpucommands.h"
 #include "frame_buffer.h"
 #include "../assets/material.h"
+#include "../asset_manager.h"
 #include "../camera.h"
 
 #include <memory>
@@ -13,9 +14,9 @@
 class RenderSystem : public ecs::System
 {
 public:
-    void init(int width, int height, ecs::Coordinator* coordinator, Camera* camera);
+    void init(int width, int height, ecs::Coordinator* coordinator, Camera* camera, AssetManager* assetManager);
     void update();
-    void updateIrradianceMaps();
+    void updateIrradianceMaps(AssetManager& assetManager);
     void resizeBuffers(int width, int height);
     void toggleSSAO(bool enabled);
     id_t getFinalRenderTexID();
@@ -54,6 +55,7 @@ private:
     bool m_ssaoEnabled = true;
 
     ecs::Coordinator* m_coordinator;
+    AssetManager* m_assetManager;
     Camera* m_camera;
 };
 

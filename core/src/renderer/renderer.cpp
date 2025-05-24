@@ -33,9 +33,9 @@ glm::mat4& Renderer::projMatrix()
     return m_projMatrix;
 }
 
-void Renderer::updateIrradianceMaps()
+void Renderer::updateIrradianceMaps(AssetManager& assetManager)
 {
-    m_renderSystem->updateIrradianceMaps();
+    m_renderSystem->updateIrradianceMaps(assetManager);
 }
 
 void Renderer::updateTransformMatrices()
@@ -61,7 +61,7 @@ Renderer::Renderer(float viewportWidth, float viewportHeight,
 {
 }
 
-void Renderer::init()
+void Renderer::init(AssetManager* assetManager)
 {
     m_matricesUBO.bindBufferToIndex(0);
     m_lightUBO.bindBufferToIndex(1);
@@ -83,7 +83,7 @@ void Renderer::init()
         m_coordinator->setSystemMask<RenderSystem>(mask);
     }
     m_renderSystem->init((int) m_viewportWidth, (int) m_viewportHeight, 
-            m_coordinator, &m_camera);
+            m_coordinator, &m_camera, assetManager);
 
     Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
         std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));

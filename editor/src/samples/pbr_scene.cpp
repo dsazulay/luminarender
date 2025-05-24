@@ -1,6 +1,5 @@
 #include "pbr_scene.h"
 
-#include "assets/asset_catalog.h"
 #include "assets/model.h"
 #include "log.h"
 #include "sample_resources.h"
@@ -10,22 +9,18 @@
 
 
 void PbrScene::loadScene(AssetLibrary &assetLibrary,
-                         AssetCatalog& assetCatalog,
+                         AssetManager& assetManager,
                          ecs::Coordinator& coordinator)
 {
     unsigned int skyboxTex;
 
-    assetCatalog.getModel(MeshType::Cube);
-    assetCatalog.getModel(MeshType::Quad);
-    assetCatalog.getModel(MeshType::Sphere);
-
     loadTextures(assetLibrary);
-    loadIrradianceTextures(assetLibrary, skyboxTex);
+    loadIrradianceTextures(assetLibrary, skyboxTex, assetManager);
     loadMaterials(assetLibrary, skyboxTex);
     loadModels(assetLibrary);
     loadLights(coordinator);
-    loadSkybox(assetLibrary);
-    loadObjects(assetLibrary, assetCatalog, coordinator);
+    loadSkybox(assetLibrary, assetManager);
+    loadObjects(assetLibrary, assetManager, coordinator);
 }
 
 void PbrScene::loadTextures(AssetLibrary& assetLibrary)
@@ -46,10 +41,12 @@ void PbrScene::loadTextures(AssetLibrary& assetLibrary)
     assetLibrary.loadHDRTexture("hdrSkybox", SampleResources::texture_tiber, SampleResources::texture_skybox_dir);
 }
 
-void PbrScene::loadIrradianceTextures(AssetLibrary& assetLibrary, unsigned int& skyboxTex)
+void PbrScene::loadIrradianceTextures(AssetLibrary& assetLibrary,
+                                      unsigned int& skyboxTex,
+                                      AssetManager& assetManager)
 {
 
-    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(assetLibrary.getTexture("hdrSkybox")->ID());
+    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(assetLibrary.getTexture("hdrSkybox")->ID(), assetManager);
 
     skyboxTex = maps.cubeMap;
 }
@@ -107,21 +104,21 @@ void PbrScene::loadLights(ecs::Coordinator& coordinator)
     });
 }
 
-void PbrScene::loadSkybox(AssetLibrary &assetLibrary)
+void PbrScene::loadSkybox(AssetLibrary &assetLibrary, AssetManager& assetManager)
 {
-    Mesh* cubeMap = assetLibrary.getMesh("triangleMap");
+    Mesh* cubeMap = assetManager.getModel(MeshType::TriangleMap);
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 
 }
 
 void PbrScene::loadObjects(AssetLibrary& assetLibrary,
-                           AssetCatalog& assetCatalog,
+                           AssetManager& assetManager,
                            ecs::Coordinator& coordinator)
 {
 
-    Mesh* cube = assetCatalog.getModel(MeshType::Cube);
-    Mesh* quad = assetCatalog.getModel(MeshType::Quad);
-    Mesh* sphere = assetCatalog.getModel(MeshType::Sphere);
+    Mesh* cube = assetManager.getModel(MeshType::Cube);
+    Mesh* quad = assetManager.getModel(MeshType::Quad);
+    Mesh* sphere = assetManager.getModel(MeshType::Sphere);
     Model* spitfire = assetLibrary.getModel("spitfireModel");
     Model* cerberus = assetLibrary.getModel("cerberusModel");
     //Model* sponza = assetLibrary.getModel("sponza");
@@ -155,7 +152,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
     coordinator.addComponent(cubeEntity, ecs::Tag{
         .name = "Cube",
     });
-    
+
     auto quadEntity = coordinator.createEntity();
     coordinator.addComponent(quadEntity, ecs::MeshRenderer{
         .mesh = quad,

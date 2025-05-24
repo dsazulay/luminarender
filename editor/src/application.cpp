@@ -1,6 +1,6 @@
 #include "application.h"
 
-#include "assets/asset_catalog.h"
+#include "asset_manager.h"
 #include "components/components.h"
 #include "renderer/transform_system.h"
 #include "samples/lighting_skybox_scene.h"
@@ -17,7 +17,6 @@ Application::Application(AppConfig& config) : m_config(config)
 {
     initEcs();
     initWindow();
-    AssetCatalog assetCatalog;
     AssetLibrary::instance().createDefaultResources();
     initRenderer();
     initUiRenderer();
@@ -30,9 +29,10 @@ Application::Application(AppConfig& config) : m_config(config)
     // enable seamless cubemap sampling for lower mip levels in the pre-filter map.
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-    PbrScene::loadScene(AssetLibrary::instance(), assetCatalog, *m_coordinator);
+    PbrScene::loadScene(AssetLibrary::instance(), m_assetManager, *m_coordinator);
 //    PbrScene::loadScene(m_scene, AssetLibrary::instance());
-    m_renderer->updateIrradianceMaps();
+    m_renderer->updateIrradianceMaps(m_assetManager);
+
 }
 
 void Application::initEcs()
@@ -66,7 +66,7 @@ void Application::initRenderer()
                                             (float) m_config.viewportHeight,
                                             glm::vec3(0.0, 0.0, 8.0f),
                                             m_coordinator.get());
-    m_renderer->init();
+    m_renderer->init(&m_assetManager);
 }
 
 void Application::initUiRenderer()
@@ -82,7 +82,6 @@ void Application::mainloop()
 {
     while (!m_window.windowShouldClose())
     {
-        LOG_ERROR("{}", m_deltaTime);
         auto currentFrame = (float) glfwGetTime();
         m_deltaTime = currentFrame - m_lastFrame;
         m_lastFrame = currentFrame;

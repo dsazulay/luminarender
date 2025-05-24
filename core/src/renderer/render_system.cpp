@@ -15,12 +15,13 @@ float lerp(float a, float b, float f)
 }
 
 void RenderSystem::init(int width, int height, ecs::Coordinator* coordinator, 
-        Camera* camera)
+        Camera* camera, AssetManager* assetManager)
 {
     m_width = width;
     m_height = height;
     m_coordinator = coordinator;
     m_camera = camera;
+    m_assetManager = assetManager;
 
     m_mainTargetFrameBuffer = std::make_unique<ColorDepthStencilBuffer>(width, height, m_gpurm);
     m_shadowFrameBuffer = std::make_unique<DepthBuffer>(shadowMapSize, shadowMapSize, m_gpurm);
@@ -65,9 +66,9 @@ void RenderSystem::update()
     //normalVisualizerPass();
 }
 
-void RenderSystem::updateIrradianceMaps()
+void RenderSystem::updateIrradianceMaps(AssetManager& assetManager)
 {
-    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(AssetLibrary::instance().getTexture("hdrSkybox")->ID());
+    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(AssetLibrary::instance().getTexture("hdrSkybox")->ID(), assetManager);
     m_irradianceMap = maps.irradianceMap;
     m_prefilterMap = maps.prefilterMap;
     m_brdfLUT = maps.brdfLUTMap;
@@ -170,7 +171,7 @@ void RenderSystem::ssaoPass()
     gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gpucommands.clear(ClearMask::COLOR);
 
-    Mesh* mesh = AssetLibrary::instance().getMesh("quad");
+    Mesh* mesh = m_assetManager->getModel(MeshType::Quad);
     Material* material = AssetLibrary::instance().getMaterial("ssaoMat");
     material->shader->use();
 
@@ -203,7 +204,7 @@ void RenderSystem::ssaoBlurPass()
     gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gpucommands.clear(ClearMask::COLOR);
 
-    Mesh* mesh = AssetLibrary::instance().getMesh("quad");
+    Mesh* mesh = m_assetManager->getModel(MeshType::Quad);
     Material* material = AssetLibrary::instance().getMaterial("ssaoBlurMat");
     material->shader->use();
 
@@ -228,7 +229,7 @@ void RenderSystem::lightingPass()
     gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gpucommands.clear(ClearMask::COLORDEPTH);
 
-    Mesh* mesh = AssetLibrary::instance().getMesh("quad");
+    Mesh* mesh = m_assetManager->getModel(MeshType::Quad);
     Material* material = AssetLibrary::instance().getMaterial("LightingPass");
     material->shader->use();
 
@@ -286,7 +287,7 @@ void RenderSystem::skyboxPass()
 {
     m_mainTargetFrameBuffer->bind();
 
-    auto mesh = AssetLibrary::instance().getMesh("triangleMap");
+    auto mesh = m_assetManager->getModel(MeshType::TriangleMap);
     Material* material = AssetLibrary::instance().getMaterial("skyboxMat");
     material->shader->use();
 

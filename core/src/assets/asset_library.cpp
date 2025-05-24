@@ -119,25 +119,11 @@ bool AssetLibrary::isMeshLoaded(const char *name)
     return m_meshes.find(name) != m_meshes.end();
 }
 
-Mesh* AssetLibrary::loadMesh(const char* name, MeshType basicModel)
-{
-    if (isMeshLoaded(name))
-    {
-        LOG_WARN("mesh already loaded");
-        return m_meshes[name];
-    }
-
-    Mesh* m = new Mesh(basicModel);
-    m_meshes[name] = m;
-
-    return m;
-}
-
 Mesh *AssetLibrary::getMesh(const char *name) {
     if (isMeshLoaded(name))
         return m_meshes[name];
 
-    LOG_WARN("There is no material with this name in library");
+    LOG_WARN("There is no mesh name {} in library", name);
     return nullptr;
 }
 
@@ -210,12 +196,6 @@ void AssetLibrary::loadDefaultResources()
     loadShader("unlit", SampleResources::shader_unlit);
     loadShader("lambert", SampleResources::shader_lambert);
     loadShader("pbr", SampleResources::shader_pbr);
-
-    loadMesh("quad", MeshType::Quad);
-    //loadMesh("cube", MeshType::Cube);
-    //loadMesh("sphere", MeshType::Sphere);
-    loadMesh("cubeMap", MeshType::CubeMap);
-    loadMesh("triangleMap", MeshType::TriangleMap);
 
     load2DTexture(DefaultResources::texWhite, texture_defaultWhite, texture_dir);
 

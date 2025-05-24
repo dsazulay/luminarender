@@ -9,7 +9,6 @@ class Mesh
 {
 public:
     Mesh() = default;
-    Mesh(MeshType meshType);
     Mesh(VertexIndexTuple m);
 
     int indicesCount() const;

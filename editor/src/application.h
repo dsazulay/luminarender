@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ecs.h>
+#include "asset_manager.h"
 #include "window.h"
 #include "renderer/renderer.h"
 #include "ui/ui_renderer.h"
@@ -34,6 +35,7 @@ private:
     void initUiRenderer();
 
     std::unique_ptr<ecs::Coordinator> m_coordinator;
+    AssetManager m_assetManager;
     Window m_window;
     std::unique_ptr<Renderer> m_renderer;
     std::unique_ptr<UiRenderer> m_uiRenderer;

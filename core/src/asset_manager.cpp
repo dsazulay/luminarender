@@ -1,9 +1,8 @@
-#include "asset_catalog.h"
+#include "asset_manager.h"
 
-#include "../logger.h"
-#include "../log.h"
-#include "model.h"
-#include "primitives.h"
+#include "logger.h"
+#include "assets/model.h"
+#include "assets/primitives.h"
 
 #include <cstddef>
 #include <utility>
@@ -29,13 +28,14 @@ Texture &AssetCatalog::getTexture(std::string_view path)
     return texture;
 }
 */
-Mesh* AssetCatalog::getModel(MeshType type)
+Mesh* AssetManager::getModel(MeshType type)
 {
-    if (m_nativeModels.find(type) != m_nativeModels.end()) { return m_nativeModels.at(type); }
+    auto it = m_nativeModels.find(type);
+    if (it != m_nativeModels.end()) { return it->second; }
 
     Mesh* newModel = new Mesh();
     VertexIndexTuple mesh = getNativeMeshByType(type);
-    MeshHandles handles = m_gpurm.createMesh(MeshInfo<Vertex>{
+    MeshHandles handles = m_gpurm->createMesh(MeshInfo<Vertex>{
         .vertices = mesh.vertices,
         .indices = mesh.indices,
         .amountAndOffset = {
@@ -79,7 +79,7 @@ Shader &AssetCatalog::getShader(std::string_view path)
 }
 */
 
-void AssetCatalog::loadDefaultResources()
+void AssetManager::loadDefaultResources()
 {
     getModel(MeshType::Quad);
     getModel(MeshType::Cube);
@@ -88,7 +88,7 @@ void AssetCatalog::loadDefaultResources()
     getModel(MeshType::TriangleMap);
 }
 
-void AssetCatalog::checkFileModification()
+void AssetManager::checkFileModification()
 {
     for (AssetFile &file : m_files) {
         try {

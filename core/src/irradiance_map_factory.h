@@ -1,5 +1,6 @@
 #pragma once
 
+#include "asset_manager.h"
 #include "components/mesh_renderer.h"
 #include <glm/mat4x4.hpp>
 
@@ -14,13 +15,31 @@ struct IrradianceMaps
 class IrradianceMapFactory
 {
 public:
-    static IrradianceMaps generateIrradianceMapsFromHDR(unsigned int hdrTexture);
+    static IrradianceMaps generateIrradianceMapsFromHDR(
+        unsigned int hdrTexture, AssetManager& assetManager);
+
+    static IrradianceMaps generateCubeMapFromHDR(
+        unsigned int hdrTexture, AssetManager& assetManager);
+
+    static IrradianceMaps generateIrradianceMaps(
+        unsigned int cubeMapTex, AssetManager& assetManager);
 private:
-    static unsigned int generateCubeMapTexture(unsigned int hdrTexture, unsigned int captureFBO,
-        glm::mat4& captureProjection, glm::mat4 captureViews[], MeshRenderer& mr);
-    static unsigned int generateIrradianceTexture(unsigned int captureFBO, unsigned int envCubemap,
-        unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], MeshRenderer& mr);
-    static unsigned int generatePrefilterTexture(unsigned int captureFBO, unsigned int envCubemap,
-        unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], MeshRenderer& mr);
-    static unsigned int generateLUTTexture(unsigned int captureFBO, unsigned int captureRBO);
+    static unsigned int generateCubeMapTexture(
+        unsigned int hdrTexture, unsigned int captureFBO,
+        glm::mat4& captureProjection, glm::mat4 captureViews[],
+        MeshRenderer& mr);
+
+    static unsigned int generateIrradianceTexture(
+        unsigned int captureFBO, unsigned int envCubemap,
+        unsigned int captureRBO, glm::mat4& captureProjection,
+        glm::mat4 captureViews[], MeshRenderer& mr);
+
+    static unsigned int generatePrefilterTexture(
+        unsigned int captureFBO, unsigned int envCubemap,
+        unsigned int captureRBO, glm::mat4& captureProjection,
+        glm::mat4 captureViews[], MeshRenderer& mr);
+
+    static unsigned int generateLUTTexture(
+        unsigned int captureFBO, unsigned int captureRBO,
+        AssetManager& assetManager);
 };

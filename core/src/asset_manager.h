@@ -1,11 +1,11 @@
 #pragma once
 
 #include "file_view.h"
-#include "mesh.h"
-#include "shader.h"
-#include "texture.h"
-#include "../renderer/gpuresourcemanager.h"
-#include "../renderer/opengl.h"
+#include "assets/mesh.h"
+//#include "shader.h"
+//#include "texture.h"
+#include "renderer/gpuresourcemanager.h"
+#include "renderer/opengl.h"
 
 #include <filesystem>
 #include <string>
@@ -19,7 +19,7 @@ struct AssetFile
     FileView handle;
 };
 
-class AssetCatalog
+class AssetManager
 {
   public:
     //Texture& getTexture(std::string_view path);
@@ -37,7 +37,7 @@ class AssetCatalog
     std::unordered_map<MeshType, Mesh*> m_nativeModels;
     //std::unordered_map<std::string, Shader> m_shaders;
 
-    GPUResourceManager<OpenGL> m_gpurm{};
+    GPUResourceManager<OpenGL>* m_gpurm{};
 };
 
 AssetFile createAssetFile(std::string_view path, FileView fileView);

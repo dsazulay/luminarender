@@ -5,6 +5,7 @@
 #include "frame_buffer.h"
 #include "gpuresourcemanager.h"
 #include "gpucommands.h"
+#include "../asset_manager.h"
 #include "../ecs.h"
 #include "light_system.h"
 #include "render_system.h"
@@ -14,9 +15,9 @@ class Renderer {
 public:
     Renderer(float viewportWidth, float viewportHeight, 
             glm::vec3 cameraPos, ecs::Coordinator* coordinator);
-    void init();
+    void init(AssetManager* assetManager);
     void updateTransformMatrices();
-    void updateIrradianceMaps();
+    void updateIrradianceMaps(AssetManager& assetManager);
     void render();
 
     glm::mat4 cascadeShadows(glm::vec3 lightDir);
