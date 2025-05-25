@@ -1,5 +1,6 @@
 #pragma once
 
+#include "asset_manager.h"
 #include "ecs.h"
 #include "components/components.h"
 
@@ -9,7 +10,8 @@ class PropertiesSystem :public  ecs::System
 {
 public:
     void init(ecs::Coordinator* coordinator,
-            std::optional<ecs::Entity>* selected);
+            std::optional<ecs::Entity>* selected,
+              AssetManager* assetManager);
     void update();
 private:
     void draw(ecs::Transform& tranform);
@@ -18,5 +20,6 @@ private:
 
     ecs::Coordinator* m_coordinator{};
     std::optional<ecs::Entity>* m_selected{};
+    AssetManager* m_assetManager;
 };
 

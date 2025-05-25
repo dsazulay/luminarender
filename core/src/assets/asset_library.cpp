@@ -114,19 +114,6 @@ Model* AssetLibrary::getModel(const char* name)
     return nullptr;
 }
 
-bool AssetLibrary::isMeshLoaded(const char *name)
-{
-    return m_meshes.find(name) != m_meshes.end();
-}
-
-Mesh *AssetLibrary::getMesh(const char *name) {
-    if (isMeshLoaded(name))
-        return m_meshes[name];
-
-    LOG_WARN("There is no mesh name {} in library", name);
-    return nullptr;
-}
-
 bool AssetLibrary::isModelLoaded(const char* name)
 {
     return m_models.find(name) != m_models.end();

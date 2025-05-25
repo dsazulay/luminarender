@@ -71,7 +71,7 @@ void Application::initRenderer()
 
 void Application::initUiRenderer()
 {
-    m_uiRenderer = std::make_unique<UiRenderer>(m_coordinator.get());
+    m_uiRenderer = std::make_unique<UiRenderer>(m_coordinator.get(), &m_assetManager);
     m_uiRenderer->init();
     m_uiRenderer->setBackendImplementation(m_window.glfwWindow());
     m_uiRenderer->viewportWidth = (float) m_config.viewportWidth;

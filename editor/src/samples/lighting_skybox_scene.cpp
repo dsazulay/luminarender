@@ -71,15 +71,15 @@ void LightingSkyboxScene::loadLights(ecs::Coordinator& coordinator)
 
 void LightingSkyboxScene::loadSkybox(AssetLibrary &assetLibrary)
 {
-    Mesh* cubeMap = assetLibrary.getMesh("triangleMap");
+    //Mesh* cubeMap = assetLibrary.getMesh("triangleMap");
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 }
 
 void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinator& coordinator)
 {
-    Mesh* cube = assetLibrary.getMesh("cube");
-    Mesh* quad = assetLibrary.getMesh("quad");
-    Mesh* sphere = assetLibrary.getMesh("sphere");
+    //Mesh* cube = assetLibrary.getMesh("cube");
+    //Mesh* quad = assetLibrary.getMesh("quad");
+    //Mesh* sphere = assetLibrary.getMesh("sphere");
     Model* spitfire = assetLibrary.getModel("spitfireModel");
     Model* sponza = assetLibrary.getModel("sponza");
 
@@ -87,7 +87,7 @@ void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinat
     Material* blueMat = assetLibrary.getMaterial("blueMat");
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
     Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
-
+/*
     auto sphereEntity = coordinator.createEntity();
     coordinator.addComponent(sphereEntity, ecs::MeshRenderer{
         .mesh = sphere,
@@ -111,7 +111,7 @@ void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinat
     coordinator.addComponent(cubeEntity, ecs::Tag{
         .name = "Cube",
     });
-    
+
     auto quadEntity = coordinator.createEntity();
     coordinator.addComponent(quadEntity, ecs::MeshRenderer{
         .mesh = quad,
@@ -125,7 +125,7 @@ void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinat
     coordinator.addComponent(quadEntity, ecs::Tag{
         .name = "Quad",
     });
-
+    */
     auto spitfireEntity = coordinator.createEntity();
     coordinator.addComponent(spitfireEntity, ecs::Transform{});
     coordinator.addComponent(spitfireEntity, ecs::Tag{
@@ -178,8 +178,8 @@ void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinat
     sponzaTransform.scale = glm::vec3(0.01, 0.01, 0.01);
 
     transformSystem->update();
-    transformSystem->addChild(cubeEntity, sphereEntity);
-    transformSystem->addChild(quadEntity, cubeEntity);
+    //transformSystem->addChild(cubeEntity, sphereEntity);
+    //transformSystem->addChild(quadEntity, cubeEntity);
     transformSystem->updateHierarchically();
 }
 

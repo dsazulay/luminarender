@@ -1,8 +1,10 @@
 #include "properties_system.h"
 
+#include "asset_manager.h"
 #include "assets/asset_library.h"
 #include "assets/mesh.h"
 #include "assets/material.h"
+#include "assets/model_types.h"
 #include "renderer/transform_system.h"
 #include "log.h"
 
@@ -12,10 +14,12 @@
 #include <string>
 
 void PropertiesSystem::init(ecs::Coordinator* coordinator,
-        std::optional<ecs::Entity>* selected)
+        std::optional<ecs::Entity>* selected,
+                            AssetManager* assetManager)
 {
     m_coordinator = coordinator;
     m_selected = selected;
+    m_assetManager = assetManager;
 }
 
 void PropertiesSystem::update()
@@ -56,7 +60,7 @@ void PropertiesSystem::update()
         if (ImGui::Selectable("Mesh"))
         {
             m_coordinator->addComponent(m_selected->value(), ecs::MeshRenderer{
-                .mesh = AssetLibrary::instance().getMesh("sphere"),
+                .mesh = m_assetManager->getModel(MeshType::Sphere),
                 .material = AssetLibrary::instance().getMaterial("greyMat"),
             });
         }
@@ -66,7 +70,7 @@ void PropertiesSystem::update()
         }
         ImGui::EndPopup();
     }
-   
+
     if (ImGui::Button("Add Component"))
     {
         ImGui::OpenPopup("Add Comp Popup");
@@ -104,15 +108,15 @@ void PropertiesSystem::draw(ecs::MeshRenderer& renderer)
             switch (currentItem)
             {
             case 0:
-                renderer.mesh = AssetLibrary::instance().getMesh("quad");
+                renderer.mesh = m_assetManager->getModel(MeshType::Quad);
                 renderer.mesh->meshType(MeshType::Quad);
                 break;
             case 1:
-                renderer.mesh = AssetLibrary::instance().getMesh("cube");
+                renderer.mesh = m_assetManager->getModel(MeshType::Cube);
                 renderer.mesh->meshType(MeshType::Cube);
                 break;
             case 2:
-                renderer.mesh = AssetLibrary::instance().getMesh("sphere");
+                renderer.mesh = m_assetManager->getModel(MeshType::Sphere);
                 renderer.mesh->meshType(MeshType::Sphere);
                 break;
             }

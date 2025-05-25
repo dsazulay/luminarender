@@ -40,7 +40,7 @@ void UiRenderer::init()
     m_hierarchySystem->init(m_coordinator, &m_selected);
 
     m_propertiesSystem = m_coordinator->registerSystem<PropertiesSystem>().get();
-    m_propertiesSystem->init(m_coordinator, &m_selected);
+    m_propertiesSystem->init(m_coordinator, &m_selected, m_assetManager);
 
     Dispatcher::instance().subscribe(KeyPressEvent::descriptor,
         [&] (const auto& arg) { UiRenderer::onKeyPress(arg); });

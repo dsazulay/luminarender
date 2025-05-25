@@ -1,5 +1,6 @@
 #pragma once
 
+#include "asset_manager.h"
 #include "ecs.h"
 #include "debug_view.h"
 #include "mainmenu_system.h"
@@ -16,7 +17,7 @@
 class UiRenderer
 {
 public:
-    UiRenderer(ecs::Coordinator* coordinator) : m_coordinator{coordinator} {}
+    UiRenderer(ecs::Coordinator* coordinator, AssetManager* assetManager) : m_coordinator{coordinator}, m_assetManager(assetManager) {}
     void init();
     void terminate();
     void update(unsigned int frameBufferTexcolorID, glm::mat4& viewMatrix, glm::mat4& projMatrix);
@@ -34,6 +35,7 @@ private:
     std::optional<ecs::Entity> m_selected;
 
     ecs::Coordinator* m_coordinator;
+    AssetManager* m_assetManager;
     MainMenuSystem* m_mainMenuSystem{};
     ViewportSystem* m_viewportSystem{};
     HierarchySystem* m_hierarchySystem{};
