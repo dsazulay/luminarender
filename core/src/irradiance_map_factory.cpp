@@ -34,7 +34,7 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMapsFromHDR(
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Mesh* mesh = assetManager.getModel(MeshType::CubeMap);
+    Mesh* mesh = assetManager.getMesh(MeshType::CubeMap);
     MeshRenderer mr;
     mr.mesh = mesh;
 
@@ -86,7 +86,7 @@ IrradianceMaps IrradianceMapFactory::generateCubeMapFromHDR(
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Mesh* mesh = assetManager.getModel(MeshType::CubeMap);
+    Mesh* mesh = assetManager.getMesh(MeshType::CubeMap);
     MeshRenderer mr;
     mr.mesh = mesh;
 
@@ -124,7 +124,7 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMaps(
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Mesh* mesh = assetManager.getModel(MeshType::CubeMap);
+    Mesh* mesh = assetManager.getMesh(MeshType::CubeMap);
     MeshRenderer mr;
     mr.mesh = mesh;
 
@@ -323,7 +323,7 @@ unsigned int IrradianceMapFactory::generateLUTTexture(unsigned int captureFBO, u
 
     // pbr: generate a 2D LUT from the BRDF equations used.
     // ----------------------------------------------------
-    Mesh* quadMesh = assetManager.getModel(MeshType::Quad);
+    Mesh* quadMesh = assetManager.getMesh(MeshType::Quad);
     MeshRenderer quadRenderer;
     quadRenderer.mesh = quadMesh;
 

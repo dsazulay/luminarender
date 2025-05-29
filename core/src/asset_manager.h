@@ -1,7 +1,9 @@
 #pragma once
 
+#include "assets/model_types.h"
 #include "file_view.h"
 #include "assets/mesh.h"
+#include "assets/model.h"
 //#include "shader.h"
 //#include "texture.h"
 #include "renderer/gpuresourcemanager.h"
@@ -23,8 +25,10 @@ class AssetManager
 {
   public:
     //Texture& getTexture(std::string_view path);
-    Mesh* getModel(MeshType type);
-    //Model& getModel(std::string_view path);
+    Mesh* loadMesh(MeshType type, VertexIndexTuple& mesh);
+    Mesh* getMesh(MeshType type);
+    Mesh* getMesh(std::string_view name);
+    Model* getModel(std::string_view path);
     //Shader& getShader(std::string_view path);
     void loadDefaultResources();
     void checkFileModification();
@@ -33,7 +37,8 @@ class AssetManager
     std::vector<AssetFile> m_files;
 
     //std::unordered_map<std::string, Texture> m_textures;
-    //std::unordered_map<std::string, Model> m_models;
+    std::unordered_map<std::string, Model*> m_models;
+    std::unordered_map<std::string, Mesh*> m_importedModels;
     std::unordered_map<MeshType, Mesh*> m_nativeModels;
     //std::unordered_map<std::string, Shader> m_shaders;
 

@@ -84,8 +84,6 @@ void PbrScene::loadMaterials(AssetLibrary &assetLibrary, unsigned int& skyboxTex
 
 void PbrScene::loadModels(AssetLibrary &assetLibrary)
 {
-    assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire, false);
-    assetLibrary.loadModel("cerberusModel", SampleResources::model_cerberus, false);
     //assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
 }
 
@@ -106,7 +104,7 @@ void PbrScene::loadLights(ecs::Coordinator& coordinator)
 
 void PbrScene::loadSkybox(AssetLibrary &assetLibrary, AssetManager& assetManager)
 {
-    Mesh* cubeMap = assetManager.getModel(MeshType::TriangleMap);
+    Mesh* cubeMap = assetManager.getMesh(MeshType::TriangleMap);
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 
 }
@@ -116,11 +114,11 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
                            ecs::Coordinator& coordinator)
 {
 
-    Mesh* cube = assetManager.getModel(MeshType::Cube);
-    Mesh* quad = assetManager.getModel(MeshType::Quad);
-    Mesh* sphere = assetManager.getModel(MeshType::Sphere);
-    Model* spitfire = assetLibrary.getModel("spitfireModel");
-    Model* cerberus = assetLibrary.getModel("cerberusModel");
+    Mesh* cube = assetManager.getMesh(MeshType::Cube);
+    Mesh* quad = assetManager.getMesh(MeshType::Quad);
+    Mesh* sphere = assetManager.getMesh(MeshType::Sphere);
+    Model* spitfire = assetManager.getModel(SampleResources::model_spitfire);
+    Model* cerberus = assetManager.getModel(SampleResources::model_cerberus);
     //Model* sponza = assetLibrary.getModel("sponza");
 
     Material* greyMat = assetLibrary.getMaterial("greyMat");

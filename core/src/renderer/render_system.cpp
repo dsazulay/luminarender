@@ -171,7 +171,7 @@ void RenderSystem::ssaoPass()
     gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gpucommands.clear(ClearMask::COLOR);
 
-    Mesh* mesh = m_assetManager->getModel(MeshType::Quad);
+    Mesh* mesh = m_assetManager->getMesh(MeshType::Quad);
     Material* material = AssetLibrary::instance().getMaterial("ssaoMat");
     material->shader->use();
 
@@ -204,7 +204,7 @@ void RenderSystem::ssaoBlurPass()
     gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gpucommands.clear(ClearMask::COLOR);
 
-    Mesh* mesh = m_assetManager->getModel(MeshType::Quad);
+    Mesh* mesh = m_assetManager->getMesh(MeshType::Quad);
     Material* material = AssetLibrary::instance().getMaterial("ssaoBlurMat");
     material->shader->use();
 
@@ -229,7 +229,7 @@ void RenderSystem::lightingPass()
     gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gpucommands.clear(ClearMask::COLORDEPTH);
 
-    Mesh* mesh = m_assetManager->getModel(MeshType::Quad);
+    Mesh* mesh = m_assetManager->getMesh(MeshType::Quad);
     Material* material = AssetLibrary::instance().getMaterial("LightingPass");
     material->shader->use();
 
@@ -287,7 +287,7 @@ void RenderSystem::skyboxPass()
 {
     m_mainTargetFrameBuffer->bind();
 
-    auto mesh = m_assetManager->getModel(MeshType::TriangleMap);
+    auto mesh = m_assetManager->getMesh(MeshType::TriangleMap);
     Material* material = AssetLibrary::instance().getMaterial("skyboxMat");
     material->shader->use();
 

@@ -60,7 +60,7 @@ void PropertiesSystem::update()
         if (ImGui::Selectable("Mesh"))
         {
             m_coordinator->addComponent(m_selected->value(), ecs::MeshRenderer{
-                .mesh = m_assetManager->getModel(MeshType::Sphere),
+                .mesh = m_assetManager->getMesh(MeshType::Sphere),
                 .material = AssetLibrary::instance().getMaterial("greyMat"),
             });
         }
@@ -108,15 +108,15 @@ void PropertiesSystem::draw(ecs::MeshRenderer& renderer)
             switch (currentItem)
             {
             case 0:
-                renderer.mesh = m_assetManager->getModel(MeshType::Quad);
+                renderer.mesh = m_assetManager->getMesh(MeshType::Quad);
                 renderer.mesh->meshType(MeshType::Quad);
                 break;
             case 1:
-                renderer.mesh = m_assetManager->getModel(MeshType::Cube);
+                renderer.mesh = m_assetManager->getMesh(MeshType::Cube);
                 renderer.mesh->meshType(MeshType::Cube);
                 break;
             case 2:
-                renderer.mesh = m_assetManager->getModel(MeshType::Sphere);
+                renderer.mesh = m_assetManager->getMesh(MeshType::Sphere);
                 renderer.mesh->meshType(MeshType::Sphere);
                 break;
             }

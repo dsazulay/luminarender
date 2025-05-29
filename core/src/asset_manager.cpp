@@ -1,8 +1,10 @@
 #include "asset_manager.h"
 
+#include "assets/model_types.h"
 #include "logger.h"
 #include "assets/model.h"
 #include "assets/primitives.h"
+#include "assets/importer.h"
 
 #include <cstddef>
 #include <utility>
@@ -16,7 +18,7 @@ AssetFile createAssetFile(std::string_view path, FileView fileView)
     };
 }
 /*
-Texture &AssetCatalog::getTexture(std::string_view path)
+Texture &AssetManager::getTexture(std::string_view path)
 {
     std::string strPath{ path };
     if (m_textures.find(strPath) != m_textures.end()) { return m_textures.at(strPath); }
@@ -28,13 +30,10 @@ Texture &AssetCatalog::getTexture(std::string_view path)
     return texture;
 }
 */
-Mesh* AssetManager::getModel(MeshType type)
-{
-    auto it = m_nativeModels.find(type);
-    if (it != m_nativeModels.end()) { return it->second; }
 
-    Mesh* newModel = new Mesh();
-    VertexIndexTuple mesh = getNativeMeshByType(type);
+Mesh* AssetManager::loadMesh(MeshType type, VertexIndexTuple& mesh)
+{
+    Mesh* newMesh = new Mesh();
     MeshHandles handles = m_gpurm->createMesh(MeshInfo<Vertex>{
         .vertices = mesh.vertices,
         .indices = mesh.indices,
@@ -44,28 +43,59 @@ Mesh* AssetManager::getModel(MeshType type)
             std::make_pair(2, offsetof(Vertex, texcoord)),
         }
     });
-    newModel->m_meshType = type;
-    newModel->m_vao = handles.vao;
-    newModel->m_vbo = handles.vbo;
-    newModel->m_ebo = handles.ebo;
-    newModel->m_indices = mesh.indices;
-    auto* model = m_nativeModels.insert(std::make_pair(type, newModel)).first->second;
+    newMesh->m_meshType = type;
+    newMesh->m_vao = handles.vao;
+    newMesh->m_vbo = handles.vbo;
+    newMesh->m_ebo = handles.ebo;
+    newMesh->m_indices = mesh.indices;
+
+    return newMesh;
+}
+
+Mesh* AssetManager::getMesh(MeshType type)
+{
+    auto it = m_nativeModels.find(type);
+    if (it != m_nativeModels.end()) { return it->second; }
+
+
+    VertexIndexTuple meshData = getNativeMeshByType(type);
+    Mesh* mesh = loadMesh(type, meshData);
+    auto* model = m_nativeModels.insert({type, mesh}).first->second;
+
+    return model;
+}
+
+Mesh* AssetManager::getMesh(std::string_view name)
+{
+    auto it = m_importedModels.find(name.data());
+    if (it != m_importedModels.end()) { return it->second; }
+
+    // If imported model is not loaded, return a quad
+    return getMesh(MeshType::Quad);
+}
+
+Model* AssetManager::getModel(std::string_view path)
+{
+    std::string strPath{ path };
+    auto it = m_models.find(strPath);
+    if (it != m_models.end()) { return it->second; }
+
+    Model* newModel = new Model();
+    ModelData* modelData = loadModel(path, false);
+
+    for (auto mesh : *modelData)
+    {
+        Mesh* m = loadMesh(MeshType::Custom, mesh.vertexIndex);
+        m_importedModels.insert({mesh.name, m});
+        newModel->m_meshes.push_back({mesh.name, m});
+    }
+
+    auto* model = m_models.insert(std::make_pair(path, newModel)).first->second;
+    //m_files.push_back(createAssetFile(path, FileView{ model }));
     return model;
 }
 /*
-Model &AssetCatalog::getModel(std::string_view path)
-{
-    std::string strPath{ path };
-    if (m_models.find(strPath) != m_models.end()) { return m_models.at(strPath); }
-
-    Model newModel;
-    newModel.create(path);
-    auto &model = m_models.insert(std::make_pair(path, newModel)).first->second;
-    m_files.push_back(createAssetFile(path, FileView{ model }));
-    return model;
-}
-
-Shader &AssetCatalog::getShader(std::string_view path)
+Shader &AssetManager::getShader(std::string_view path)
 {
     std::string basePath{ path };
     if (m_shaders.find(basePath) != m_shaders.end()) { return m_shaders.at(basePath); }
@@ -81,11 +111,11 @@ Shader &AssetCatalog::getShader(std::string_view path)
 
 void AssetManager::loadDefaultResources()
 {
-    getModel(MeshType::Quad);
-    getModel(MeshType::Cube);
-    getModel(MeshType::Sphere);
-    getModel(MeshType::CubeMap);
-    getModel(MeshType::TriangleMap);
+    getMesh(MeshType::Quad);
+    getMesh(MeshType::Cube);
+    getMesh(MeshType::Sphere);
+    getMesh(MeshType::CubeMap);
+    getMesh(MeshType::TriangleMap);
 }
 
 void AssetManager::checkFileModification()
