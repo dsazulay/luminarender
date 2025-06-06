@@ -1,10 +1,12 @@
 #include "asset_manager.h"
 
 #include "assets/model_types.h"
+#include "log.h"
 #include "logger.h"
 #include "assets/model.h"
 #include "assets/primitives.h"
 #include "assets/importer.h"
+#include "renderer/gfxapi.h"
 
 #include <cstddef>
 #include <utility>
@@ -17,19 +19,43 @@ AssetFile createAssetFile(std::string_view path, FileView fileView)
         .handle = fileView,
     };
 }
-/*
-Texture &AssetManager::getTexture(std::string_view path)
-{
-    std::string strPath{ path };
-    if (m_textures.find(strPath) != m_textures.end()) { return m_textures.at(strPath); }
 
-    Texture newTexture;
-    newTexture.create(path);
-    auto &texture = m_textures.insert(std::make_pair(path, newTexture)).first->second;
-    m_files.push_back(createAssetFile(path, FileView{ texture }));
+Texture* AssetManager::getTexture(std::string_view path)
+{
+    auto it = m_textures.find(path.data());
+    if (it != m_textures.end()) { return it->second; }
+
+    TextureData textureData = loadTextureFromFile(path);
+
+    Format format = Format::RGBA;
+    ByteFormat byteFormat = ByteFormat::RGBA;
+    if (textureData.channels == 1)
+    {
+        format = Format::RED;
+        byteFormat = ByteFormat::RED;
+    }
+    else if (textureData.channels == 3)
+    {
+        format = Format::RGB;
+        byteFormat = ByteFormat::RGB;
+    }
+
+    Texture* newTexture = new Texture();
+    id_t tex = m_gpurm->createTexture({
+        .width = textureData.width,
+        .height = textureData.height,
+        .format = format,
+        .byteFormat = byteFormat,
+        .initialData = textureData.data,
+    });
+    newTexture->m_ID = tex;
+    auto* texture = m_textures.insert(std::make_pair(path, newTexture)).first->second;
+    //m_files.push_back(createAssetFile(path, FileView{ texture }));
+
+    textureData.freeData();
+
     return texture;
 }
-*/
 
 Mesh* AssetManager::loadMesh(MeshType type, VertexIndexTuple& mesh)
 {

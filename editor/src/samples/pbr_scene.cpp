@@ -16,7 +16,7 @@ void PbrScene::loadScene(AssetLibrary &assetLibrary,
 
     loadTextures(assetLibrary);
     loadIrradianceTextures(assetLibrary, skyboxTex, assetManager);
-    loadMaterials(assetLibrary, skyboxTex);
+    loadMaterials(assetLibrary, assetManager, skyboxTex);
     loadModels(assetLibrary);
     loadLights(coordinator);
     loadSkybox(assetLibrary, assetManager);
@@ -25,11 +25,6 @@ void PbrScene::loadScene(AssetLibrary &assetLibrary,
 
 void PbrScene::loadTextures(AssetLibrary& assetLibrary)
 {
-    assetLibrary.load2DTexture("spitfire", SampleResources::texture_spitfire, SampleResources::texture_spitfire_dir);
-    assetLibrary.load2DTexture("spitfire_m", SampleResources::texture_spitfire_metallic, SampleResources::texture_spitfire_dir);
-    assetLibrary.load2DTexture("spitfire_r", SampleResources::texture_spitfire_roughness, SampleResources::texture_spitfire_dir);
-    assetLibrary.load2DTexture("spitfire_ao", SampleResources::texture_spitfire_ao, SampleResources::texture_spitfire_dir);
-
     assetLibrary.load2DTexture("metalBox", SampleResources::texture_metalbox, SampleResources::texture_metalbox_dir);
     assetLibrary.load2DTexture("metalBox_r", SampleResources::texture_metalbox_roughness, SampleResources::texture_metalbox_dir);
     assetLibrary.load2DTexture("metalBox_ao", SampleResources::texture_metalbox_ao, SampleResources::texture_metalbox_dir);
@@ -51,7 +46,7 @@ void PbrScene::loadIrradianceTextures(AssetLibrary& assetLibrary,
     skyboxTex = maps.cubeMap;
 }
 
-void PbrScene::loadMaterials(AssetLibrary &assetLibrary, unsigned int& skyboxTex)
+void PbrScene::loadMaterials(AssetLibrary &assetLibrary, AssetManager &assetManager, unsigned int& skyboxTex)
 {
     Material* blueMat = assetLibrary.createMaterial("blueMat", "pbr");
     blueMat->setProperty("u_albedo", glm::vec4(0.2f, 0.2f, 1.0f, 1.0f));
@@ -63,10 +58,10 @@ void PbrScene::loadMaterials(AssetLibrary &assetLibrary, unsigned int& skyboxTex
     greyMat->setProperty("u_roughness", 0.2f);
 
     Material* spitfireMat = assetLibrary.createMaterial("spitfireMat", "pbr");
-    spitfireMat->setTexture("u_albedoTex", assetLibrary.getTexture("spitfire")->ID(), 0);
-    spitfireMat->setTexture("u_metallicTex", assetLibrary.getTexture("spitfire_m")->ID(), 0);
-    spitfireMat->setTexture("u_roughnessTex", assetLibrary.getTexture("spitfire_r")->ID(), 0);
-    spitfireMat->setTexture("u_aoTex", assetLibrary.getTexture("spitfire_ao")->ID(), 0);
+    spitfireMat->setTexture("u_albedoTex", assetManager.getTexture("resources/textures/spitfire/spitfire_d.png")->ID(), 0);
+    spitfireMat->setTexture("u_metallicTex", assetManager.getTexture("resources/textures/spitfire/spitfire_m.png")->ID(), 0);
+    spitfireMat->setTexture("u_roughnessTex", assetManager.getTexture("resources/textures/spitfire/spitfire_r.png")->ID(), 0);
+    spitfireMat->setTexture("u_aoTex", assetManager.getTexture("resources/textures/spitfire/spitfire_ao.png")->ID(), 0);
 
     Material* metalBoxMat = assetLibrary.createMaterial("metalBoxMat", "pbr");
     metalBoxMat->setTexture("u_albedoTex", assetLibrary.getTexture("metalBox")->ID(), 0);

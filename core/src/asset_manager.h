@@ -5,7 +5,7 @@
 #include "assets/mesh.h"
 #include "assets/model.h"
 //#include "shader.h"
-//#include "texture.h"
+#include "assets/texture.h"
 #include "renderer/gpuresourcemanager.h"
 #include "renderer/opengl.h"
 
@@ -24,7 +24,7 @@ struct AssetFile
 class AssetManager
 {
   public:
-    //Texture& getTexture(std::string_view path);
+    Texture* getTexture(std::string_view path);
     Mesh* loadMesh(MeshType type, VertexIndexTuple& mesh);
     Mesh* getMesh(MeshType type);
     Mesh* getMesh(std::string_view name);
@@ -36,7 +36,7 @@ class AssetManager
   private:
     std::vector<AssetFile> m_files;
 
-    //std::unordered_map<std::string, Texture> m_textures;
+    std::unordered_map<std::string, Texture*> m_textures;
     std::unordered_map<std::string, Model*> m_models;
     std::unordered_map<std::string, Mesh*> m_importedModels;
     std::unordered_map<MeshType, Mesh*> m_nativeModels;

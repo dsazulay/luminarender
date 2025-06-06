@@ -36,9 +36,16 @@ struct MeshData
 
 using ModelData = std::vector<MeshData>;
 
+struct TextureData
+{
+    int width;
+    int height;
+    int channels;
+    unsigned char* data;
 
+    void freeData();
+};
+
+TextureData loadTextureFromFile(std::string_view file);
 ModelData* loadModel(std::string_view path, bool material);
 
-void processNode(aiNode *node, const aiScene *scene, ModelData* data, bool material);
-
-MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial);

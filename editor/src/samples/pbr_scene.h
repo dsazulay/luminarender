@@ -18,7 +18,9 @@ private:
     static void loadIrradianceTextures(AssetLibrary& assetLibrary,
                                        unsigned int& skyboxTex,
                                        AssetManager& assetManager);
-    static void loadMaterials(AssetLibrary& assetLibrary, unsigned int& skyboxTex);
+    static void loadMaterials(AssetLibrary& assetLibrary,
+                              AssetManager& assetManager,
+                              unsigned int& skyboxTex);
     static void loadModels(AssetLibrary& assetLibrary);
     static void loadLights(ecs::Coordinator& coordinator);
     static void loadSkybox(AssetLibrary& assetLibrary, AssetManager& assetManager);

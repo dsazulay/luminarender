@@ -7,82 +7,67 @@
 
 #include <stb_image.h>
 
-Texture* Importer::loadTextureFromFile(const std::string& file, const std::string &directory) {
-    std::string filename = directory + '/' + file;
 
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
+void processNode(aiNode *node, const aiScene *scene, ModelData* data, bool material);
+MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial);
 
-    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-    Texture* texture = nullptr;
-    if (data)
-        texture = new Texture(TextureType::Tex2D, width, height, nrChannels, data);
-    else
-        LOG_ERROR("Failed to load texture");
-
+void TextureData::freeData()
+{
     stbi_image_free(data);
-
-    return texture;
 }
 
-Texture* Importer::loadHDRTextureFromFile(const std::string& file, const std::string &directory)
-{
-    std::string filename = directory + '/' + file;
+TextureData loadTextureFromFile(std::string_view file) {
+    std::string filename{ file };
 
-    int width, height, nrChannels;
+    TextureData textureData;
     stbi_set_flip_vertically_on_load(true);
 
-    float* data = stbi_loadf(filename.c_str(), &width, &height, &nrChannels, 0);
-    Texture* texture = nullptr;
-    if (data)
-        texture = new Texture(TextureType::HDR, width, height, data);
-    else
+    unsigned char* data = stbi_load(filename.c_str(),
+                                    &textureData.width,
+                                    &textureData.height,
+                                    &textureData.channels, 0);
+    if (!data) {
         LOG_ERROR("Failed to load texture");
-
-    stbi_image_free(data);
-
-    return texture;
-}
-
-Texture* Importer::loadCubeMapFromFiles(std::vector<std::string> faces, const std::string &directory)
-{
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(false);
-    std::vector<unsigned char*> textureVector;
-
-    for (auto & face : faces)
-    {
-        unsigned char *data = stbi_load((directory + '/' + face).c_str(), &width, &height, &nrChannels, 0);
-        if (data)
-            textureVector.push_back(data);
-        else
-            LOG_ERROR("Cubemap tex failed to load at path: {}", face);
     }
 
-    Texture* texture = new Texture(TextureType::CubeMap, width, height, textureVector);
+    textureData.data = data;
 
-    for (auto texData : textureVector)
-        stbi_image_free(texData);
-
-    return texture;
+    return textureData;
 }
 
-Model* Importer::loadModel(const char* path, bool material)
+ModelData* loadModel(std::string_view path, bool material)
 {
-    Model* model = new Model();
+    ModelData* data = new ModelData();
 
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate);
+    const aiScene* scene = import.ReadFile(path.data(), aiProcess_Triangulate);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         LOG_ERROR("ERROR::ASSIMP::{}", import.GetErrorString());
-        return model;
+        delete data;
+        return nullptr;
     }
 
-    processNode(scene->mRootNode, scene, model, material);
+    processNode(scene->mRootNode, scene, data, material);
 
-    return model;
+    return data;
+}
+
+void processNode(aiNode *node, const aiScene *scene, ModelData* data, bool material)
+{
+    for(unsigned int i = 0; i < node->mNumMeshes; i++)
+    {
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        // TODO: Check copy of mesh data
+        MeshData meshData = processMesh(mesh, scene, material);
+        data->push_back(meshData);
+    }
+
+    for (unsigned int i = 0; i < node->mNumChildren; i++)
+    {
+        processNode(node->mChildren[i], scene, data, material);
+    }
 }
 
 MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial)
@@ -148,41 +133,6 @@ MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial)
     }
 
     return { mesh->mName.C_Str(), m, materialData };
-}
-
-void processNode(aiNode *node, const aiScene *scene, ModelData* data, bool material)
-{
-    for(unsigned int i = 0; i < node->mNumMeshes; i++)
-    {
-        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        // TODO: Check copy of mesh data
-        MeshData meshData = processMesh(mesh, scene, material);
-        data->push_back(meshData);
-    }
-
-    for (unsigned int i = 0; i < node->mNumChildren; i++)
-    {
-        processNode(node->mChildren[i], scene, data, material);
-    }
-}
-
-ModelData* loadModel(std::string_view path, bool material)
-{
-    ModelData* data = new ModelData();
-
-    Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path.data(), aiProcess_Triangulate);
-
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-    {
-        LOG_ERROR("ERROR::ASSIMP::{}", import.GetErrorString());
-        delete data;
-        return nullptr;
-    }
-
-    processNode(scene->mRootNode, scene, data, material);
-
-    return data;
 }
 
 void Importer::processNode(aiNode *node, const aiScene *scene, Model* model, bool material)
@@ -265,4 +215,82 @@ VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene, bool 
     }
 
     return m;
+}
+
+Texture* Importer::loadTextureFromFile(const std::string& file, const std::string &directory) {
+    std::string filename = directory + '/' + file;
+
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true);
+
+    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
+    Texture* texture = nullptr;
+    if (data)
+        texture = new Texture(TextureType::Tex2D, width, height, nrChannels, data);
+    else
+        LOG_ERROR("Failed to load texture");
+
+    stbi_image_free(data);
+
+    return texture;
+}
+
+Texture* Importer::loadHDRTextureFromFile(const std::string& file, const std::string &directory)
+{
+    std::string filename = directory + '/' + file;
+
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true);
+
+    float* data = stbi_loadf(filename.c_str(), &width, &height, &nrChannels, 0);
+    Texture* texture = nullptr;
+    if (data)
+        texture = new Texture(TextureType::HDR, width, height, data);
+    else
+        LOG_ERROR("Failed to load texture");
+
+    stbi_image_free(data);
+
+    return texture;
+}
+
+Texture* Importer::loadCubeMapFromFiles(std::vector<std::string> faces, const std::string &directory)
+{
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(false);
+    std::vector<unsigned char*> textureVector;
+
+    for (auto & face : faces)
+    {
+        unsigned char *data = stbi_load((directory + '/' + face).c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+            textureVector.push_back(data);
+        else
+            LOG_ERROR("Cubemap tex failed to load at path: {}", face);
+    }
+
+    Texture* texture = new Texture(TextureType::CubeMap, width, height, textureVector);
+
+    for (auto texData : textureVector)
+        stbi_image_free(texData);
+
+    return texture;
+}
+
+Model* Importer::loadModel(const char* path, bool material)
+{
+    Model* model = new Model();
+
+    Assimp::Importer import;
+    const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate);
+
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+    {
+        LOG_ERROR("ERROR::ASSIMP::{}", import.GetErrorString());
+        return model;
+    }
+
+    processNode(scene->mRootNode, scene, model, material);
+
+    return model;
 }
