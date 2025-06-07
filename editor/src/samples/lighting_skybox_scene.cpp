@@ -1,35 +1,45 @@
 #include "lighting_skybox_scene.h"
 
+#include "asset_manager.h"
 #include "sample_resources.h"
 #include "components/components.h"
 #include "renderer/transform_system.h"
 
 
-void LightingSkyboxScene::loadScene(AssetLibrary &assetLibrary, ecs::Coordinator& coordinator)
+void LightingSkyboxScene::loadScene(AssetLibrary &assetLibrary,
+                                    AssetManager& assetManager,
+                                    ecs::Coordinator& coordinator)
 {
     loadTextures(assetLibrary);
-    loadMaterials(assetLibrary);
+    loadMaterials(assetLibrary, assetManager);
     loadModels(assetLibrary);
     loadLights(coordinator);
-    loadSkybox(assetLibrary);
+    loadSkybox(assetLibrary, assetManager);
     loadObjects(assetLibrary, coordinator);
 }
 
 void LightingSkyboxScene::loadTextures(AssetLibrary& assetLibrary)
 {
-    std::vector<std::string> faces =
-    {
-        SampleResources::faces[0], SampleResources::faces[1], SampleResources::faces[2],
-        SampleResources::faces[3], SampleResources::faces[4], SampleResources::faces[5],
-    };
 
-    assetLibrary.load2DTexture("spitfire", SampleResources::texture_spitfire, SampleResources::texture_spitfire_dir);
-    assetLibrary.load2DTexture("woodBox", SampleResources::texture_woodBox, SampleResources::texture_dir);
-    assetLibrary.loadCubeMapTexture("glaciers", faces, SampleResources::texture_skybox_dir);
+
+    //assetLibrary.load2DTexture("spitfire", SampleResources::texture_spitfire, SampleResources::texture_spitfire_dir);
+    //assetLibrary.load2DTexture("woodBox", SampleResources::texture_woodBox, SampleResources::texture_dir);
+    //assetLibrary.loadCubeMapTexture("glaciers", faces, SampleResources::texture_skybox_dir);
 }
 
-void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary)
+void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary,
+                                        AssetManager& assetManager)
 {
+    std::vector<std::string> faces =
+    {
+        "resources/textures/skybox/right.jpg",
+        "resources/textures/skybox/left.jpg",
+        "resources/textures/skybox/top.jpg",
+        "resources/textures/skybox/bottom.jpg",
+        "resources/textures/skybox/front.jpg",
+        "resources/textures/skybox/back.jpg",
+    };
+
     Material* blueMat = assetLibrary.createMaterial("blueMat", "lambert");
     blueMat->setProperty("u_color", glm::vec4(0.2f, 0.2f, 1.0f, 1.0f));
 
@@ -37,13 +47,14 @@ void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary)
     greyMat->setProperty("u_color", glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
 
     Material* spitfireMat = assetLibrary.createMaterial("spitfireMat", "lambert");
-    spitfireMat->setTexture("u_mainTex", assetLibrary.getTexture("spitfire")->ID(), 0);
+    spitfireMat->setTexture("u_mainTex",
+                            assetManager.getTexture("resources/textures/spitfire/spitfire_d.png")->ID(), 0);
 
     Material* woodBoxMat = assetLibrary.createMaterial("woodBoxMat", "lambert");
-    woodBoxMat->setTexture("u_mainTex", assetLibrary.getTexture("woodBox")->ID(), 0);
+    //woodBoxMat->setTexture("u_mainTex", assetLibrary.getTexture("woodBox")->ID(), 0);
 
     Material* skyboxMat = assetLibrary.createMaterial("skyboxMat", "skytriangle");
-    skyboxMat->setTexture("u_mainTex", assetLibrary.getTexture("glaciers")->ID(), 0);
+    skyboxMat->setTexture("u_mainTex", assetManager.getTexture(faces)->ID(), 0);
 }
 
 void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
@@ -69,9 +80,10 @@ void LightingSkyboxScene::loadLights(ecs::Coordinator& coordinator)
     });
 }
 
-void LightingSkyboxScene::loadSkybox(AssetLibrary &assetLibrary)
+void LightingSkyboxScene::loadSkybox(AssetLibrary &assetLibrary,
+                                     AssetManager& assetManager)
 {
-    //Mesh* cubeMap = assetLibrary.getMesh("triangleMap");
+    Mesh* cubeMap = assetManager.getMesh(MeshType::TriangleMap);
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 }
 
@@ -80,8 +92,8 @@ void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinat
     //Mesh* cube = assetLibrary.getMesh("cube");
     //Mesh* quad = assetLibrary.getMesh("quad");
     //Mesh* sphere = assetLibrary.getMesh("sphere");
-    Model* spitfire = assetLibrary.getModel("spitfireModel");
-    Model* sponza = assetLibrary.getModel("sponza");
+    //Model* spitfire = assetLibrary.getModel("spitfireModel");
+    //Model* sponza = assetLibrary.getModel("sponza");
 
     Material* greyMat = assetLibrary.getMaterial("greyMat");
     Material* blueMat = assetLibrary.getMaterial("blueMat");
@@ -126,6 +138,7 @@ void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinat
         .name = "Quad",
     });
     */
+    /*
     auto spitfireEntity = coordinator.createEntity();
     coordinator.addComponent(spitfireEntity, ecs::Transform{});
     coordinator.addComponent(spitfireEntity, ecs::Tag{
@@ -181,5 +194,6 @@ void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinat
     //transformSystem->addChild(cubeEntity, sphereEntity);
     //transformSystem->addChild(quadEntity, cubeEntity);
     transformSystem->updateHierarchically();
+    */
 }
 

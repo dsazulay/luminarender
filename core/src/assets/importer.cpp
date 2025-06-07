@@ -13,7 +13,9 @@ MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial);
 
 void TextureData::freeData()
 {
-    stbi_image_free(data);
+    for (auto &d : data) {
+        stbi_image_free(d);
+    }
 }
 
 TextureData loadTextureFromFile(std::string_view file) {
@@ -30,7 +32,28 @@ TextureData loadTextureFromFile(std::string_view file) {
         LOG_ERROR("Failed to load texture");
     }
 
-    textureData.data = data;
+    textureData.data.push_back(data);
+
+    return textureData;
+}
+
+TextureData loadCubeMapFromFiles(std::vector<std::string> &faces)
+{
+    TextureData textureData;
+    stbi_set_flip_vertically_on_load(false);
+
+    for (auto &face : faces)
+    {
+        unsigned char *data = stbi_load(face.c_str(),
+                                        &textureData.width,
+                                        &textureData.height,
+                                        &textureData.channels, 0);
+        if (!data) {
+            LOG_ERROR("Cubemap tex failed to load at path: {}", face);
+        }
+
+        textureData.data.push_back(data);
+    }
 
     return textureData;
 }
@@ -208,8 +231,9 @@ VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene, bool 
             // TODO: check OS before change it
             correctName.replace(8, 1, "/");
 
+            /*
             Texture* tex = AssetLibrary::instance().load2DTexture(correctName.c_str(), correctName.c_str(), "resources/sponza");
-            mat->setTexture("u_albedoTex", tex->ID(), 0);
+            mat->setTexture("u_albedoTex", tex->ID(), 0);*/
         }
         m.material = matName.C_Str();
     }

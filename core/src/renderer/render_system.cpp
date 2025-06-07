@@ -8,6 +8,7 @@
 
 #include <random>
 #include <array>
+#include <vector>
 
 float lerp(float a, float b, float f)
 {

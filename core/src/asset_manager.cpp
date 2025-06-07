@@ -5,8 +5,8 @@
 #include "logger.h"
 #include "assets/model.h"
 #include "assets/primitives.h"
-#include "assets/importer.h"
 #include "renderer/gfxapi.h"
+#include "assets/material.h"
 
 #include <cstddef>
 #include <utility>
@@ -20,13 +20,8 @@ AssetFile createAssetFile(std::string_view path, FileView fileView)
     };
 }
 
-Texture* AssetManager::getTexture(std::string_view path)
+Texture* AssetManager::loadTexture(TextureData &textureData)
 {
-    auto it = m_textures.find(path.data());
-    if (it != m_textures.end()) { return it->second; }
-
-    TextureData textureData = loadTextureFromFile(path);
-
     Format format = Format::RGBA;
     ByteFormat byteFormat = ByteFormat::RGBA;
     if (textureData.channels == 1)
@@ -41,18 +36,58 @@ Texture* AssetManager::getTexture(std::string_view path)
     }
 
     Texture* newTexture = new Texture();
-    id_t tex = m_gpurm->createTexture({
-        .width = textureData.width,
-        .height = textureData.height,
-        .format = format,
-        .byteFormat = byteFormat,
-        .initialData = textureData.data,
-    });
-    newTexture->m_ID = tex;
-    auto* texture = m_textures.insert(std::make_pair(path, newTexture)).first->second;
+
+    if (textureData.data.size() > 1) {
+        newTexture->m_ID = m_gpurm->createTexture({
+            .width = textureData.width,
+            .height = textureData.height,
+            .format = format,
+            .byteFormat = byteFormat,
+            .target = TextureTarget::CUBEMAP,
+            .wrap = Wrap::CLAMPEDGE,
+            .arrayOfInitialData = textureData.data,
+        });
+    }
+    else {
+        newTexture->m_ID = m_gpurm->createTexture({
+            .width = textureData.width,
+            .height = textureData.height,
+            .format = format,
+            .byteFormat = byteFormat,
+            .initialData = textureData.data.front(),
+        });
+    }
+    textureData.freeData();
+
     //m_files.push_back(createAssetFile(path, FileView{ texture }));
 
-    textureData.freeData();
+    return newTexture;
+}
+
+Texture* AssetManager::getTexture(std::string_view path)
+{
+    auto it = m_textures.find(path.data());
+    if (it != m_textures.end()) { return it->second; }
+
+    TextureData textureData = loadTextureFromFile(path);
+
+    Texture* newTexture = loadTexture(textureData);
+
+    auto* texture = m_textures.insert(std::make_pair(path, newTexture)).first->second;
+
+    return texture;
+}
+
+Texture* AssetManager::getTexture(std::vector<std::string> path)
+{
+    auto it = m_textures.find(path.front());
+    if (it != m_textures.end()) { return it->second; }
+
+    TextureData textureData = loadCubeMapFromFiles(path);
+
+    Texture* newTexture = loadTexture(textureData);
+
+    auto* texture = m_textures.insert(std::make_pair(path.front(), newTexture)).first->second;
 
     return texture;
 }
@@ -137,11 +172,17 @@ Shader &AssetManager::getShader(std::string_view path)
 
 void AssetManager::loadDefaultResources()
 {
+    /*
     getMesh(MeshType::Quad);
     getMesh(MeshType::Cube);
     getMesh(MeshType::Sphere);
     getMesh(MeshType::CubeMap);
     getMesh(MeshType::TriangleMap);
+    */
+
+
+    Material::setDefaultTexWhite(
+        getTexture("resources/textures/default_white.png")->ID());
 }
 
 void AssetManager::checkFileModification()

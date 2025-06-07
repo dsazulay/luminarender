@@ -28,10 +28,10 @@ public:
     Material* createMaterial(const char* name, const char* shader);
     Material* createMaterial(const char* name, Shader*);
     Model* loadModel(const char* name, const char* path, bool material);
-    Texture* load2DTexture(const char* name, const std::string& file, const std::string& directory);
     Texture* loadHDRTexture(const char* name, const std::string& file, const std::string& directory);
     Texture* loadCubeMapTexture(const char* name, const std::vector<std::string> faces, const std::string& directory);
 
+    void loadDefaultResources();
     void createDefaultResources();
 
     Shader* getShader(const char* name);
@@ -42,8 +42,6 @@ public:
 
 private:
     AssetLibrary();
-    void loadDefaultResources();
-    void setMaterialDefaultResources();
     void generateSSAONoiseTexture();
 
     bool isShaderLoaded(const char* name);

@@ -8,6 +8,7 @@
 #include "assets/texture.h"
 #include "renderer/gpuresourcemanager.h"
 #include "renderer/opengl.h"
+#include "assets/importer.h"
 
 #include <filesystem>
 #include <string>
@@ -23,9 +24,9 @@ struct AssetFile
 
 class AssetManager
 {
-  public:
+public:
     Texture* getTexture(std::string_view path);
-    Mesh* loadMesh(MeshType type, VertexIndexTuple& mesh);
+    Texture* getTexture(std::vector<std::string> path);
     Mesh* getMesh(MeshType type);
     Mesh* getMesh(std::string_view name);
     Model* getModel(std::string_view path);
@@ -33,8 +34,11 @@ class AssetManager
     void loadDefaultResources();
     void checkFileModification();
 
-  private:
+private:
     std::vector<AssetFile> m_files;
+
+    Texture* loadTexture(TextureData &textureData);
+    Mesh* loadMesh(MeshType type, VertexIndexTuple& mesh);
 
     std::unordered_map<std::string, Texture*> m_textures;
     std::unordered_map<std::string, Model*> m_models;

@@ -42,6 +42,12 @@ enum class TexType
     FLOAT,
 };
 
+enum class TextureTarget
+{
+    TEX2D,
+    CUBEMAP,
+};
+
 enum class Wrap
 {
     REPEAT,
@@ -99,10 +105,12 @@ struct TextureInfo
     int height;
     Format format;
     ByteFormat byteFormat;
+    TextureTarget target = TextureTarget::TEX2D;
     Filtering filtering = Filtering::BILINEAR;
     Wrap wrap = Wrap::REPEAT;
     TexType type = TexType::UBYTE;
     void* initialData = nullptr;
+    std::vector<void *> arrayOfInitialData = {};
 };
 
 struct RenderBufferInfo

@@ -41,11 +41,11 @@ struct TextureData
     int width;
     int height;
     int channels;
-    unsigned char* data;
+    std::vector<void*> data;
 
     void freeData();
 };
 
 TextureData loadTextureFromFile(std::string_view file);
 ModelData* loadModel(std::string_view path, bool material);
-
+TextureData loadCubeMapFromFiles(std::vector<std::string> &faces);

@@ -37,6 +37,7 @@ private:
     GLint getFiltering(Filtering filtering);
     GLint getWrap(Wrap wrap);
     GLenum getTexType(TexType type);
+    GLenum getTextureTarget(TextureTarget target);
     GLenum getAttachmentType(AttachmentType type);
     GLenum getAttachmentTarget(AttachmentTarget target);
     GLbitfield getClearMask(ClearMask mask);

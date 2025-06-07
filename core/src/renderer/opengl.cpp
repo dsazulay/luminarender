@@ -13,23 +13,37 @@ id_t OpenGL::createTexture(TextureInfo info)
     GLint filtering = getFiltering(info.filtering);
     GLint wrap = getWrap(info.wrap);
     GLenum type = getTexType(info.type);
+    GLenum target = getTextureTarget(info.target);
 
     glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-    glTexImage2D(GL_TEXTURE_2D, 0, byteFormat, info.width, info.height,
-            0, format, type, info.initialData);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filtering);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filtering);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
+    glBindTexture(target, id);
+
+    if (target == GL_TEXTURE_CUBE_MAP) {
+        for (unsigned int i = 0; i < info.arrayOfInitialData.size(); ++i) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, byteFormat,
+                         info.width, info.height, 0, format, type,
+                         info.arrayOfInitialData[i]);
+        }
+        glTexParameteri(target, GL_TEXTURE_WRAP_R, wrap);
+    }
+    else {
+        glTexImage2D(target, 0, byteFormat, info.width, info.height,
+                     0, format, type, info.initialData);
+    }
+
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, filtering);
+    glTexParameteri(target, GL_TEXTURE_MAG_FILTER, filtering);
+    glTexParameteri(target, GL_TEXTURE_WRAP_S, wrap);
+    glTexParameteri(target, GL_TEXTURE_WRAP_T, wrap);
+
     // TODO: pass border color as parameter
     if (info.wrap == Wrap::CLAMPBORDER)
     {
         float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
-        glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+        glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
     }
     // TODO: handle mip mapping
-    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindTexture(target, 0);
 
     return id;
 }
@@ -274,6 +288,17 @@ GLenum OpenGL::getAttachmentTarget(AttachmentTarget target)
             return GL_TEXTURE_2D;
         case AttachmentTarget::RENDERBUFFER:
             return GL_RENDERBUFFER;
+    }
+}
+
+GLenum OpenGL::getTextureTarget(TextureTarget target)
+{
+    switch (target)
+    {
+        case TextureTarget::TEX2D:
+            return GL_TEXTURE_2D;
+        case TextureTarget::CUBEMAP:
+            return GL_TEXTURE_CUBE_MAP;
     }
 }
 

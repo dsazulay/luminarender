@@ -17,7 +17,9 @@ Application::Application(AppConfig& config) : m_config(config)
 {
     initEcs();
     initWindow();
+    AssetLibrary::instance().loadDefaultResources();
     AssetLibrary::instance().createDefaultResources();
+    m_assetManager.loadDefaultResources();
     initRenderer();
     initUiRenderer();
 
@@ -30,7 +32,6 @@ Application::Application(AppConfig& config) : m_config(config)
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     PbrScene::loadScene(AssetLibrary::instance(), m_assetManager, *m_coordinator);
-//    PbrScene::loadScene(m_scene, AssetLibrary::instance());
     m_renderer->updateIrradianceMaps(m_assetManager);
 
 }

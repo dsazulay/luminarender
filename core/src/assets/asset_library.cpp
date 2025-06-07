@@ -119,18 +119,6 @@ bool AssetLibrary::isModelLoaded(const char* name)
     return m_models.find(name) != m_models.end();
 }
 
-Texture* AssetLibrary::load2DTexture(const char *name, const std::string &file, const std::string &directory)
-{
-    if (isTextureLoaded(name))
-    {
-        LOG_INFO("texture already loaded");
-        return m_textures[name];
-    }
-    Texture* texture = Importer::loadTextureFromFile(file, directory);
-    m_textures[name] = texture;
-    return texture;
-}
-
 Texture* AssetLibrary::loadHDRTexture(const char *name, const std::string &file, const std::string &directory)
 {
     if (isTextureLoaded(name))
@@ -172,8 +160,6 @@ bool AssetLibrary::isTextureLoaded(const char *name)
 
 AssetLibrary::AssetLibrary()
 {
-    loadDefaultResources();
-    setMaterialDefaultResources();
 }
 
 void AssetLibrary::loadDefaultResources()
@@ -184,7 +170,6 @@ void AssetLibrary::loadDefaultResources()
     loadShader("lambert", SampleResources::shader_lambert);
     loadShader("pbr", SampleResources::shader_pbr);
 
-    load2DTexture(DefaultResources::texWhite, texture_defaultWhite, texture_dir);
 
     generateSSAONoiseTexture();
 }
@@ -194,11 +179,6 @@ void AssetLibrary::createDefaultResources()
     Material* defaultPbr = createMaterial("defaultPbr", "pbr");
     defaultPbr->setProperty("u_albedo", glm::vec4(0.7f, 0.7f, 0.7f, 1.0f));
     defaultPbr->setProperty("u_roughness", 0.8f);
-}
-
-void AssetLibrary::setMaterialDefaultResources()
-{
-    Material::setDefaultTexWhite(getTexture(DefaultResources::texWhite)->ID());
 }
 
 void AssetLibrary::generateSSAONoiseTexture()
