@@ -15,6 +15,7 @@ enum class Filtering
 {
     POINT,
     BILINEAR,
+    LINEAR_MIPMAP_LINEAR,
 };
 
 enum class Format
@@ -108,6 +109,7 @@ struct TextureInfo
     ByteFormat byteFormat;
     TextureTarget target = TextureTarget::TEX2D;
     Filtering filtering = Filtering::BILINEAR;
+    Filtering minFiltering = Filtering::BILINEAR;
     Wrap wrap = Wrap::REPEAT;
     TexType type = TexType::UBYTE;
     void* initialData = nullptr;

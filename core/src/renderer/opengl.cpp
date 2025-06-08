@@ -11,6 +11,7 @@ id_t OpenGL::createTexture(TextureInfo info)
     GLenum format = getFormat(info.format);
     GLenum byteFormat = getByteFormat(info.byteFormat);
     GLint filtering = getFiltering(info.filtering);
+    GLint minFiltering = getFiltering(info.minFiltering);
     GLint wrap = getWrap(info.wrap);
     GLenum type = getTexType(info.type);
     GLenum target = getTextureTarget(info.target);
@@ -18,31 +19,33 @@ id_t OpenGL::createTexture(TextureInfo info)
     glGenTextures(1, &id);
     glBindTexture(target, id);
 
-    if (target == GL_TEXTURE_CUBE_MAP) {
-        for (unsigned int i = 0; i < info.arrayOfInitialData.size(); ++i) {
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, byteFormat,
-                         info.width, info.height, 0, format, type,
-                         info.arrayOfInitialData[i]);
-        }
-        glTexParameteri(target, GL_TEXTURE_WRAP_R, wrap);
-    }
-    else {
-        glTexImage2D(target, 0, byteFormat, info.width, info.height,
-                     0, format, type, info.initialData);
-    }
-
-    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, filtering);
+    glTexParameteri(target, GL_TEXTURE_MIN_FILTER, minFiltering);
     glTexParameteri(target, GL_TEXTURE_MAG_FILTER, filtering);
     glTexParameteri(target, GL_TEXTURE_WRAP_S, wrap);
     glTexParameteri(target, GL_TEXTURE_WRAP_T, wrap);
-
     // TODO: pass border color as parameter
     if (info.wrap == Wrap::CLAMPBORDER)
     {
         float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
         glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
     }
-    // TODO: handle mip mapping
+
+    if (target == GL_TEXTURE_CUBE_MAP) {
+        glTexParameteri(target, GL_TEXTURE_WRAP_R, wrap);
+        for (unsigned int i = 0; i < info.arrayOfInitialData.size(); ++i) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, byteFormat,
+                         info.width, info.height, 0, format, type,
+                         info.arrayOfInitialData[i]);
+        }
+    }
+    else {
+        glTexImage2D(target, 0, byteFormat, info.width, info.height,
+                     0, format, type, info.initialData);
+        if (info.minFiltering == Filtering::LINEAR_MIPMAP_LINEAR) {
+            glGenerateMipmap(target);
+        }
+    }
+
     glBindTexture(target, 0);
 
     return id;
@@ -230,6 +233,8 @@ GLint OpenGL::getFiltering(Filtering filtering)
             return GL_NEAREST;
         case Filtering::BILINEAR:
             return GL_LINEAR;
+        case Filtering::LINEAR_MIPMAP_LINEAR:
+            return GL_LINEAR_MIPMAP_LINEAR;
     }
 }
 

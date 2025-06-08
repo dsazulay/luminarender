@@ -1,11 +1,13 @@
 #include "asset_manager.h"
 
 #include "assets/model_types.h"
+#include "log.h"
 #include "logger.h"
 #include "assets/model.h"
 #include "assets/primitives.h"
 #include "renderer/gfxapi.h"
 #include "assets/material.h"
+#include "assets/asset_library.h"
 
 #include <cstddef>
 #include <utility>
@@ -45,6 +47,7 @@ Texture* AssetManager::getTexture2D(std::string_view path)
         .height = textureData.height,
         .format = format,
         .byteFormat = byteFormat,
+        .minFiltering = Filtering::LINEAR_MIPMAP_LINEAR,
         .initialData = textureData.data.front(),
     });
     textureData.freeData();
@@ -153,20 +156,33 @@ Mesh* AssetManager::getMesh(std::string_view name)
     return getMesh(MeshType::Quad);
 }
 
-Model* AssetManager::getModel(std::string_view path)
+Model* AssetManager::getModel(std::string_view path, bool loadMaterial)
 {
     std::string strPath{ path };
     auto it = m_models.find(strPath);
     if (it != m_models.end()) { return it->second; }
 
     Model* newModel = new Model();
-    ModelData* modelData = loadModel(path, false);
+    ModelData* modelData = loadModel(path, loadMaterial);
 
     for (auto mesh : *modelData)
     {
         Mesh* m = loadMesh(MeshType::Custom, mesh.vertexIndex);
         m_importedModels.insert({mesh.name, m});
         newModel->m_meshes.push_back({mesh.name, m});
+
+        // TODO: Fixme
+        Material* mat = AssetLibrary::instance().createMaterial(mesh.material.name.c_str(), "pbr");
+        m->m_modelMat = mesh.material.name;
+
+        mat->setProperty("u_albedo", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+
+        if (mesh.material.diffusePath == "") {
+            continue;
+        }
+        Texture* tex = getTexture2D("resources/sponza/" + mesh.material.diffusePath);
+        mat->setTexture("u_albedoTex", tex->ID(), 0);
+
     }
 
     auto* model = m_models.insert(std::make_pair(path, newModel)).first->second;

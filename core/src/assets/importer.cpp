@@ -27,7 +27,7 @@ TextureData loadTextureFromFile(const std::string& file) {
                                     &textureData.height,
                                     &textureData.channels, 0);
     if (!data) {
-        LOG_ERROR("Failed to load texture");
+        LOG_ERROR("Failed to load texture {}", file);
     }
 
     textureData.data.push_back(data);

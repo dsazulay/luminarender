@@ -30,7 +30,7 @@ public:
     Texture* getTextureCM(std::vector<std::string> path);
     Mesh* getMesh(MeshType type);
     Mesh* getMesh(std::string_view name);
-    Model* getModel(std::string_view path);
+    Model* getModel(std::string_view path, bool loadMaterial = false);
     //Shader& getShader(std::string_view path);
     void loadDefaultResources();
     void checkFileModification();

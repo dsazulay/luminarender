@@ -33,7 +33,7 @@ void Camera::onKeyPress(const Event& e)
         return;
 
     //float velocity = movementSpeed * Application::deltaTime;
-    float velocity = movementSpeed;
+    float velocity = movementSpeed * 0.1;
     if (keyCode == 87)
         position += front * velocity;
     else if (keyCode == 83)
