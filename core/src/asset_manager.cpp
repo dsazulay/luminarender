@@ -21,7 +21,7 @@ AssetFile createAssetFile(std::string_view path, FileView fileView)
     };
 }
 
-Texture* AssetManager::getTexture2D(std::string_view path)
+Texture AssetManager::getTexture2D(std::string_view path)
 {
     auto it = m_textures.find(path.data());
     if (it != m_textures.end()) { return it->second; }
@@ -41,8 +41,8 @@ Texture* AssetManager::getTexture2D(std::string_view path)
         byteFormat = ByteFormat::RGB;
     }
 
-    Texture* newTexture = new Texture();
-    newTexture->m_ID = m_gpurm->createTexture({
+    Texture newTexture;
+    newTexture.handle = m_gpurm->createTexture({
         .width = textureData.width,
         .height = textureData.height,
         .format = format,
@@ -54,20 +54,20 @@ Texture* AssetManager::getTexture2D(std::string_view path)
 
     //m_files.push_back(createAssetFile(path, FileView{ texture }));
 
-    auto* texture = m_textures.insert(std::make_pair(path, newTexture)).first->second;
+    m_textures.insert(std::make_pair(path, newTexture));
 
-    return texture;
+    return newTexture;
 }
 
-Texture* AssetManager::getTextureHDR(std::string_view path)
+Texture AssetManager::getTextureHDR(std::string_view path)
 {
     auto it = m_textures.find(path.data());
     if (it != m_textures.end()) { return it->second; }
 
     TextureData textureData = loadHDRTextureFromFile(std::string{path});
 
-    Texture* newTexture = new Texture();
-    newTexture->m_ID = m_gpurm->createTexture({
+    Texture newTexture;
+    newTexture.handle = m_gpurm->createTexture({
         .width = textureData.width,
         .height = textureData.height,
         .format = Format::RGB,
@@ -81,20 +81,20 @@ Texture* AssetManager::getTextureHDR(std::string_view path)
 
     //m_files.push_back(createAssetFile(path, FileView{ texture }));
 
-    auto* texture = m_textures.insert(std::make_pair(path, newTexture)).first->second;
+    m_textures.insert(std::make_pair(path, newTexture));
 
-    return texture;
+    return newTexture;
 }
 
-Texture* AssetManager::getTextureCM(std::vector<std::string> path)
+Texture AssetManager::getTextureCM(std::vector<std::string> path)
 {
     auto it = m_textures.find(path.front());
     if (it != m_textures.end()) { return it->second; }
 
     TextureData textureData = loadCubeMapFromFiles(path);
 
-    Texture* newTexture = new Texture();
-    newTexture->m_ID = m_gpurm->createTexture({
+    Texture newTexture;
+    newTexture.handle = m_gpurm->createTexture({
         .width = textureData.width,
         .height = textureData.height,
         .format = Format::RGB,
@@ -108,9 +108,9 @@ Texture* AssetManager::getTextureCM(std::vector<std::string> path)
 
     //m_files.push_back(createAssetFile(path, FileView{ texture }));
 
-    auto* texture = m_textures.insert(std::make_pair(path.front(), newTexture)).first->second;
+    m_textures.insert(std::make_pair(path.front(), newTexture));
 
-    return texture;
+    return newTexture;
 }
 
 Mesh* AssetManager::loadMesh(MeshType type, VertexIndexTuple& mesh)
@@ -180,8 +180,8 @@ Model* AssetManager::getModel(std::string_view path, bool loadMaterial)
         if (mesh.material.diffusePath == "") {
             continue;
         }
-        Texture* tex = getTexture2D("resources/sponza/" + mesh.material.diffusePath);
-        mat->setTexture("u_albedoTex", tex->ID(), 0);
+        Texture tex = getTexture2D("resources/sponza/" + mesh.material.diffusePath);
+        mat->setTexture("u_albedoTex", tex.handle, 0);
 
     }
 
@@ -216,7 +216,7 @@ void AssetManager::loadDefaultResources()
 
 
     Material::setDefaultTexWhite(
-        getTexture2D("resources/textures/default_white.png")->ID());
+        getTexture2D("resources/textures/default_white.png").handle);
 }
 
 void AssetManager::checkFileModification()

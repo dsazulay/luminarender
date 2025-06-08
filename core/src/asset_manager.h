@@ -25,9 +25,9 @@ struct AssetFile
 class AssetManager
 {
 public:
-    Texture* getTexture2D(std::string_view path);
-    Texture* getTextureHDR(std::string_view path);
-    Texture* getTextureCM(std::vector<std::string> path);
+    Texture getTexture2D(std::string_view path);
+    Texture getTextureHDR(std::string_view path);
+    Texture getTextureCM(std::vector<std::string> path);
     Mesh* getMesh(MeshType type);
     Mesh* getMesh(std::string_view name);
     Model* getModel(std::string_view path, bool loadMaterial = false);
@@ -41,7 +41,7 @@ private:
     Texture* loadTexture(TextureData &textureData);
     Mesh* loadMesh(MeshType type, VertexIndexTuple& mesh);
 
-    std::unordered_map<std::string, Texture*> m_textures;
+    std::unordered_map<std::string, Texture> m_textures;
     std::unordered_map<std::string, Model*> m_models;
     std::unordered_map<std::string, Mesh*> m_importedModels;
     std::unordered_map<MeshType, Mesh*> m_nativeModels;

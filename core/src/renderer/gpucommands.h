@@ -1,6 +1,6 @@
 #pragma once
 
-#include "opengl.h"
+#include "gfxapi.h"
 
 template <class T>
 class GPUCommands
