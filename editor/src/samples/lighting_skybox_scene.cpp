@@ -48,13 +48,13 @@ void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary,
 
     Material* spitfireMat = assetLibrary.createMaterial("spitfireMat", "lambert");
     spitfireMat->setTexture("u_mainTex",
-                            assetManager.getTexture("resources/textures/spitfire/spitfire_d.png")->ID(), 0);
+                            assetManager.getTexture2D("resources/textures/spitfire/spitfire_d.png")->ID(), 0);
 
     Material* woodBoxMat = assetLibrary.createMaterial("woodBoxMat", "lambert");
     //woodBoxMat->setTexture("u_mainTex", assetLibrary.getTexture("woodBox")->ID(), 0);
 
     Material* skyboxMat = assetLibrary.createMaterial("skyboxMat", "skytriangle");
-    skyboxMat->setTexture("u_mainTex", assetManager.getTexture(faces)->ID(), 0);
+    skyboxMat->setTexture("u_mainTex", assetManager.getTextureCM(faces)->ID(), 0);
 }
 
 void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)

@@ -28,8 +28,6 @@ public:
     Material* createMaterial(const char* name, const char* shader);
     Material* createMaterial(const char* name, Shader*);
     Model* loadModel(const char* name, const char* path, bool material);
-    Texture* loadHDRTexture(const char* name, const std::string& file, const std::string& directory);
-    Texture* loadCubeMapTexture(const char* name, const std::vector<std::string> faces, const std::string& directory);
 
     void loadDefaultResources();
     void createDefaultResources();
@@ -38,7 +36,6 @@ public:
     Material* getMaterial(const char* name);
     Mesh* getMesh(const char* name);
     Model* getModel(const char* name);
-    Texture* getTexture(const char* name);
 
 private:
     AssetLibrary();
@@ -54,7 +51,6 @@ private:
     std::unordered_map<std::string, Material*> m_materials;
     std::unordered_map<std::string, Mesh*> m_meshes;
     std::unordered_map<std::string, Model*> m_models;
-    std::unordered_map<std::string, Texture*> m_textures;
 
     static constexpr char* texture_defaultWhite = (char*) "default_white.png";
     static constexpr char* texture_dir = (char*) "resources/textures";

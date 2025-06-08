@@ -209,6 +209,8 @@ GLenum OpenGL::getByteFormat(ByteFormat format)
             return GL_RGB;
         case ByteFormat::RGBA:
             return GL_RGBA;
+        case ByteFormat::RGB16F:
+            return GL_RGB16F;
         case ByteFormat::RGBA16F:
             return GL_RGBA16F;
         case ByteFormat::RGBA32F:

@@ -119,44 +119,6 @@ bool AssetLibrary::isModelLoaded(const char* name)
     return m_models.find(name) != m_models.end();
 }
 
-Texture* AssetLibrary::loadHDRTexture(const char *name, const std::string &file, const std::string &directory)
-{
-    if (isTextureLoaded(name))
-    {
-        LOG_INFO("texture already loaded");
-        return m_textures[name];
-    }
-    Texture* texture = Importer::loadHDRTextureFromFile(file, directory);
-    m_textures[name] = texture;
-    return texture;
-}
-
-Texture *AssetLibrary::loadCubeMapTexture(const char *name, const std::vector<std::string> faces,
-                                          const std::string &directory)
-{
-    if (isTextureLoaded(name))
-    {
-        LOG_INFO("texture already loaded");
-        return m_textures[name];
-    }
-    Texture* texture = Importer::loadCubeMapFromFiles(faces, directory);
-    m_textures[name] = texture;
-    return texture;
-}
-
-Texture *AssetLibrary::getTexture(const char *name)
-{
-    if (isTextureLoaded(name))
-        return m_textures[name];
-
-    LOG_WARN("texture not loaded");
-    return nullptr;
-}
-
-bool AssetLibrary::isTextureLoaded(const char *name)
-{
-    return m_textures.find(name) != m_textures.end();
-}
 
 AssetLibrary::AssetLibrary()
 {

@@ -25,7 +25,6 @@ void PbrScene::loadScene(AssetLibrary &assetLibrary,
 
 void PbrScene::loadTextures(AssetLibrary& assetLibrary)
 {
-    assetLibrary.loadHDRTexture("hdrSkybox", SampleResources::texture_tiber, SampleResources::texture_skybox_dir);
 }
 
 void PbrScene::loadIrradianceTextures(AssetLibrary& assetLibrary,
@@ -33,7 +32,7 @@ void PbrScene::loadIrradianceTextures(AssetLibrary& assetLibrary,
                                       AssetManager& assetManager)
 {
 
-    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(assetLibrary.getTexture("hdrSkybox")->ID(), assetManager);
+    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(assetManager.getTextureHDR("resources/textures/skybox/tiber_2.hdr")->m_ID, assetManager);
 
     skyboxTex = maps.cubeMap;
 }
@@ -50,20 +49,20 @@ void PbrScene::loadMaterials(AssetLibrary &assetLibrary, AssetManager &assetMana
     greyMat->setProperty("u_roughness", 0.2f);
 
     Material* spitfireMat = assetLibrary.createMaterial("spitfireMat", "pbr");
-    spitfireMat->setTexture("u_albedoTex", assetManager.getTexture("resources/textures/spitfire/spitfire_d.png")->ID(), 0);
-    spitfireMat->setTexture("u_metallicTex", assetManager.getTexture("resources/textures/spitfire/spitfire_m.png")->ID(), 0);
-    spitfireMat->setTexture("u_roughnessTex", assetManager.getTexture("resources/textures/spitfire/spitfire_r.png")->ID(), 0);
-    spitfireMat->setTexture("u_aoTex", assetManager.getTexture("resources/textures/spitfire/spitfire_ao.png")->ID(), 0);
+    spitfireMat->setTexture("u_albedoTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_d.png")->ID(), 0);
+    spitfireMat->setTexture("u_metallicTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_m.png")->ID(), 0);
+    spitfireMat->setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_r.png")->ID(), 0);
+    spitfireMat->setTexture("u_aoTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_ao.png")->ID(), 0);
 
     Material* metalBoxMat = assetLibrary.createMaterial("metalBoxMat", "pbr");
-    metalBoxMat->setTexture("u_albedoTex", assetManager.getTexture("resources/textures/metalbox/metalbox_a.png")->ID(), 0);
-    metalBoxMat->setTexture("u_roughnessTex", assetManager.getTexture("resources/textures/metalbox/metalbox_r.png")->ID(), 0);
-    metalBoxMat->setTexture("u_aoTex", assetManager.getTexture("resources/textures/metalbox/metalbox_ao.png")->ID(), 0);
+    metalBoxMat->setTexture("u_albedoTex", assetManager.getTexture2D("resources/textures/metalbox/metalbox_a.png")->ID(), 0);
+    metalBoxMat->setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/metalbox/metalbox_r.png")->ID(), 0);
+    metalBoxMat->setTexture("u_aoTex", assetManager.getTexture2D("resources/textures/metalbox/metalbox_ao.png")->ID(), 0);
 
     Material* cerberusMat = assetLibrary.createMaterial("cerberusMat", "pbr");
-    cerberusMat->setTexture("u_albedoTex", assetManager.getTexture("resources/textures/cerberus/cerberus_a.png")->ID(), 0);
-    cerberusMat->setTexture("u_metallicTex", assetManager.getTexture("resources/textures/cerberus/cerberus_r.png")->ID(), 0);
-    cerberusMat->setTexture("u_roughnessTex", assetManager.getTexture("resources/textures/cerberus/cerberus_r.png")->ID(), 0);
+    cerberusMat->setTexture("u_albedoTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_a.png")->ID(), 0);
+    cerberusMat->setTexture("u_metallicTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_r.png")->ID(), 0);
+    cerberusMat->setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_r.png")->ID(), 0);
 
     Material* skyboxMat = assetLibrary.createMaterial("skyboxMat", "skytriangle");
     skyboxMat->setTexture("u_mainTex", skyboxTex, 0);

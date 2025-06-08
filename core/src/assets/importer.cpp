@@ -18,13 +18,11 @@ void TextureData::freeData()
     }
 }
 
-TextureData loadTextureFromFile(std::string_view file) {
-    std::string filename{ file };
-
+TextureData loadTextureFromFile(const std::string& file) {
     TextureData textureData;
     stbi_set_flip_vertically_on_load(true);
 
-    unsigned char* data = stbi_load(filename.c_str(),
+    unsigned char* data = stbi_load(file.c_str(),
                                     &textureData.width,
                                     &textureData.height,
                                     &textureData.channels, 0);
@@ -33,6 +31,25 @@ TextureData loadTextureFromFile(std::string_view file) {
     }
 
     textureData.data.push_back(data);
+
+    return textureData;
+}
+
+TextureData loadHDRTextureFromFile(const std::string& file)
+{
+    TextureData textureData;
+    stbi_set_flip_vertically_on_load(true);
+
+    float* data = stbi_loadf(file.c_str(),
+                             &textureData.width,
+                             &textureData.height,
+                             &textureData.channels, 0);
+    if (!data) {
+        LOG_ERROR("Failed to load texture {}", file);
+    }
+
+    textureData.data.push_back(data);
+
 
     return textureData;
 }
@@ -239,66 +256,6 @@ VertexIndexTuple Importer::processMesh(aiMesh *mesh, const aiScene *scene, bool 
     }
 
     return m;
-}
-
-Texture* Importer::loadTextureFromFile(const std::string& file, const std::string &directory) {
-    std::string filename = directory + '/' + file;
-
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
-
-    unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
-    Texture* texture = nullptr;
-    if (data)
-        texture = new Texture(TextureType::Tex2D, width, height, nrChannels, data);
-    else
-        LOG_ERROR("Failed to load texture");
-
-    stbi_image_free(data);
-
-    return texture;
-}
-
-Texture* Importer::loadHDRTextureFromFile(const std::string& file, const std::string &directory)
-{
-    std::string filename = directory + '/' + file;
-
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
-
-    float* data = stbi_loadf(filename.c_str(), &width, &height, &nrChannels, 0);
-    Texture* texture = nullptr;
-    if (data)
-        texture = new Texture(TextureType::HDR, width, height, data);
-    else
-        LOG_ERROR("Failed to load texture");
-
-    stbi_image_free(data);
-
-    return texture;
-}
-
-Texture* Importer::loadCubeMapFromFiles(std::vector<std::string> faces, const std::string &directory)
-{
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(false);
-    std::vector<unsigned char*> textureVector;
-
-    for (auto & face : faces)
-    {
-        unsigned char *data = stbi_load((directory + '/' + face).c_str(), &width, &height, &nrChannels, 0);
-        if (data)
-            textureVector.push_back(data);
-        else
-            LOG_ERROR("Cubemap tex failed to load at path: {}", face);
-    }
-
-    Texture* texture = new Texture(TextureType::CubeMap, width, height, textureVector);
-
-    for (auto texData : textureVector)
-        stbi_image_free(texData);
-
-    return texture;
 }
 
 Model* Importer::loadModel(const char* path, bool material)

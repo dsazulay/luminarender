@@ -30,6 +30,7 @@ enum class ByteFormat
     RED,
     RGB,
     RGBA,
+    RGB16F,
     RGBA16F,
     RGBA32F,
     DEPTH,

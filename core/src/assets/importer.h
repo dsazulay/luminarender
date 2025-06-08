@@ -12,10 +12,6 @@ class Texture;
 class Importer
 {
 public:
-    static Texture* loadTextureFromFile(const std::string& file, const std::string &directory);
-    static Texture* loadCubeMapFromFiles(std::vector<std::string> faces, const std::string &directory);
-    static Texture* loadHDRTextureFromFile(const std::string& file, const std::string &directory);
-
     static Model* loadModel(const char* path, bool material);
     static void processNode(aiNode* node, const aiScene* scene, Model* meshes, bool material);
     static VertexIndexTuple processMesh(aiMesh* mesh, const aiScene* scene, bool material);
@@ -46,6 +42,8 @@ struct TextureData
     void freeData();
 };
 
-TextureData loadTextureFromFile(std::string_view file);
-ModelData* loadModel(std::string_view path, bool material);
+TextureData loadTextureFromFile(const std::string& file);
+TextureData loadHDRTextureFromFile(const std::string& file);
 TextureData loadCubeMapFromFiles(std::vector<std::string> &faces);
+
+ModelData* loadModel(std::string_view path, bool material);

@@ -25,8 +25,9 @@ struct AssetFile
 class AssetManager
 {
 public:
-    Texture* getTexture(std::string_view path);
-    Texture* getTexture(std::vector<std::string> path);
+    Texture* getTexture2D(std::string_view path);
+    Texture* getTextureHDR(std::string_view path);
+    Texture* getTextureCM(std::vector<std::string> path);
     Mesh* getMesh(MeshType type);
     Mesh* getMesh(std::string_view name);
     Model* getModel(std::string_view path);

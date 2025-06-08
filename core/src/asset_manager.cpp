@@ -1,7 +1,6 @@
 #include "asset_manager.h"
 
 #include "assets/model_types.h"
-#include "log.h"
 #include "logger.h"
 #include "assets/model.h"
 #include "assets/primitives.h"
@@ -20,8 +19,13 @@ AssetFile createAssetFile(std::string_view path, FileView fileView)
     };
 }
 
-Texture* AssetManager::loadTexture(TextureData &textureData)
+Texture* AssetManager::getTexture2D(std::string_view path)
 {
+    auto it = m_textures.find(path.data());
+    if (it != m_textures.end()) { return it->second; }
+
+    TextureData textureData = loadTextureFromFile(std::string{path});
+
     Format format = Format::RGBA;
     ByteFormat byteFormat = ByteFormat::RGBA;
     if (textureData.channels == 1)
@@ -36,56 +40,70 @@ Texture* AssetManager::loadTexture(TextureData &textureData)
     }
 
     Texture* newTexture = new Texture();
-
-    if (textureData.data.size() > 1) {
-        newTexture->m_ID = m_gpurm->createTexture({
-            .width = textureData.width,
-            .height = textureData.height,
-            .format = format,
-            .byteFormat = byteFormat,
-            .target = TextureTarget::CUBEMAP,
-            .wrap = Wrap::CLAMPEDGE,
-            .arrayOfInitialData = textureData.data,
-        });
-    }
-    else {
-        newTexture->m_ID = m_gpurm->createTexture({
-            .width = textureData.width,
-            .height = textureData.height,
-            .format = format,
-            .byteFormat = byteFormat,
-            .initialData = textureData.data.front(),
-        });
-    }
+    newTexture->m_ID = m_gpurm->createTexture({
+        .width = textureData.width,
+        .height = textureData.height,
+        .format = format,
+        .byteFormat = byteFormat,
+        .initialData = textureData.data.front(),
+    });
     textureData.freeData();
 
     //m_files.push_back(createAssetFile(path, FileView{ texture }));
-
-    return newTexture;
-}
-
-Texture* AssetManager::getTexture(std::string_view path)
-{
-    auto it = m_textures.find(path.data());
-    if (it != m_textures.end()) { return it->second; }
-
-    TextureData textureData = loadTextureFromFile(path);
-
-    Texture* newTexture = loadTexture(textureData);
 
     auto* texture = m_textures.insert(std::make_pair(path, newTexture)).first->second;
 
     return texture;
 }
 
-Texture* AssetManager::getTexture(std::vector<std::string> path)
+Texture* AssetManager::getTextureHDR(std::string_view path)
+{
+    auto it = m_textures.find(path.data());
+    if (it != m_textures.end()) { return it->second; }
+
+    TextureData textureData = loadHDRTextureFromFile(std::string{path});
+
+    Texture* newTexture = new Texture();
+    newTexture->m_ID = m_gpurm->createTexture({
+        .width = textureData.width,
+        .height = textureData.height,
+        .format = Format::RGB,
+        .byteFormat = ByteFormat::RGB16F,
+        .wrap = Wrap::CLAMPEDGE,
+        .type = TexType::FLOAT,
+        .initialData = textureData.data.front(),
+    });
+
+    textureData.freeData();
+
+    //m_files.push_back(createAssetFile(path, FileView{ texture }));
+
+    auto* texture = m_textures.insert(std::make_pair(path, newTexture)).first->second;
+
+    return texture;
+}
+
+Texture* AssetManager::getTextureCM(std::vector<std::string> path)
 {
     auto it = m_textures.find(path.front());
     if (it != m_textures.end()) { return it->second; }
 
     TextureData textureData = loadCubeMapFromFiles(path);
 
-    Texture* newTexture = loadTexture(textureData);
+    Texture* newTexture = new Texture();
+    newTexture->m_ID = m_gpurm->createTexture({
+        .width = textureData.width,
+        .height = textureData.height,
+        .format = Format::RGB,
+        .byteFormat = ByteFormat::RGB,
+        .target = TextureTarget::CUBEMAP,
+        .wrap = Wrap::CLAMPEDGE,
+        .arrayOfInitialData = textureData.data,
+    });
+
+    textureData.freeData();
+
+    //m_files.push_back(createAssetFile(path, FileView{ texture }));
 
     auto* texture = m_textures.insert(std::make_pair(path.front(), newTexture)).first->second;
 
@@ -182,7 +200,7 @@ void AssetManager::loadDefaultResources()
 
 
     Material::setDefaultTexWhite(
-        getTexture("resources/textures/default_white.png")->ID());
+        getTexture2D("resources/textures/default_white.png")->ID());
 }
 
 void AssetManager::checkFileModification()

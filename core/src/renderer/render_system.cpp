@@ -69,7 +69,7 @@ void RenderSystem::update()
 
 void RenderSystem::updateIrradianceMaps(AssetManager& assetManager)
 {
-    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(AssetLibrary::instance().getTexture("hdrSkybox")->ID(), assetManager);
+    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(assetManager.getTextureHDR("resources/textures/skybox/tiber_2.hdr")->ID(), assetManager);
     m_irradianceMap = maps.irradianceMap;
     m_prefilterMap = maps.prefilterMap;
     m_brdfLUT = maps.brdfLUTMap;
@@ -256,8 +256,8 @@ void RenderSystem::lightingPass()
         glBindTexture(GL_TEXTURE_2D, m_ssaoBlurBuffer->getColorAttachmentID());
     else
     {
-        glBindTexture(GL_TEXTURE_2D, AssetLibrary::instance().getTexture(
-            AssetLibrary::DefaultResources::texWhite)->ID());
+        glBindTexture(GL_TEXTURE_2D, m_assetManager->getTexture2D(
+            "resources/textures/default_white.png")->ID());
     }
 
     material->shader->setInt("u_orm", 5);
