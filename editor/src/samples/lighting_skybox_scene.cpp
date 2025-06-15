@@ -59,8 +59,8 @@ void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary,
 
 void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
 {
-    assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire, false);
-    assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
+    //assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire, false);
+    //assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
 }
 
 void LightingSkyboxScene::loadLights(ecs::Coordinator& coordinator)

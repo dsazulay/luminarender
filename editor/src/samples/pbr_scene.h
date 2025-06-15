@@ -14,14 +14,11 @@ public:
 
 private:
     static void loadShaders(AssetLibrary& assetLibrary);
-    static void loadTextures(AssetLibrary& assetLibrary);
-    static void loadIrradianceTextures(AssetLibrary& assetLibrary,
-                                       unsigned int& skyboxTex,
+    static void loadIrradianceTextures(unsigned int& skyboxTex,
                                        AssetManager& assetManager);
     static void loadMaterials(AssetLibrary& assetLibrary,
                               AssetManager& assetManager,
                               unsigned int& skyboxTex);
-    static void loadModels(AssetLibrary& assetLibrary);
     static void loadLights(ecs::Coordinator& coordinator);
     static void loadSkybox(AssetLibrary& assetLibrary, AssetManager& assetManager);
     static void loadObjects(AssetLibrary& assetLibrary,

@@ -1,7 +1,6 @@
 #include "asset_manager.h"
 
 #include "assets/model_types.h"
-#include "log.h"
 #include "logger.h"
 #include "assets/model.h"
 #include "assets/primitives.h"

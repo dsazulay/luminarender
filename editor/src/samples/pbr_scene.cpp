@@ -14,21 +14,15 @@ void PbrScene::loadScene(AssetLibrary &assetLibrary,
 {
     unsigned int skyboxTex;
 
-    loadTextures(assetLibrary);
-    loadIrradianceTextures(assetLibrary, skyboxTex, assetManager);
+    loadIrradianceTextures(skyboxTex, assetManager);
     loadMaterials(assetLibrary, assetManager, skyboxTex);
-    loadModels(assetLibrary);
     loadLights(coordinator);
     loadSkybox(assetLibrary, assetManager);
     loadObjects(assetLibrary, assetManager, coordinator);
 }
 
-void PbrScene::loadTextures(AssetLibrary& assetLibrary)
-{
-}
 
-void PbrScene::loadIrradianceTextures(AssetLibrary& assetLibrary,
-                                      unsigned int& skyboxTex,
+void PbrScene::loadIrradianceTextures(unsigned int& skyboxTex,
                                       AssetManager& assetManager)
 {
 
@@ -68,11 +62,6 @@ void PbrScene::loadMaterials(AssetLibrary &assetLibrary, AssetManager &assetMana
     skyboxMat->setTexture("u_mainTex", skyboxTex, 0);
 }
 
-void PbrScene::loadModels(AssetLibrary &assetLibrary)
-{
-    //assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
-}
-
 void PbrScene::loadLights(ecs::Coordinator& coordinator)
 {
     ecs::Entity light = coordinator.createEntity();
@@ -105,7 +94,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
     Mesh* sphere = assetManager.getMesh(MeshType::Sphere);
     Model* spitfire = assetManager.getModel(SampleResources::model_spitfire);
     Model* cerberus = assetManager.getModel(SampleResources::model_cerberus);
-    Model* sponza = assetManager.getModel("resources/sponza/sponza.obj", true);
+    //Model* sponza = assetManager.getModel("resources/sponza/sponza.obj", true);
 
     Material* greyMat = assetLibrary.getMaterial("greyMat");
     Material* blueMat = assetLibrary.getMaterial("blueMat");
@@ -206,7 +195,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
     cerberusTransform.position = SampleResources::object_positions[5];
     cerberusTransform.rotation = glm::vec3(-96.0, 0.0, 0.0);
     cerberusTransform.scale = glm::vec3(0.05);
-
+/*
     auto sponzaEntity = coordinator.createEntity();
     coordinator.addComponent(sponzaEntity, ecs::Transform{});
     coordinator.addComponent(sponzaEntity, ecs::Tag{
@@ -229,7 +218,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
 
     auto& sponzaTransform = coordinator.getComponent<ecs::Transform>(sponzaEntity);
     sponzaTransform.scale = glm::vec3(0.01, 0.01, 0.01);
-
+*/
     transformSystem->update();
     transformSystem->addChild(cubeEntity, sphereEntity);
     transformSystem->addChild(quadEntity, cubeEntity);

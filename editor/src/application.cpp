@@ -2,6 +2,7 @@
 
 #include "asset_manager.h"
 #include "components/components.h"
+#include "logger.h"
 #include "renderer/transform_system.h"
 #include "samples/lighting_skybox_scene.h"
 #include "samples/pbr_scene.h"

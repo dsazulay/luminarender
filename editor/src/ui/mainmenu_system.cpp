@@ -1,14 +1,8 @@
 #include "mainmenu_system.h"
 
 #include "assets/asset_library.h"
-#include "assets/mesh.h"
-#include "assets/material.h"
-#include "log.h"
 
 #include <tinyfiledialogs.h>
-
-#include <optional>
-#include <string>
 
 
 void MainMenuSystem::init(ecs::Coordinator* coordinator)
@@ -68,7 +62,7 @@ void MainMenuSystem::drawMenuFile()
         if (selection != nullptr)
         {
             // TODO: extract file name + check for name repetition
-            auto model = AssetLibrary::instance().loadModel(selection, selection, true);
+            //auto model = AssetLibrary::instance().loadModel(selection, selection, true);
             // TODO: create entity and add to the scene
         }
     }

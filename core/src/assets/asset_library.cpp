@@ -1,7 +1,6 @@
 #include "asset_library.h" 
 
 #include "../sample_resources.h"
-#include "importer.h"
 #include "../log.h"
 
 #include <glm/vec4.hpp>
@@ -20,16 +19,6 @@ AssetLibrary::~AssetLibrary()
     }
 
     for (auto kv : m_materials)
-    {
-        delete kv.second;
-    }
-
-    for (auto kv : m_meshes)
-    {
-        delete kv.second;
-    }
-
-    for (auto kv : m_models)
     {
         delete kv.second;
     }
@@ -87,38 +76,6 @@ bool AssetLibrary::isMaterialCreated(const char* name)
 {
     return (m_materials.find(name) != m_materials.end());
 }
-
-Model* AssetLibrary::loadModel(const char *name, const char *path, bool material)
-{
-    if (isModelLoaded(name))
-    {
-        LOG_INFO("model already loaded");
-        return m_models[name];
-    }
-
-    m_models[name] = Importer::loadModel(path, material);
-    for (auto mesh : m_models[name]->m_meshes)
-    {
-        m_meshes[mesh.first] = mesh.second;
-    }
-
-    return m_models[name];
-}
-
-Model* AssetLibrary::getModel(const char* name)
-{
-    if (isModelLoaded(name))
-        return m_models[name];
-
-    LOG_WARN("model not loaded");
-    return nullptr;
-}
-
-bool AssetLibrary::isModelLoaded(const char* name)
-{
-    return m_models.find(name) != m_models.end();
-}
-
 
 AssetLibrary::AssetLibrary()
 {

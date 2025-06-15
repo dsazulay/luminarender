@@ -2,9 +2,6 @@
 
 #include "shader.h"
 #include "material.h"
-#include "mesh.h"
-#include "model.h"
-#include "texture.h"
 
 #include <vector>
 #include <unordered_map>
@@ -27,15 +24,12 @@ public:
     Shader* loadShader(const char* name, const char* shaderPath);
     Material* createMaterial(const char* name, const char* shader);
     Material* createMaterial(const char* name, Shader*);
-    Model* loadModel(const char* name, const char* path, bool material);
 
     void loadDefaultResources();
     void createDefaultResources();
 
     Shader* getShader(const char* name);
     Material* getMaterial(const char* name);
-    Mesh* getMesh(const char* name);
-    Model* getModel(const char* name);
 
 private:
     AssetLibrary();
@@ -43,14 +37,9 @@ private:
 
     bool isShaderLoaded(const char* name);
     bool isMaterialCreated(const char* name);
-    bool isMeshLoaded(const char* name);
-    bool isModelLoaded(const char* name);
-    bool isTextureLoaded(const char* name);
 
     std::unordered_map<std::string, Shader*> m_shaders;
     std::unordered_map<std::string, Material*> m_materials;
-    std::unordered_map<std::string, Mesh*> m_meshes;
-    std::unordered_map<std::string, Model*> m_models;
 
     static constexpr char* texture_defaultWhite = (char*) "default_white.png";
     static constexpr char* texture_dir = (char*) "resources/textures";

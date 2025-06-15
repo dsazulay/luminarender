@@ -2,7 +2,6 @@
 
 #include <fmt/color.h>
 
-
 namespace logger {
     enum class Level {
         Debug = 1,
@@ -22,7 +21,7 @@ namespace logger {
 #ifdef DEBUG
     constexpr static bool debug = true;
 #else
-    constexpr static bool debug = false;
+    constexpr static bool debug = true;
 #endif
 
     void setFilter(Level level, bool isInclusive);
