@@ -5,6 +5,7 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <optional>
 
 struct MaterialData
 {
@@ -31,8 +32,8 @@ struct TextureData
     void freeData();
 };
 
-TextureData loadTextureFromFile(const std::string &file);
-TextureData loadHDRTextureFromFile(const std::string &file);
-TextureData loadCubeMapFromFiles(std::vector<std::string> &faces);
+std::optional<TextureData> loadTextureFromFile(const std::string &file);
+std::optional<TextureData> loadHDRTextureFromFile(const std::string &file);
+std::optional<TextureData> loadCubeMapFromFiles(std::vector<std::string> &faces);
 
 ModelData* loadModel(std::string_view path, bool material);

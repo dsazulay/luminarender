@@ -10,6 +10,7 @@
 
 #include <cstddef>
 #include <utility>
+#include <optional>
 
 AssetFile createAssetFile(std::string_view path, FileView fileView)
 {
@@ -25,7 +26,14 @@ Texture AssetManager::getTexture2D(std::string_view path)
     auto it = m_textures.find(path.data());
     if (it != m_textures.end()) { return it->second; }
 
-    TextureData textureData = loadTextureFromFile(std::string{path});
+    std::optional<TextureData> optionalTexData = loadTextureFromFile(std::string{path});
+    if (!optionalTexData.has_value())
+    {
+        logger::logError("Failed to load texture {}.", path);
+        return getTexture2D("resources/textures/default_white.png");
+    }
+
+    TextureData textureData = optionalTexData.value();
 
     Format format = Format::RGBA;
     ByteFormat byteFormat = ByteFormat::RGBA;
@@ -63,7 +71,14 @@ Texture AssetManager::getTextureHDR(std::string_view path)
     auto it = m_textures.find(path.data());
     if (it != m_textures.end()) { return it->second; }
 
-    TextureData textureData = loadHDRTextureFromFile(std::string{path});
+    std::optional<TextureData> optionalTexData = loadHDRTextureFromFile(std::string{path});
+    if (!optionalTexData.has_value())
+    {
+        logger::logError("Failed to load HDR texture {}.", path);
+        return getTextureHDR("resources/textures/skybox/green_point_park.hdr");
+    }
+
+    TextureData textureData = optionalTexData.value();
 
     Texture newTexture;
     newTexture.handle = m_gpurm->createTexture({
@@ -90,7 +105,23 @@ Texture AssetManager::getTextureCM(std::vector<std::string> path)
     auto it = m_textures.find(path.front());
     if (it != m_textures.end()) { return it->second; }
 
-    TextureData textureData = loadCubeMapFromFiles(path);
+    std::optional<TextureData> optionalTexData = loadCubeMapFromFiles(path);
+
+    if (!optionalTexData.has_value())
+    {
+        logger::logError("Failed to load CubeMap texture {}.", path.front());
+        std::vector<std::string> faces = {
+            "resources/textures/skybox/right.jpg",
+            "resources/textures/skybox/left.jpg",
+            "resources/textures/skybox/top.jpg",
+            "resources/textures/skybox/bottom.jpg",
+            "resources/textures/skybox/front.jpg",
+            "resources/textures/skybox/back.jpg",
+        };
+        return getTextureCM(faces);
+    }
+
+    TextureData textureData = optionalTexData.value();
 
     Texture newTexture;
     newTexture.handle = m_gpurm->createTexture({

@@ -8,8 +8,10 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <algorithm>
 
-void processNode(aiNode *node, const aiScene *scene, ModelData* data, bool material);
+
+void processNode(aiNode *node, const aiScene *scene, ModelData *data, bool material);
 MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial);
 
 void TextureData::freeData()
@@ -19,7 +21,7 @@ void TextureData::freeData()
     }
 }
 
-TextureData loadTextureFromFile(const std::string &file)
+std::optional<TextureData> loadTextureFromFile(const std::string &file)
 {
     TextureData textureData;
     stbi_set_flip_vertically_on_load(true);
@@ -29,7 +31,7 @@ TextureData loadTextureFromFile(const std::string &file)
                                     &textureData.height,
                                     &textureData.channels, 0);
     if (!data) {
-        logger::logError("Failed to load texture {}", file);
+        return std::nullopt;
     }
 
     textureData.data.push_back(data);
@@ -37,7 +39,7 @@ TextureData loadTextureFromFile(const std::string &file)
     return textureData;
 }
 
-TextureData loadHDRTextureFromFile(const std::string &file)
+std::optional<TextureData> loadHDRTextureFromFile(const std::string &file)
 {
     TextureData textureData;
     stbi_set_flip_vertically_on_load(true);
@@ -47,7 +49,7 @@ TextureData loadHDRTextureFromFile(const std::string &file)
                              &textureData.height,
                              &textureData.channels, 0);
     if (!data) {
-        logger::logError("Failed to load HDR texture {}", file);
+        return std::nullopt;
     }
 
     textureData.data.push_back(data);
@@ -56,7 +58,7 @@ TextureData loadHDRTextureFromFile(const std::string &file)
     return textureData;
 }
 
-TextureData loadCubeMapFromFiles(std::vector<std::string> &faces)
+std::optional<TextureData> loadCubeMapFromFiles(std::vector<std::string> &faces)
 {
     TextureData textureData;
     stbi_set_flip_vertically_on_load(false);
@@ -68,7 +70,7 @@ TextureData loadCubeMapFromFiles(std::vector<std::string> &faces)
                                         &textureData.height,
                                         &textureData.channels, 0);
         if (!data) {
-            logger::logError("Failed to load CubeMap texture {}", face);
+            return std::nullopt;
         }
 
         textureData.data.push_back(data);
@@ -106,8 +108,7 @@ void processNode(aiNode *node, const aiScene *scene, ModelData *data, bool mater
         data->push_back(meshData);
     }
 
-    for (unsigned int i = 0; i < node->mNumChildren; i++)
-    {
+    for (unsigned int i = 0; i < node->mNumChildren; i++) {
         processNode(node->mChildren[i], scene, data, material);
     }
 }
@@ -142,7 +143,10 @@ MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial)
     }
 
     // process indices
-    // outIndices.reserve(indicesSize);
+    if (mesh->mNumFaces > 0) {
+        m.indices.reserve(mesh->mNumFaces * mesh->mFaces[0].mNumIndices);
+    }
+
     for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
         aiFace face = mesh->mFaces[i];
@@ -151,8 +155,9 @@ MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial)
         }
     }
 
-    if (!importMaterial)
+    if (!importMaterial) {
         return { mesh->mName.C_Str(), m, {} };
+    }
 
     // process material
     MaterialData materialData;
@@ -167,10 +172,11 @@ MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial)
         {
             aiString texName;
             material->GetTexture(aiTextureType_DIFFUSE, i, &texName);
-            std::string correctName = texName.C_Str();
-            // TODO: check OS before change it
-            correctName.replace(8, 1, "/");
-            materialData.diffusePath = correctName;
+            materialData.diffusePath = texName.C_Str();
+
+            #if defined (__unix) || defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+            std::replace(materialData.diffusePath.begin(), materialData.diffusePath.end(), '\\', '/');
+            #endif
         }
     }
 
