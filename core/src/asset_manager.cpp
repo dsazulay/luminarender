@@ -33,7 +33,7 @@ Texture AssetManager::getTexture2D(std::string_view path)
         return getTexture2D("resources/textures/default_white.png");
     }
 
-    TextureData textureData = optionalTexData.value();
+    TextureData& textureData = optionalTexData.value();
 
     Format format = Format::RGBA;
     ByteFormat byteFormat = ByteFormat::RGBA;
@@ -78,7 +78,7 @@ Texture AssetManager::getTextureHDR(std::string_view path)
         return getTextureHDR("resources/textures/skybox/green_point_park.hdr");
     }
 
-    TextureData textureData = optionalTexData.value();
+    TextureData& textureData = optionalTexData.value();
 
     Texture newTexture;
     newTexture.handle = m_gpurm->createTexture({
@@ -121,7 +121,7 @@ Texture AssetManager::getTextureCM(std::vector<std::string> path)
         return getTextureCM(faces);
     }
 
-    TextureData textureData = optionalTexData.value();
+    TextureData& textureData = optionalTexData.value();
 
     Texture newTexture;
     newTexture.handle = m_gpurm->createTexture({
@@ -193,9 +193,16 @@ Model* AssetManager::getModel(std::string_view path, bool loadMaterial)
     if (it != m_models.end()) { return it->second; }
 
     Model* newModel = new Model();
-    ModelData* modelData = loadModel(path, loadMaterial);
+    std::optional<ModelData> modelData = loadModel(path, loadMaterial);
 
-    for (auto mesh : *modelData)
+    if (!modelData.has_value())
+    {
+        logger::logError("Failed to load model {}.", path);
+        // TODO: Return gracefully
+        return nullptr;
+    }
+
+    for (auto& mesh : modelData.value())
     {
         Mesh* m = loadMesh(MeshType::Custom, mesh.vertexIndex);
         m_importedModels.insert({mesh.name, m});
@@ -217,6 +224,7 @@ Model* AssetManager::getModel(std::string_view path, bool loadMaterial)
 
     auto* model = m_models.insert(std::make_pair(path, newModel)).first->second;
     //m_files.push_back(createAssetFile(path, FileView{ model }));
+
     return model;
 }
 /*

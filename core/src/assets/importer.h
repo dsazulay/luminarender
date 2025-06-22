@@ -36,4 +36,4 @@ std::optional<TextureData> loadTextureFromFile(const std::string &file);
 std::optional<TextureData> loadHDRTextureFromFile(const std::string &file);
 std::optional<TextureData> loadCubeMapFromFiles(std::vector<std::string> &faces);
 
-ModelData* loadModel(std::string_view path, bool material);
+std::optional<ModelData> loadModel(std::string_view path, bool material);

@@ -79,9 +79,9 @@ std::optional<TextureData> loadCubeMapFromFiles(std::vector<std::string> &faces)
     return textureData;
 }
 
-ModelData* loadModel(std::string_view path, bool material)
+std::optional<ModelData> loadModel(std::string_view path, bool material)
 {
-    ModelData *data = new ModelData();
+    ModelData data;
 
     Assimp::Importer import;
     const aiScene *scene = import.ReadFile(path.data(), aiProcess_Triangulate);
@@ -89,11 +89,11 @@ ModelData* loadModel(std::string_view path, bool material)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         logger::logError("Failed to load model {}: {}", path, import.GetErrorString());
-        delete data;
-        return nullptr;
+        return std::nullopt;
     }
 
-    processNode(scene->mRootNode, scene, data, material);
+    data.reserve(scene->mNumMeshes);
+    processNode(scene->mRootNode, scene, &data, material);
 
     return data;
 }
@@ -103,9 +103,7 @@ void processNode(aiNode *node, const aiScene *scene, ModelData *data, bool mater
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        // TODO: Check copy of mesh data
-        MeshData meshData = processMesh(mesh, scene, material);
-        data->push_back(meshData);
+        data->push_back(processMesh(mesh, scene, material));
     }
 
     for (unsigned int i = 0; i < node->mNumChildren; i++) {
