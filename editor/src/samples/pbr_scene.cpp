@@ -1,7 +1,5 @@
 #include "pbr_scene.h"
 
-#include "assets/model.h"
-#include "log.h"
 #include "sample_resources.h"
 #include "irradiance_map_factory.h"
 #include "components/components.h"
@@ -92,9 +90,9 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
     Mesh cube = assetManager.getMesh(MeshType::Cube);
     Mesh quad = assetManager.getMesh(MeshType::Quad);
     Mesh sphere = assetManager.getMesh(MeshType::Sphere);
-    Model* spitfire = assetManager.getModel(SampleResources::model_spitfire);
-    Model* cerberus = assetManager.getModel(SampleResources::model_cerberus);
-    //Model* sponza = assetManager.getModel("resources/sponza/sponza.obj", true);
+    const Model& spitfire = assetManager.getModel(SampleResources::model_spitfire);
+    const Model& cerberus = assetManager.getModel(SampleResources::model_cerberus);
+    //const Model& sponza = assetManager.getModel("resources/sponza/sponza.obj", true);
 
     Material* greyMat = assetLibrary.getMaterial("greyMat");
     Material* blueMat = assetLibrary.getMaterial("blueMat");
@@ -148,7 +146,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
 
     auto transformSystem = coordinator.getSytem<TransformSystem>();
 
-    for (auto& mesh : spitfire->m_meshes)
+    for (auto& mesh : spitfire.meshes)
     {
         auto newEntity = coordinator.createEntity();
         coordinator.addComponent(newEntity, ecs::Transform{});
@@ -176,7 +174,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
         .name = "Cerberus",
     });
 
-    for (auto& mesh : cerberus->m_meshes)
+    for (auto& mesh : cerberus.meshes)
     {
         auto newEntity = coordinator.createEntity();
         coordinator.addComponent(newEntity, ecs::Transform{});
@@ -202,13 +200,13 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
         .name = "Sponza",
     });
 
-    for (auto& mesh : sponza->m_meshes)
+    for (auto& mesh : sponza.meshes)
     {
         auto newEntity = coordinator.createEntity();
         coordinator.addComponent(newEntity, ecs::Transform{});
         coordinator.addComponent(newEntity, ecs::MeshRenderer{
             .mesh = mesh.second,
-            .material = AssetLibrary::instance().getMaterial(mesh.second->modelMat().c_str()),
+            .material = AssetLibrary::instance().getMaterial(mesh.second.importedMatName.c_str()),
         });
         coordinator.addComponent(newEntity, ecs::Tag{
             .name = mesh.first,

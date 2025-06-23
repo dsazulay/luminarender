@@ -1,16 +1,17 @@
 #include "asset_manager.h"
 
-#include "assets/model_types.h"
 #include "logger.h"
-#include "assets/model.h"
 #include "assets/primitives.h"
+
 #include "renderer/gfxapi.h"
-#include "assets/material.h"
-#include "assets/asset_library.h"
 
 #include <cstddef>
 #include <utility>
 #include <optional>
+
+// NOTE: Old
+#include "assets/material.h"
+#include "assets/asset_library.h"
 
 AssetFile createAssetFile(std::string_view path, FileView fileView)
 {
@@ -184,31 +185,32 @@ Mesh AssetManager::getMesh(std::string_view name)
     return getMesh(MeshType::Quad);
 }
 
-Model* AssetManager::getModel(std::string_view path, bool loadMaterial)
+Model AssetManager::getModel(std::string_view path, bool loadMaterial)
 {
     std::string strPath{ path };
     auto it = m_models.find(strPath);
     if (it != m_models.end()) { return it->second; }
 
-    Model* newModel = new Model();
+    Model newModel;
     std::optional<ModelData> modelData = loadModel(path, loadMaterial);
 
     if (!modelData.has_value())
     {
         logger::logError("Failed to load model {}.", path);
         // TODO: Return gracefully
-        return nullptr;
+        return newModel;
     }
 
     for (auto& mesh : modelData.value())
     {
         Mesh m = loadMesh(MeshType::Custom, mesh.vertexIndex);
+        m.importedMatName = mesh.material.name;
+
         m_importedModels.insert({mesh.name, m});
-        newModel->m_meshes.push_back({mesh.name, m});
+        newModel.meshes.push_back({mesh.name, m});
 
         // TODO: Fixme
         Material* mat = AssetLibrary::instance().createMaterial(mesh.material.name.c_str(), "pbr");
-        m.importedMatName = mesh.material.name;
 
         mat->setProperty("u_albedo", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
@@ -220,10 +222,10 @@ Model* AssetManager::getModel(std::string_view path, bool loadMaterial)
 
     }
 
-    auto* model = m_models.insert(std::make_pair(path, newModel)).first->second;
+    const auto& model = m_models.insert(std::make_pair(path, newModel));
     //m_files.push_back(createAssetFile(path, FileView{ model }));
 
-    return model;
+    return model.first->second;
 }
 /*
 Shader &AssetManager::getShader(std::string_view path)
