@@ -79,7 +79,7 @@ void PbrScene::loadLights(ecs::Coordinator& coordinator)
 
 void PbrScene::loadSkybox(AssetLibrary &assetLibrary, AssetManager& assetManager)
 {
-    Mesh* cubeMap = assetManager.getMesh(MeshType::TriangleMap);
+    Mesh cubeMap = assetManager.getMesh(MeshType::TriangleMap);
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 
 }
@@ -89,9 +89,9 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
                            ecs::Coordinator& coordinator)
 {
 
-    Mesh* cube = assetManager.getMesh(MeshType::Cube);
-    Mesh* quad = assetManager.getMesh(MeshType::Quad);
-    Mesh* sphere = assetManager.getMesh(MeshType::Sphere);
+    Mesh cube = assetManager.getMesh(MeshType::Cube);
+    Mesh quad = assetManager.getMesh(MeshType::Quad);
+    Mesh sphere = assetManager.getMesh(MeshType::Sphere);
     Model* spitfire = assetManager.getModel(SampleResources::model_spitfire);
     Model* cerberus = assetManager.getModel(SampleResources::model_cerberus);
     //Model* sponza = assetManager.getModel("resources/sponza/sponza.obj", true);

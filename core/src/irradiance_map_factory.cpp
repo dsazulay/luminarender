@@ -1,8 +1,7 @@
 #include "irradiance_map_factory.h"
-#include "asset_manager.h"
+
 #include "assets/shader.h"
-#include "assets/mesh.h"
-#include "components/mesh_renderer.h"
+
 #include <glm/glm.hpp>
 #include <glad/gl.h>
 #include <glm/ext/matrix_transform.hpp>
@@ -34,25 +33,23 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMapsFromHDR(
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Mesh* mesh = assetManager.getMesh(MeshType::CubeMap);
-    MeshRenderer mr;
-    mr.mesh = mesh;
+    Mesh mesh = assetManager.getMesh(MeshType::CubeMap);
 
     IrradianceMaps maps{};
     maps.cubeMap = generateCubeMapTexture(hdrTexture, captureFBO,
                                           captureProjection,
-                                          captureViews, mr);
-    maps.irradianceMap = generateIrradianceTexture(captureFBO, 
-                                                   maps.cubeMap, 
+                                          captureViews, mesh);
+    maps.irradianceMap = generateIrradianceTexture(captureFBO,
+                                                   maps.cubeMap,
                                                    captureRBO,
                                                    captureProjection,
-                                                   captureViews, mr);
+                                                   captureViews, mesh);
 
     maps.prefilterMap = generatePrefilterTexture(captureFBO,
                                                  maps.cubeMap,
                                                  captureRBO,
                                                  captureProjection,
-                                                 captureViews, mr);
+                                                 captureViews, mesh);
 
     maps.brdfLUTMap = generateLUTTexture(captureFBO, captureRBO,
                                          assetManager);
@@ -86,14 +83,12 @@ IrradianceMaps IrradianceMapFactory::generateCubeMapFromHDR(
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Mesh* mesh = assetManager.getMesh(MeshType::CubeMap);
-    MeshRenderer mr;
-    mr.mesh = mesh;
+    Mesh mesh = assetManager.getMesh(MeshType::CubeMap);
 
     IrradianceMaps maps{};
     maps.cubeMap = generateCubeMapTexture(hdrTexture, captureFBO,
                                           captureProjection,
-                                          captureViews, mr);
+                                          captureViews, mesh);
 
     return maps;
 }
@@ -124,22 +119,20 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMaps(
         glm::lookAt(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f))
     };
 
-    Mesh* mesh = assetManager.getMesh(MeshType::CubeMap);
-    MeshRenderer mr;
-    mr.mesh = mesh;
+    Mesh mesh = assetManager.getMesh(MeshType::CubeMap);
 
     IrradianceMaps maps{};
     maps.irradianceMap = generateIrradianceTexture(captureFBO,
                                                    cubeMapTex, 
                                                    captureRBO,
                                                    captureProjection,
-                                                   captureViews, mr);
+                                                   captureViews, mesh);
 
     maps.prefilterMap = generatePrefilterTexture(captureFBO,
                                                  cubeMapTex,
                                                  captureRBO,
                                                  captureProjection,
-                                                 captureViews, mr);
+                                                 captureViews, mesh);
     maps.brdfLUTMap = generateLUTTexture(captureFBO, captureRBO,
                                          assetManager);
 
@@ -147,7 +140,7 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMaps(
 }
 
 unsigned int IrradianceMapFactory::generateCubeMapTexture(unsigned int hdrTexture, unsigned int captureFBO,
-      glm::mat4& captureProjection, glm::mat4 captureViews[], MeshRenderer& mr)
+      glm::mat4& captureProjection, glm::mat4 captureViews[], Mesh& mesh)
 {
     unsigned int envCubemap;
     glGenTextures(1, &envCubemap);
@@ -180,8 +173,8 @@ unsigned int IrradianceMapFactory::generateCubeMapTexture(unsigned int hdrTextur
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBindVertexArray(mr.vao());
-        glDrawElements(GL_TRIANGLES, (int)mr.indicesCount(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(mesh.handle);
+        glDrawElements(GL_TRIANGLES, (int)mesh.indexCount, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -194,7 +187,7 @@ unsigned int IrradianceMapFactory::generateCubeMapTexture(unsigned int hdrTextur
 }
 
 unsigned int IrradianceMapFactory::generateIrradianceTexture(unsigned int captureFBO, unsigned int envCubemap,
-     unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], MeshRenderer& mr)
+     unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], Mesh& mesh)
 {
     unsigned int irradianceMap;
     glGenTextures(1, &irradianceMap);
@@ -228,8 +221,8 @@ unsigned int IrradianceMapFactory::generateIrradianceTexture(unsigned int captur
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glBindVertexArray(mr.vao());
-        glDrawElements(GL_TRIANGLES, (int)mr.indicesCount(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(mesh.handle);
+        glDrawElements(GL_TRIANGLES, (int)mesh.indexCount, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -238,7 +231,7 @@ unsigned int IrradianceMapFactory::generateIrradianceTexture(unsigned int captur
 }
 
 unsigned int IrradianceMapFactory::generatePrefilterTexture(unsigned int captureFBO, unsigned int envCubemap,
-    unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], MeshRenderer& mr)
+    unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], Mesh& mesh)
 {
     // pbr: create a pre-filter cubemap, and re-scale capture FBO to pre-filter scale.
     // --------------------------------------------------------------------------------
@@ -285,8 +278,8 @@ unsigned int IrradianceMapFactory::generatePrefilterTexture(unsigned int capture
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glBindVertexArray(mr.vao());
-            glDrawElements(GL_TRIANGLES, (int)mr.indicesCount(), GL_UNSIGNED_INT, nullptr);
+            glBindVertexArray(mesh.handle);
+            glDrawElements(GL_TRIANGLES, (int)mesh.indexCount, GL_UNSIGNED_INT, nullptr);
             glBindVertexArray(0);
         }
     }
@@ -323,12 +316,10 @@ unsigned int IrradianceMapFactory::generateLUTTexture(unsigned int captureFBO, u
 
     // pbr: generate a 2D LUT from the BRDF equations used.
     // ----------------------------------------------------
-    Mesh* quadMesh = assetManager.getMesh(MeshType::Quad);
-    MeshRenderer quadRenderer;
-    quadRenderer.mesh = quadMesh;
+    Mesh quadMesh = assetManager.getMesh(MeshType::Quad);
 
-    glBindVertexArray(quadRenderer.vao());
-    glDrawElements(GL_TRIANGLES, (int)quadRenderer.indicesCount(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(quadMesh.handle);
+    glDrawElements(GL_TRIANGLES, (int)quadMesh.indexCount, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

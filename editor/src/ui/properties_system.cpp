@@ -2,7 +2,6 @@
 
 #include "asset_manager.h"
 #include "assets/asset_library.h"
-#include "assets/mesh.h"
 #include "assets/material.h"
 #include "assets/model_types.h"
 #include "renderer/transform_system.h"
@@ -97,6 +96,7 @@ void PropertiesSystem::draw(ecs::MeshRenderer& renderer)
 {
     if (ImGui::TreeNodeEx("meshRenderer", ImGuiTreeNodeFlags_DefaultOpen, "Mesh Renderer"))
     {
+        /*
         // TODO: add mesh renderer without mesh
         const char* items[] = { "Quad", "Cube", "Sphere" };
         // TODO: remove -1 when able to have mesh renderer without mesh
@@ -121,7 +121,7 @@ void PropertiesSystem::draw(ecs::MeshRenderer& renderer)
                 break;
             }
         }
-
+        */
         draw(renderer.material);
         ImGui::TreePop();
     }

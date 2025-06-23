@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../ecs.h"
-#include "../assets/mesh.h"
 #include "../assets/material.h"
+#include "../assets/assets.h"
 
 #include <glm/vec3.hpp>
 #include <glm/gtc/quaternion.hpp>
@@ -44,7 +44,7 @@ struct Light
 
 struct MeshRenderer
 {
-    Mesh* mesh;
+    Mesh mesh;
     Material* material;
 };
 

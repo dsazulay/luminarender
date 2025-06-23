@@ -83,7 +83,7 @@ void LightingSkyboxScene::loadLights(ecs::Coordinator& coordinator)
 void LightingSkyboxScene::loadSkybox(AssetLibrary &assetLibrary,
                                      AssetManager& assetManager)
 {
-    Mesh* cubeMap = assetManager.getMesh(MeshType::TriangleMap);
+    Mesh cubeMap = assetManager.getMesh(MeshType::TriangleMap);
     Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 }
 

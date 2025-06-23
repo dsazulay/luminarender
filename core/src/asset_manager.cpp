@@ -143,9 +143,9 @@ Texture AssetManager::getTextureCM(std::vector<std::string> path)
     return newTexture;
 }
 
-Mesh* AssetManager::loadMesh(MeshType type, VertexIndexTuple& mesh)
+Mesh AssetManager::loadMesh(MeshType type, VertexIndexTuple& mesh)
 {
-    Mesh* newMesh = new Mesh();
+    Mesh newMesh;
     MeshHandles handles = m_gpurm->createMesh(MeshInfo<Vertex>{
         .vertices = mesh.vertices,
         .indices = mesh.indices,
@@ -155,29 +155,27 @@ Mesh* AssetManager::loadMesh(MeshType type, VertexIndexTuple& mesh)
             std::make_pair(2, offsetof(Vertex, texcoord)),
         }
     });
-    newMesh->m_meshType = type;
-    newMesh->m_vao = handles.vao;
-    newMesh->m_vbo = handles.vbo;
-    newMesh->m_ebo = handles.ebo;
-    newMesh->m_indices = mesh.indices;
+    newMesh.handle = handles.vao;
+    newMesh.indexCount = mesh.indices.size();
 
     return newMesh;
 }
 
-Mesh* AssetManager::getMesh(MeshType type)
+Mesh AssetManager::getMesh(MeshType type)
 {
     auto it = m_nativeModels.find(type);
     if (it != m_nativeModels.end()) { return it->second; }
 
 
     VertexIndexTuple meshData = getNativeMeshByType(type);
-    Mesh* mesh = loadMesh(type, meshData);
-    auto* model = m_nativeModels.insert({type, mesh}).first->second;
+    Mesh mesh = loadMesh(type, meshData);
 
-    return model;
+    m_nativeModels.insert({type, mesh});
+
+    return mesh;
 }
 
-Mesh* AssetManager::getMesh(std::string_view name)
+Mesh AssetManager::getMesh(std::string_view name)
 {
     auto it = m_importedModels.find(name.data());
     if (it != m_importedModels.end()) { return it->second; }
@@ -204,13 +202,13 @@ Model* AssetManager::getModel(std::string_view path, bool loadMaterial)
 
     for (auto& mesh : modelData.value())
     {
-        Mesh* m = loadMesh(MeshType::Custom, mesh.vertexIndex);
+        Mesh m = loadMesh(MeshType::Custom, mesh.vertexIndex);
         m_importedModels.insert({mesh.name, m});
         newModel->m_meshes.push_back({mesh.name, m});
 
         // TODO: Fixme
         Material* mat = AssetLibrary::instance().createMaterial(mesh.material.name.c_str(), "pbr");
-        m->m_modelMat = mesh.material.name;
+        m.importedMatName = mesh.material.name;
 
         mat->setProperty("u_albedo", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 

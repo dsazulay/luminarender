@@ -114,8 +114,8 @@ void RenderSystem::shadowPass()
         material->shader->setMat4("u_model", transform.modelMatrix);
         material->setUniformData();
 
-        glBindVertexArray(meshRenderer.mesh->vao());
-        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(meshRenderer.mesh.handle);
+        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh.indexCount, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
 
@@ -157,8 +157,8 @@ void RenderSystem::geometryPass()
         material->setProperty("u_albedo", color);
         material->setUniformData();
 
-        glBindVertexArray(meshRenderer.mesh->vao());
-        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(meshRenderer.mesh.handle);
+        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh.indexCount, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
 
@@ -172,7 +172,7 @@ void RenderSystem::ssaoPass()
     gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gpucommands.clear(ClearMask::COLOR);
 
-    Mesh* mesh = m_assetManager->getMesh(MeshType::Quad);
+    Mesh mesh = m_assetManager->getMesh(MeshType::Quad);
     Material* material = AssetLibrary::instance().getMaterial("ssaoMat");
     material->shader->use();
 
@@ -191,8 +191,8 @@ void RenderSystem::ssaoPass()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_ssaoNoiseTex);
 
-    glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int) mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(mesh.handle);
+    glDrawElements(GL_TRIANGLES, (int) mesh.indexCount, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 
     m_ssaoBuffer->unbind();
@@ -205,7 +205,7 @@ void RenderSystem::ssaoBlurPass()
     gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gpucommands.clear(ClearMask::COLOR);
 
-    Mesh* mesh = m_assetManager->getMesh(MeshType::Quad);
+    Mesh mesh = m_assetManager->getMesh(MeshType::Quad);
     Material* material = AssetLibrary::instance().getMaterial("ssaoBlurMat");
     material->shader->use();
 
@@ -216,8 +216,8 @@ void RenderSystem::ssaoBlurPass()
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_ssaoBuffer->getColorAttachmentID());
 
-    glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int) mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(mesh.handle);
+    glDrawElements(GL_TRIANGLES, (int) mesh.indexCount, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 
     m_ssaoBuffer->unbind();
@@ -230,7 +230,7 @@ void RenderSystem::lightingPass()
     gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     gpucommands.clear(ClearMask::COLORDEPTH);
 
-    Mesh* mesh = m_assetManager->getMesh(MeshType::Quad);
+    Mesh mesh = m_assetManager->getMesh(MeshType::Quad);
     Material* material = AssetLibrary::instance().getMaterial("LightingPass");
     material->shader->use();
 
@@ -277,8 +277,8 @@ void RenderSystem::lightingPass()
     glActiveTexture(GL_TEXTURE12);
     glBindTexture(GL_TEXTURE_2D, m_brdfLUT);
 
-    glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int) mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(mesh.handle);
+    glDrawElements(GL_TRIANGLES, (int) mesh.indexCount, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 
     m_mainTargetFrameBuffer->unbind();
@@ -288,7 +288,7 @@ void RenderSystem::skyboxPass()
 {
     m_mainTargetFrameBuffer->bind();
 
-    auto mesh = m_assetManager->getMesh(MeshType::TriangleMap);
+    Mesh mesh = m_assetManager->getMesh(MeshType::TriangleMap);
     Material* material = AssetLibrary::instance().getMaterial("skyboxMat");
     material->shader->use();
 
@@ -300,8 +300,8 @@ void RenderSystem::skyboxPass()
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture.second);
     }
 
-    glBindVertexArray(mesh->vao());
-    glDrawElements(GL_TRIANGLES, (int)mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(mesh.handle);
+    glDrawElements(GL_TRIANGLES, (int)mesh.indexCount, GL_UNSIGNED_INT, nullptr);
     glBindVertexArray(0);
 
     m_mainTargetFrameBuffer->unbind();
@@ -327,8 +327,8 @@ void RenderSystem::normalVisualizerPass()
 
         material->setUniformData();
 
-        glBindVertexArray(meshRenderer.mesh->vao());
-        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh->indicesCount(), GL_UNSIGNED_INT, nullptr);
+        glBindVertexArray(meshRenderer.mesh.handle);
+        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh.indexCount, GL_UNSIGNED_INT, nullptr);
         glBindVertexArray(0);
     }
 
