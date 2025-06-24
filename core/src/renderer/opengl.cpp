@@ -4,6 +4,47 @@
 
 #include <vector>
 
+id_t OpenGL::createShader(ShaderInfo info)
+{
+    id_t id = glCreateProgram();
+
+    for (auto& kv : info.sources)
+    {
+        const char* shaderCode = kv.second.c_str();
+
+        unsigned int shaderID;
+        int success;
+        char infoLog[512];
+
+        shaderID = glCreateShader(getShaderType(kv.first));
+        glShaderSource(shaderID, 1, &shaderCode, nullptr);
+        glCompileShader(shaderID);
+
+        glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(shaderID, 512, nullptr, infoLog);
+            LOG_ERROR("Shader compilation failed: {}", infoLog);
+        }
+
+        glAttachShader(id, shaderID);
+        glDeleteShader(shaderID);
+    }
+
+    glLinkProgram(id);
+
+    int success;
+    char infoLog[512];
+    glGetProgramiv(id, GL_LINK_STATUS, &success);
+    if (!success)
+    {
+        glGetProgramInfoLog(id, 512, nullptr, infoLog);
+        LOG_ERROR("Shader program linking failed: {}", infoLog);
+    }
+
+    return id;
+}
+
 id_t OpenGL::createTexture(TextureInfo info)
 {
     LOG(LogLevel::OPENGLAPI, "OpenGL backend create texture: {}", info.debugName);
@@ -30,7 +71,8 @@ id_t OpenGL::createTexture(TextureInfo info)
         glTexParameterfv(target, GL_TEXTURE_BORDER_COLOR, borderColor);
     }
 
-    if (target == GL_TEXTURE_CUBE_MAP) {
+    if (target == GL_TEXTURE_CUBE_MAP)
+    {
         glTexParameteri(target, GL_TEXTURE_WRAP_R, wrap);
         for (unsigned int i = 0; i < info.arrayOfInitialData.size(); ++i) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, byteFormat,
@@ -38,7 +80,8 @@ id_t OpenGL::createTexture(TextureInfo info)
                          info.arrayOfInitialData[i]);
         }
     }
-    else {
+    else
+    {
         glTexImage2D(target, 0, byteFormat, info.width, info.height,
                      0, format, type, info.initialData);
         if (info.minFiltering == Filtering::LINEAR_MIPMAP_LINEAR) {
@@ -161,6 +204,41 @@ bool OpenGL::isFrameBufferComplete(id_t frameBuffer)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return isComplete;
+}
+
+void OpenGL::bindShader(id_t shader)
+{
+    glUseProgram(shader);
+}
+
+void OpenGL::setUniform(id_t shader, const char *name, int value)
+{
+    glUniform1i(glGetUniformLocation(shader, name), value);
+}
+
+void OpenGL::setUniform(id_t shader, const char *name, float value)
+{
+    glUniform1f(glGetUniformLocation(shader, name), value);
+}
+
+void OpenGL::setUniform(id_t shader, const char *name, glm::vec3 &value)
+{
+    glUniform3fv(glGetUniformLocation(shader, name), 1, &value[0]);
+}
+
+void OpenGL::setUniform(id_t shader, const char *name, glm::vec4 &value)
+{
+    glUniform4fv(glGetUniformLocation(shader, name), 1, &value[0]);
+}
+
+void OpenGL::setUniform(id_t shader, const char *name, glm::mat3 &value)
+{
+    glUniformMatrix3fv(glGetUniformLocation(shader, name), 1, GL_FALSE, &value[0][0]);
+}
+
+void OpenGL::setUniform(id_t shader, const char *name, glm::mat4 &value)
+{
+    glUniformMatrix4fv(glGetUniformLocation(shader, name), 1, GL_FALSE, &value[0][0]);
 }
 
 // Commands
@@ -334,5 +412,18 @@ GLenum OpenGL::getFrameBufferOp(FrameBufferOp op)
             return GL_DRAW_FRAMEBUFFER;
         case FrameBufferOp::READWRITE:
             return GL_FRAMEBUFFER;
+    }
+}
+
+GLenum OpenGL::getShaderType(ShaderType type)
+{
+    switch (type)
+    {
+        case ShaderType::VERTEX:
+            return GL_VERTEX_SHADER;
+        case ShaderType::FRAGMENT:
+            return GL_FRAGMENT_SHADER;
+        case ShaderType::GEOMETRY:
+            return GL_GEOMETRY_SHADER;
     }
 }

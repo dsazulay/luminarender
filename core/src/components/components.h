@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../ecs.h"
-#include "../assets/material.h"
 #include "../assets/assets.h"
 
 #include <glm/vec3.hpp>
@@ -45,7 +44,7 @@ struct Light
 struct MeshRenderer
 {
     Mesh mesh;
-    Material* material;
+    Material *material;
 };
 
 struct Tag

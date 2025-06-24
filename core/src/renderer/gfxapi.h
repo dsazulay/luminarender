@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_map>
 #include <vector>
 
 typedef unsigned int id_t;
@@ -9,6 +10,13 @@ struct MeshHandles
     id_t vao;
     id_t vbo;
     id_t ebo;
+};
+
+enum class ShaderType
+{
+    VERTEX,
+    FRAGMENT,
+    GEOMETRY,
 };
 
 enum class Filtering
@@ -98,6 +106,12 @@ struct MeshInfo
     std::vector<T> vertices;
     std::vector<unsigned int> indices;
     std::vector<std::pair<int, unsigned long>> amountAndOffset;
+};
+
+struct ShaderInfo
+{
+    const char* shaderName = "Shader";
+    std::unordered_map<ShaderType, std::string> sources;
 };
 
 struct TextureInfo

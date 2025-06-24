@@ -6,19 +6,19 @@
 #include "renderer/transform_system.h"
 
 
-void LightingSkyboxScene::loadScene(AssetLibrary &assetLibrary,
-                                    AssetManager& assetManager,
+void LightingSkyboxScene::loadScene(AssetManager& assetManager,
                                     ecs::Coordinator& coordinator)
 {
+    /*
     loadTextures(assetLibrary);
     loadMaterials(assetLibrary, assetManager);
     loadModels(assetLibrary);
     loadLights(coordinator);
     loadSkybox(assetLibrary, assetManager);
-    loadObjects(assetLibrary, coordinator);
+    loadObjects(assetLibrary, coordinator);*/
 }
 
-void LightingSkyboxScene::loadTextures(AssetLibrary& assetLibrary)
+void LightingSkyboxScene::loadTextures()
 {
 
 
@@ -27,8 +27,7 @@ void LightingSkyboxScene::loadTextures(AssetLibrary& assetLibrary)
     //assetLibrary.loadCubeMapTexture("glaciers", faces, SampleResources::texture_skybox_dir);
 }
 
-void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary,
-                                        AssetManager& assetManager)
+void LightingSkyboxScene::loadMaterials(AssetManager& assetManager)
 {
     std::vector<std::string> faces =
     {
@@ -39,7 +38,7 @@ void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary,
         "resources/textures/skybox/front.jpg",
         "resources/textures/skybox/back.jpg",
     };
-
+/*
     Material* blueMat = assetLibrary.createMaterial("blueMat", "lambert");
     blueMat->setProperty("u_color", glm::vec4(0.2f, 0.2f, 1.0f, 1.0f));
 
@@ -54,10 +53,10 @@ void LightingSkyboxScene::loadMaterials(AssetLibrary &assetLibrary,
     //woodBoxMat->setTexture("u_mainTex", assetLibrary.getTexture("woodBox")->ID(), 0);
 
     Material* skyboxMat = assetLibrary.createMaterial("skyboxMat", "skytriangle");
-    skyboxMat->setTexture("u_mainTex", assetManager.getTextureCM(faces).handle, 0);
+    skyboxMat->setTexture("u_mainTex", assetManager.getTextureCM(faces).handle, 0);*/
 }
 
-void LightingSkyboxScene::loadModels(AssetLibrary &assetLibrary)
+void LightingSkyboxScene::loadModels()
 {
     //assetLibrary.loadModel("spitfireModel", SampleResources::model_spitfire, false);
     //assetLibrary.loadModel("sponza", "resources/sponza/sponza.obj", true);
@@ -80,25 +79,24 @@ void LightingSkyboxScene::loadLights(ecs::Coordinator& coordinator)
     });
 }
 
-void LightingSkyboxScene::loadSkybox(AssetLibrary &assetLibrary,
-                                     AssetManager& assetManager)
+void LightingSkyboxScene::loadSkybox(AssetManager& assetManager)
 {
     Mesh cubeMap = assetManager.getMesh(MeshType::TriangleMap);
-    Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
+    //Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
 }
 
-void LightingSkyboxScene::loadObjects(AssetLibrary& assetLibrary, ecs::Coordinator& coordinator)
+void LightingSkyboxScene::loadObjects(ecs::Coordinator& coordinator)
 {
     //Mesh* cube = assetLibrary.getMesh("cube");
     //Mesh* quad = assetLibrary.getMesh("quad");
     //Mesh* sphere = assetLibrary.getMesh("sphere");
     //Model* spitfire = assetLibrary.getModel("spitfireModel");
     //Model* sponza = assetLibrary.getModel("sponza");
-
+/*
     Material* greyMat = assetLibrary.getMaterial("greyMat");
     Material* blueMat = assetLibrary.getMaterial("blueMat");
     Material* woodBoxMat = assetLibrary.getMaterial("woodBoxMat");
-    Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
+    Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");*/
 /*
     auto sphereEntity = coordinator.createEntity();
     coordinator.addComponent(sphereEntity, ecs::MeshRenderer{

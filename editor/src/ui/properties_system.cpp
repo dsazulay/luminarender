@@ -1,8 +1,6 @@
 #include "properties_system.h"
 
 #include "asset_manager.h"
-#include "assets/asset_library.h"
-#include "assets/material.h"
 #include "assets/model_types.h"
 #include "renderer/transform_system.h"
 #include "log.h"
@@ -60,7 +58,7 @@ void PropertiesSystem::update()
         {
             m_coordinator->addComponent(m_selected->value(), ecs::MeshRenderer{
                 .mesh = m_assetManager->getMesh(MeshType::Sphere),
-                .material = AssetLibrary::instance().getMaterial("greyMat"),
+                .material = &m_assetManager->getMaterial("greyMat"),
             });
         }
         if (ImGui::Selectable("Light"))
@@ -134,7 +132,7 @@ void PropertiesSystem::draw(Material* mat)
 
     if (ImGui::TreeNodeEx("material", ImGuiTreeNodeFlags_DefaultOpen, "Material"))
     {
-        ImGui::Text("%s", mat->name().c_str());
+        ImGui::Text("%s", mat->name.c_str());
         ImGui::TreePop();
     }
 }

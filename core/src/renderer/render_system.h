@@ -3,7 +3,6 @@
 #include "../ecs.h"
 #include "gpucommands.h"
 #include "frame_buffer.h"
-#include "../assets/material.h"
 #include "../asset_manager.h"
 #include "../camera.h"
 

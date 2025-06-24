@@ -6,17 +6,16 @@
 #include "renderer/transform_system.h"
 
 
-void PbrScene::loadScene(AssetLibrary &assetLibrary,
-                         AssetManager& assetManager,
+void PbrScene::loadScene(AssetManager& assetManager,
                          ecs::Coordinator& coordinator)
 {
     unsigned int skyboxTex;
 
     loadIrradianceTextures(skyboxTex, assetManager);
-    loadMaterials(assetLibrary, assetManager, skyboxTex);
+    loadMaterials(assetManager, skyboxTex);
     loadLights(coordinator);
-    loadSkybox(assetLibrary, assetManager);
-    loadObjects(assetLibrary, assetManager, coordinator);
+    loadSkybox(assetManager);
+    loadObjects(assetManager, coordinator);
 }
 
 
@@ -29,35 +28,37 @@ void PbrScene::loadIrradianceTextures(unsigned int& skyboxTex,
     skyboxTex = maps.cubeMap;
 }
 
-void PbrScene::loadMaterials(AssetLibrary &assetLibrary, AssetManager &assetManager, unsigned int& skyboxTex)
+void PbrScene::loadMaterials(AssetManager &assetManager, unsigned int& skyboxTex)
 {
-    Material* blueMat = assetLibrary.createMaterial("blueMat", "pbr");
-    blueMat->setProperty("u_albedo", glm::vec4(0.2f, 0.2f, 1.0f, 1.0f));
-    blueMat->setProperty("u_roughness", 0.2f);
+    Shader pbr = assetManager.getShader("resources/shaders/cook_torrance.glsl");
+    Material& blueMat = assetManager.createMaterial("blueMat", pbr);
+    blueMat.setColor("u_albedo", glm::vec4(0.2f, 0.2f, 1.0f, 1.0f));
+    blueMat.setFloat("u_roughness", 0.9f);
 
 
-    Material* greyMat = assetLibrary.createMaterial("greyMat", "pbr");
-    greyMat->setProperty("u_albedo", glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
-    greyMat->setProperty("u_roughness", 0.2f);
+    Material& greyMat = assetManager.createMaterial("greyMat", pbr);
+    greyMat.setColor("u_albedo", glm::vec4(0.3f, 0.3f, 0.3f, 1.0f));
+    greyMat.setFloat("u_roughness", 0.2f);
 
-    Material* spitfireMat = assetLibrary.createMaterial("spitfireMat", "pbr");
-    spitfireMat->setTexture("u_albedoTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_d.png").handle, 0);
-    spitfireMat->setTexture("u_metallicTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_m.png").handle, 0);
-    spitfireMat->setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_r.png").handle, 0);
-    spitfireMat->setTexture("u_aoTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_ao.png").handle, 0);
+    Material& spitfireMat = assetManager.createMaterial("spitfireMat", pbr);
+    spitfireMat.setTexture("u_albedoTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_d.png").handle);
+    spitfireMat.setTexture("u_metallicTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_m.png").handle);
+    spitfireMat.setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_r.png").handle);
+    spitfireMat.setTexture("u_aoTex", assetManager.getTexture2D("resources/textures/spitfire/spitfire_ao.png").handle);
 
-    Material* metalBoxMat = assetLibrary.createMaterial("metalBoxMat", "pbr");
-    metalBoxMat->setTexture("u_albedoTex", assetManager.getTexture2D("resources/textures/metalbox/metalbox_a.png").handle, 0);
-    metalBoxMat->setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/metalbox/metalbox_r.png").handle, 0);
-    metalBoxMat->setTexture("u_aoTex", assetManager.getTexture2D("resources/textures/metalbox/metalbox_ao.png").handle, 0);
+    Material& metalBoxMat = assetManager.createMaterial("metalBoxMat", pbr);
+    metalBoxMat.setTexture("u_albedoTex", assetManager.getTexture2D("resources/textures/metalbox/metalbox_a.png").handle);
+    metalBoxMat.setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/metalbox/metalbox_r.png").handle);
+    metalBoxMat.setTexture("u_aoTex", assetManager.getTexture2D("resources/textures/metalbox/metalbox_ao.png").handle);
 
-    Material* cerberusMat = assetLibrary.createMaterial("cerberusMat", "pbr");
-    cerberusMat->setTexture("u_albedoTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_a.png").handle, 0);
-    cerberusMat->setTexture("u_metallicTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_r.png").handle, 0);
-    cerberusMat->setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_r.png").handle, 0);
+    Material& cerberusMat = assetManager.createMaterial("cerberusMat", pbr);
+    cerberusMat.setTexture("u_albedoTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_a.png").handle);
+    cerberusMat.setTexture("u_metallicTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_r.png").handle);
+    cerberusMat.setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_r.png").handle);
 
-    Material* skyboxMat = assetLibrary.createMaterial("skyboxMat", "skytriangle");
-    skyboxMat->setTexture("u_mainTex", skyboxTex, 0);
+    Shader skytri = assetManager.getShader("resources/shaders/skytriangle.glsl");
+    Material& skyboxMat = assetManager.createMaterial("skyboxMat", skytri);
+    skyboxMat.setTexture("u_mainTex", skyboxTex);
 }
 
 void PbrScene::loadLights(ecs::Coordinator& coordinator)
@@ -75,15 +76,14 @@ void PbrScene::loadLights(ecs::Coordinator& coordinator)
     });
 }
 
-void PbrScene::loadSkybox(AssetLibrary &assetLibrary, AssetManager& assetManager)
+void PbrScene::loadSkybox(AssetManager& assetManager)
 {
     Mesh cubeMap = assetManager.getMesh(MeshType::TriangleMap);
-    Material* skyboxMat = assetLibrary.getMaterial("skyboxMat");
+    Material& skyboxMat = assetManager.getMaterial("skyboxMat");
 
 }
 
-void PbrScene::loadObjects(AssetLibrary& assetLibrary,
-                           AssetManager& assetManager,
+void PbrScene::loadObjects(AssetManager& assetManager,
                            ecs::Coordinator& coordinator)
 {
 
@@ -92,18 +92,18 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
     Mesh sphere = assetManager.getMesh(MeshType::Sphere);
     const Model& spitfire = assetManager.getModel(SampleResources::model_spitfire);
     const Model& cerberus = assetManager.getModel(SampleResources::model_cerberus);
-    //const Model& sponza = assetManager.getModel("resources/sponza/sponza.obj", true);
+    const Model& sponza = assetManager.getModel("resources/sponza/sponza.obj", true);
 
-    Material* greyMat = assetLibrary.getMaterial("greyMat");
-    Material* blueMat = assetLibrary.getMaterial("blueMat");
-    Material* spitfireMat = assetLibrary.getMaterial("spitfireMat");
-    Material* woodBoxMat = assetLibrary.getMaterial("metalBoxMat");
-    Material* cerberusMat = assetLibrary.getMaterial("cerberusMat");
+    Material& greyMat = assetManager.getMaterial("greyMat");
+    Material& blueMat = assetManager.getMaterial("blueMat");
+    Material& spitfireMat = assetManager.getMaterial("spitfireMat");
+    Material& woodBoxMat = assetManager.getMaterial("metalBoxMat");
+    Material& cerberusMat = assetManager.getMaterial("cerberusMat");
 
     auto sphereEntity = coordinator.createEntity();
     coordinator.addComponent(sphereEntity, ecs::MeshRenderer{
         .mesh = sphere,
-        .material = blueMat,
+        .material = &blueMat,
     });
     coordinator.addComponent(sphereEntity, ecs::Transform{
         .position = SampleResources::object_positions[1],
@@ -115,7 +115,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
     auto cubeEntity = coordinator.createEntity();
     coordinator.addComponent(cubeEntity, ecs::MeshRenderer{
         .mesh = cube,
-        .material = woodBoxMat,
+        .material = &woodBoxMat,
     });
     coordinator.addComponent(cubeEntity, ecs::Transform{
         .position = SampleResources::object_positions[3],
@@ -127,7 +127,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
     auto quadEntity = coordinator.createEntity();
     coordinator.addComponent(quadEntity, ecs::MeshRenderer{
         .mesh = quad,
-        .material = greyMat,
+        .material = &greyMat,
     });
     coordinator.addComponent(quadEntity, ecs::Transform{
         .position = SampleResources::object_positions[0],
@@ -152,7 +152,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
         coordinator.addComponent(newEntity, ecs::Transform{});
         coordinator.addComponent(newEntity, ecs::MeshRenderer{
             .mesh = mesh.second,
-            .material = spitfireMat,
+            .material = &spitfireMat,
         });
         coordinator.addComponent(newEntity, ecs::Tag{
             .name = mesh.first,
@@ -180,7 +180,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
         coordinator.addComponent(newEntity, ecs::Transform{});
         coordinator.addComponent(newEntity, ecs::MeshRenderer{
             .mesh = mesh.second,
-            .material = cerberusMat,
+            .material = &cerberusMat,
         });
         coordinator.addComponent(newEntity, ecs::Tag{
             .name = mesh.first,
@@ -193,7 +193,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
     cerberusTransform.position = SampleResources::object_positions[5];
     cerberusTransform.rotation = glm::vec3(-96.0, 0.0, 0.0);
     cerberusTransform.scale = glm::vec3(0.05);
-/*
+
     auto sponzaEntity = coordinator.createEntity();
     coordinator.addComponent(sponzaEntity, ecs::Transform{});
     coordinator.addComponent(sponzaEntity, ecs::Tag{
@@ -206,7 +206,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
         coordinator.addComponent(newEntity, ecs::Transform{});
         coordinator.addComponent(newEntity, ecs::MeshRenderer{
             .mesh = mesh.second,
-            .material = AssetLibrary::instance().getMaterial(mesh.second.importedMatName.c_str()),
+            .material = &assetManager.getMaterial(mesh.second.importedMatName.c_str()),
         });
         coordinator.addComponent(newEntity, ecs::Tag{
             .name = mesh.first,
@@ -216,7 +216,7 @@ void PbrScene::loadObjects(AssetLibrary& assetLibrary,
 
     auto& sponzaTransform = coordinator.getComponent<ecs::Transform>(sponzaEntity);
     sponzaTransform.scale = glm::vec3(0.01, 0.01, 0.01);
-*/
+
     transformSystem->update();
     transformSystem->addChild(cubeEntity, sphereEntity);
     transformSystem->addChild(quadEntity, cubeEntity);

@@ -1,6 +1,5 @@
 #include "irradiance_map_factory.h"
-
-#include "assets/shader.h"
+#include "renderer/gpuresourcemanager.h"
 
 #include <glm/glm.hpp>
 #include <glad/gl.h>
@@ -38,18 +37,21 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMapsFromHDR(
     IrradianceMaps maps{};
     maps.cubeMap = generateCubeMapTexture(hdrTexture, captureFBO,
                                           captureProjection,
-                                          captureViews, mesh);
+                                          captureViews, mesh,
+                                          assetManager);
     maps.irradianceMap = generateIrradianceTexture(captureFBO,
                                                    maps.cubeMap,
                                                    captureRBO,
                                                    captureProjection,
-                                                   captureViews, mesh);
+                                                   captureViews, mesh,
+                                                   assetManager);
 
     maps.prefilterMap = generatePrefilterTexture(captureFBO,
                                                  maps.cubeMap,
                                                  captureRBO,
                                                  captureProjection,
-                                                 captureViews, mesh);
+                                                 captureViews, mesh,
+                                                 assetManager);
 
     maps.brdfLUTMap = generateLUTTexture(captureFBO, captureRBO,
                                          assetManager);
@@ -88,7 +90,8 @@ IrradianceMaps IrradianceMapFactory::generateCubeMapFromHDR(
     IrradianceMaps maps{};
     maps.cubeMap = generateCubeMapTexture(hdrTexture, captureFBO,
                                           captureProjection,
-                                          captureViews, mesh);
+                                          captureViews, mesh,
+                                          assetManager);
 
     return maps;
 }
@@ -126,13 +129,15 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMaps(
                                                    cubeMapTex, 
                                                    captureRBO,
                                                    captureProjection,
-                                                   captureViews, mesh);
+                                                   captureViews, mesh,
+                                                   assetManager);
 
     maps.prefilterMap = generatePrefilterTexture(captureFBO,
                                                  cubeMapTex,
                                                  captureRBO,
                                                  captureProjection,
-                                                 captureViews, mesh);
+                                                 captureViews, mesh,
+                                                 assetManager);
     maps.brdfLUTMap = generateLUTTexture(captureFBO, captureRBO,
                                          assetManager);
 
@@ -140,7 +145,8 @@ IrradianceMaps IrradianceMapFactory::generateIrradianceMaps(
 }
 
 unsigned int IrradianceMapFactory::generateCubeMapTexture(unsigned int hdrTexture, unsigned int captureFBO,
-      glm::mat4& captureProjection, glm::mat4 captureViews[], Mesh& mesh)
+      glm::mat4& captureProjection, glm::mat4 captureViews[], Mesh& mesh,
+      AssetManager& assetManager)
 {
     unsigned int envCubemap;
     glGenTextures(1, &envCubemap);
@@ -157,10 +163,12 @@ unsigned int IrradianceMapFactory::generateCubeMapTexture(unsigned int hdrTextur
 
     // pbr: convert HDR equirectangular environment map to cubemap equivalent
     // ----------------------------------------------------------------------
-    Shader equirectangularToCubemapShader("resources/shaders/skybox_equirectangular.glsl");
-    equirectangularToCubemapShader.use();
-    equirectangularToCubemapShader.setInt("u_equirectangularMap", 0);
-    equirectangularToCubemapShader.setMat4("u_projection", captureProjection);
+
+    GPUResourceManager<OpenGL> gpurm;
+    Shader equiShader = assetManager.getShader("resources/shaders/skybox_equirectangular.glsl");
+    gpurm.bindShader(equiShader.handle);
+    gpurm.setUniform(equiShader.handle, "u_equirectangularMap", 0);
+    gpurm.setUniform(equiShader.handle, "u_projection", captureProjection);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, hdrTexture);
 
@@ -169,7 +177,7 @@ unsigned int IrradianceMapFactory::generateCubeMapTexture(unsigned int hdrTextur
 
     for (unsigned int i = 0; i < 6; ++i)
     {
-        equirectangularToCubemapShader.setMat4("u_view", captureViews[i]);
+        gpurm.setUniform(equiShader.handle, "u_view", captureViews[i]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, envCubemap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -187,7 +195,7 @@ unsigned int IrradianceMapFactory::generateCubeMapTexture(unsigned int hdrTextur
 }
 
 unsigned int IrradianceMapFactory::generateIrradianceTexture(unsigned int captureFBO, unsigned int envCubemap,
-     unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], Mesh& mesh)
+     unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], Mesh& mesh, AssetManager& assetManager)
 {
     unsigned int irradianceMap;
     glGenTextures(1, &irradianceMap);
@@ -206,10 +214,12 @@ unsigned int IrradianceMapFactory::generateIrradianceTexture(unsigned int captur
     glBindRenderbuffer(GL_RENDERBUFFER, captureRBO);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 32, 32);
 
-    Shader irradianceShader("resources/shaders/skybox_irradiance.glsl");
-    irradianceShader.use();
-    irradianceShader.setInt("u_environmentMap", 0);
-    irradianceShader.setMat4("u_projection", captureProjection);
+    GPUResourceManager<OpenGL> gpurm;
+    Shader irradianceShader = assetManager.getShader("resources/shaders/skybox_irradiance.glsl");
+    gpurm.bindShader(irradianceShader.handle);
+
+    gpurm.setUniform(irradianceShader.handle, "u_environmentMap", 0);
+    gpurm.setUniform(irradianceShader.handle, "u_projection", captureProjection);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -217,7 +227,7 @@ unsigned int IrradianceMapFactory::generateIrradianceTexture(unsigned int captur
     glBindFramebuffer(GL_FRAMEBUFFER, captureFBO);
     for (unsigned int i = 0; i < 6; ++i)
     {
-        irradianceShader.setMat4("u_view", captureViews[i]);
+        gpurm.setUniform(irradianceShader.handle, "u_view", captureViews[i]);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, irradianceMap, 0);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -231,7 +241,7 @@ unsigned int IrradianceMapFactory::generateIrradianceTexture(unsigned int captur
 }
 
 unsigned int IrradianceMapFactory::generatePrefilterTexture(unsigned int captureFBO, unsigned int envCubemap,
-    unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], Mesh& mesh)
+    unsigned int captureRBO, glm::mat4& captureProjection, glm::mat4 captureViews[], Mesh& mesh, AssetManager& assetManager)
 {
     // pbr: create a pre-filter cubemap, and re-scale capture FBO to pre-filter scale.
     // --------------------------------------------------------------------------------
@@ -252,10 +262,12 @@ unsigned int IrradianceMapFactory::generatePrefilterTexture(unsigned int capture
 
     // pbr: run a quasi monte-carlo simulation on the environment lighting to create a prefilter (cube)map.
     // ----------------------------------------------------------------------------------------------------
-    Shader prefilterShader("resources/shaders/prefilter.glsl");
-    prefilterShader.use();
-    prefilterShader.setInt("u_environmentMap", 0);
-    prefilterShader.setMat4("u_projection", captureProjection);
+
+    GPUResourceManager<OpenGL> gpurm;
+    Shader prefilterShader = assetManager.getShader("resources/shaders/prefilter.glsl");
+    gpurm.bindShader(prefilterShader.handle);
+    gpurm.setUniform(prefilterShader.handle, "u_environmentMap", 0);
+    gpurm.setUniform(prefilterShader.handle, "u_projection", captureProjection);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, envCubemap);
 
@@ -271,10 +283,10 @@ unsigned int IrradianceMapFactory::generatePrefilterTexture(unsigned int capture
         glViewport(0, 0, mipWidth, mipHeight);
 
         float roughness = (float)mip / (float)(maxMipLevels - 1);
-        prefilterShader.setFloat("u_roughness", roughness);
+        gpurm.setUniform(prefilterShader.handle, "u_roughness", roughness);
         for (unsigned int i = 0; i < 6; ++i)
         {
-            prefilterShader.setMat4("u_view", captureViews[i]);
+            gpurm.setUniform(prefilterShader.handle, "u_view", captureViews[i]);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, prefilterMap, mip);
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -290,7 +302,8 @@ unsigned int IrradianceMapFactory::generatePrefilterTexture(unsigned int capture
 
 unsigned int IrradianceMapFactory::generateLUTTexture(unsigned int captureFBO, unsigned int captureRBO, AssetManager& assetManager)
 {
-    Shader brdfShader("resources/shaders/brdf.glsl");
+
+    Shader brdfShader = assetManager.getShader("resources/shaders/brdf.glsl");
 
     unsigned int brdfLUTTexture;
     glGenTextures(1, &brdfLUTTexture);
@@ -311,7 +324,8 @@ unsigned int IrradianceMapFactory::generateLUTTexture(unsigned int captureFBO, u
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, brdfLUTTexture, 0);
 
     glViewport(0, 0, 512, 512);
-    brdfShader.use();
+    GPUResourceManager<OpenGL> gpurm;
+    gpurm.bindShader(brdfShader.handle);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // pbr: generate a 2D LUT from the BRDF equations used.

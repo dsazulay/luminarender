@@ -1,7 +1,5 @@
 #include "mainmenu_system.h"
 
-#include "assets/asset_library.h"
-
 #include <tinyfiledialogs.h>
 
 

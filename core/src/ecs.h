@@ -86,7 +86,7 @@ public:
     {
         const char* typeName = typeid(T).name();
         assert(m_componentTypes.find(typeName) == m_componentTypes.end() && "Component already registered");
-        
+
         m_componentTypes.insert({typeName, m_nextType});
         m_componentArrays.insert({typeName, std::make_shared<ComponentArray<T>>()});
         ++m_nextType;

@@ -26,17 +26,17 @@ private:
     static unsigned int generateCubeMapTexture(
         unsigned int hdrTexture, unsigned int captureFBO,
         glm::mat4& captureProjection, glm::mat4 captureViews[],
-        Mesh& mesh);
+        Mesh& mesh, AssetManager& assetManager);
 
     static unsigned int generateIrradianceTexture(
         unsigned int captureFBO, unsigned int envCubemap,
         unsigned int captureRBO, glm::mat4& captureProjection,
-        glm::mat4 captureViews[], Mesh& mesh);
+        glm::mat4 captureViews[], Mesh& mesh, AssetManager& assetManager);
 
     static unsigned int generatePrefilterTexture(
         unsigned int captureFBO, unsigned int envCubemap,
         unsigned int captureRBO, glm::mat4& captureProjection,
-        glm::mat4 captureViews[], Mesh& mesh);
+        glm::mat4 captureViews[], Mesh& mesh, AssetManager& assetManager);
 
     static unsigned int generateLUTTexture(
         unsigned int captureFBO, unsigned int captureRBO,

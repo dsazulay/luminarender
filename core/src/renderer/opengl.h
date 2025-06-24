@@ -3,12 +3,17 @@
 #include "gfxapi.h"
 
 #include <glad/gl.h>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat3x3.hpp>
+#include <glm/mat4x4.hpp>
 
 class OpenGL
 {
 public:
     template <typename T>
     MeshHandles createMesh(MeshInfo<T> info);
+    id_t createShader(ShaderInfo info);
     id_t createTexture(TextureInfo info);
     id_t createRenderBuffer(RenderBufferInfo info);
     id_t createFrameBuffer(FrameBufferInfo info);
@@ -24,6 +29,14 @@ public:
     void bindFrameBuffer(FrameBufferOp op, id_t frameBuffer);
     void unbindFrameBuffer();
     bool isFrameBufferComplete(id_t frameBuffer);
+
+    void bindShader(id_t shader);
+    void setUniform(id_t shader, const char *name, int value);
+    void setUniform(id_t shader, const char *name, float value);
+    void setUniform(id_t shader, const char *name, glm::vec3 &value);
+    void setUniform(id_t shader, const char *name, glm::vec4 &value);
+    void setUniform(id_t shader, const char *name, glm::mat3 &value);
+    void setUniform(id_t shader, const char *name, glm::mat4 &value);
 
     // Commands
     void setViewportSize(int x, int y, int width, int height);
@@ -42,6 +55,7 @@ private:
     GLenum getAttachmentTarget(AttachmentTarget target);
     GLbitfield getClearMask(ClearMask mask);
     GLenum getFrameBufferOp(FrameBufferOp op);
+    GLenum getShaderType(ShaderType type);
 };
 
 template <typename T>

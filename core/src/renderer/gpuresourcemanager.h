@@ -2,6 +2,11 @@
 
 #include "gfxapi.h"
 
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <glm/mat3x3.hpp>
+#include <glm/mat4x4.hpp>
+
 template <class T>
 class GPUResourceManager
 {
@@ -10,6 +15,11 @@ public:
     MeshHandles createMesh(MeshInfo<U> info)
     {
         return m_backend.createMesh(info);
+    }
+
+    id_t createShader(ShaderInfo info)
+    {
+        return m_backend.createShader(info);
     }
 
     id_t createTexture(TextureInfo info)
@@ -47,9 +57,9 @@ public:
         m_backend.attachTexture(frameBuffer, info);
     }
 
-    void attachRenderBuffer(id_t frameBuffer, FrameBufferAttachmentInfo indo)
+    void attachRenderBuffer(id_t frameBuffer, FrameBufferAttachmentInfo info)
     {
-        m_backend.attachRenderBuffer(frameBuffer, indo);
+        m_backend.attachRenderBuffer(frameBuffer, info);
     }
 
     void setTargetBuffers(id_t frameBuffer, FrameBufferTargetInfo info)
@@ -75,6 +85,41 @@ public:
     bool isFrameBufferComplete(id_t frameBuffer)
     {
         return m_backend.isFrameBufferComplete(frameBuffer);
+    }
+
+    void bindShader(id_t shader)
+    {
+        m_backend.bindShader(shader);
+    }
+
+    void setUniform(id_t shader, const char *name, int value)
+    {
+        m_backend.setUniform(shader, name, value);
+    }
+
+    void setUniform(id_t shader, const char *name, float value)
+    {
+        m_backend.setUniform(shader, name, value);
+    }
+
+    void setUniform(id_t shader, const char *name, glm::vec3 value)
+    {
+        m_backend.setUniform(shader, name, value);
+    }
+
+    void setUniform(id_t shader, const char *name, glm::vec4 value)
+    {
+        m_backend.setUniform(shader, name, value);
+    }
+
+    void setUniform(id_t shader, const char *name, glm::mat3 value)
+    {
+        m_backend.setUniform(shader, name, value);
+    }
+
+    void setUniform(id_t shader, const char *name, glm::mat4 value)
+    {
+        m_backend.setUniform(shader, name, value);
     }
 
 private:

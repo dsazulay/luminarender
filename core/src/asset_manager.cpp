@@ -1,17 +1,18 @@
 #include "asset_manager.h"
 
 #include "logger.h"
+#include "assets/importer.h"
 #include "assets/primitives.h"
 
 #include "renderer/gfxapi.h"
 
 #include <cstddef>
+#include <string_view>
+#include <unordered_map>
 #include <utility>
 #include <optional>
+#include <sstream>
 
-// NOTE: Old
-#include "assets/material.h"
-#include "assets/asset_library.h"
 
 AssetFile createAssetFile(std::string_view path, FileView fileView)
 {
@@ -187,8 +188,7 @@ Mesh AssetManager::getMesh(std::string_view name)
 
 Model AssetManager::getModel(std::string_view path, bool loadMaterial)
 {
-    std::string strPath{ path };
-    auto it = m_models.find(strPath);
+    auto it = m_models.find(path.data());
     if (it != m_models.end()) { return it->second; }
 
     Model newModel;
@@ -209,16 +209,18 @@ Model AssetManager::getModel(std::string_view path, bool loadMaterial)
         m_importedModels.insert({mesh.name, m});
         newModel.meshes.push_back({mesh.name, m});
 
-        // TODO: Fixme
-        Material* mat = AssetLibrary::instance().createMaterial(mesh.material.name.c_str(), "pbr");
+        if (m.importedMatName == "") {
+            continue;
+        }
 
-        mat->setProperty("u_albedo", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+        Material& mat = createMaterial(mesh.material.name.c_str(), getShader("resources/shaders/cook_torrance.glsl"));
+        mat.setColor("u_albedo", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
         if (mesh.material.diffusePath == "") {
             continue;
         }
         Texture tex = getTexture2D("resources/sponza/" + mesh.material.diffusePath);
-        mat->setTexture("u_albedoTex", tex.handle, 0);
+        mat.setTexture("u_albedoTex", tex.handle);
 
     }
 
@@ -227,20 +229,114 @@ Model AssetManager::getModel(std::string_view path, bool loadMaterial)
 
     return model.first->second;
 }
-/*
-Shader &AssetManager::getShader(std::string_view path)
-{
-    std::string basePath{ path };
-    if (m_shaders.find(basePath) != m_shaders.end()) { return m_shaders.at(basePath); }
 
-    Shader newShader{};
-    newShader.create(path);
-    auto &shader = m_shaders.insert(std::make_pair(path, newShader)).first->second;
-    m_files.push_back(createAssetFile(basePath + ".vert", FileView{ shader }));
-    m_files.push_back(createAssetFile(basePath + ".frag", FileView{ shader }));
+Shader AssetManager::getShader(std::string_view path)
+{
+    auto it = m_shaders.find(path.data());
+    if (it != m_shaders.end()) { return it->second; }
+
+    std::optional<ShaderData> optionalShaderData = loadShader(path);
+    if (!optionalShaderData.has_value())
+    {
+        logger::logError("Failed to load shader file {}", path);
+        // TODO: Return a fallback shader
+    }
+
+    ShaderData& shaderData = optionalShaderData.value();
+
+    ShaderInfo shaderInfo;
+    for (auto& kv : shaderData.shaders)
+    {
+        switch (kv.first)
+        {
+            case ShaderSourceType::VERTEX:
+                shaderInfo.sources[ShaderType::VERTEX] = kv.second;
+                break;
+            case ShaderSourceType::FRAGMENT:
+                shaderInfo.sources[ShaderType::FRAGMENT] = kv.second;
+                break;
+            case ShaderSourceType::GEOMETRY:
+                shaderInfo.sources[ShaderType::GEOMETRY] = kv.second;
+                break;
+            case ShaderSourceType::NONE:
+                break;
+        }
+    }
+
+    ShaderUniforms uniforms;
+    for (auto& property : shaderData.uniformDefaultValues)
+    {
+        if (property.type == "Float") {
+            uniforms.floatValues.push_back(std::make_pair(property.name, std::stof(property.value)));
+        }
+        else {
+            float values[4];
+            std::istringstream tokenStream{ property.value };
+            std::string token;
+            int index = 0;
+            while (std::getline(tokenStream, token, ','))
+            {
+                values[index++] = std::stof(token);
+            }
+            uniforms.colorValues.push_back(std::make_pair(property.name, glm::vec4(values[0], values[1], values[2], values[3])));
+        }
+    }
+
+    for (auto& tex : shaderData.texDefaultValues)
+    {
+        // TODO: create a variable to cache the default texture handle
+        if (tex.value == "white") {
+            uniforms.texValues.push_back(std::make_pair(tex.name, getTexture2D("resources/textures/default_white.png").handle));
+        }
+    }
+
+    m_shaderUniforms.push_back(uniforms);
+
+    Shader shader;
+    //logger::logWarning("{}", shaderInfo.sources.find(ShaderType::FRAGMENT)->second);
+    shader.handle = m_gpurm->createShader(shaderInfo);
+    shader.uniformIndex = m_shaderUniforms.size() - 1;
+
+
+    glUniformBlockBinding(shader.handle, glGetUniformBlockIndex(shader.handle, "Matrices"), 0);
+
+    glUniformBlockBinding(shader.handle, glGetUniformBlockIndex(shader.handle, "Lights"), 1);
+
+    m_shaders.insert(std::make_pair(path, shader));
+    //m_files.push_back(createAssetFile(basePath + ".vert", FileView{ shader }));
+    //m_files.push_back(createAssetFile(basePath + ".frag", FileView{ shader }));
     return shader;
 }
-*/
+
+Material& AssetManager::getMaterial(std::string_view name)
+{
+    auto it = m_materials.find(name.data());
+    if (it != m_materials.end()) { return it->second; }
+
+    logger::logError("Material {} doesn't exist", name);
+
+    // TODO: Return fallback material
+    return m_materials.begin()->second;
+}
+
+Material& AssetManager::createMaterial(std::string_view name, Shader shader)
+{
+    auto it = m_materials.find(name.data());
+    if (it != m_materials.end())
+    {
+        logger::logWarning("Material named {} already exist!", name);
+        return it->second;
+    }
+
+    Material m;
+    m.name = name;
+    m.shader = shader;
+    m.uniforms = m_shaderUniforms.at(shader.uniformIndex);
+
+    auto& mat = m_materials.insert(std::make_pair(name, m)).first->second;
+
+    return mat;
+}
 
 void AssetManager::loadDefaultResources()
 {
@@ -251,10 +347,6 @@ void AssetManager::loadDefaultResources()
     getMesh(MeshType::CubeMap);
     getMesh(MeshType::TriangleMap);
     */
-
-
-    Material::setDefaultTexWhite(
-        getTexture2D("resources/textures/default_white.png").handle);
 }
 
 void AssetManager::checkFileModification()

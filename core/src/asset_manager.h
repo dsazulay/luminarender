@@ -4,8 +4,6 @@
 
 #include "assets/model_types.h"
 #include "assets/assets.h"
-//#include "shader.h"
-#include "assets/importer.h"
 
 #include "renderer/gpuresourcemanager.h"
 #include "renderer/opengl.h"
@@ -31,7 +29,9 @@ public:
     Mesh getMesh(MeshType type);
     Mesh getMesh(std::string_view name);
     Model getModel(std::string_view path, bool loadMaterial = false);
-    //Shader& getShader(std::string_view path);
+    Shader getShader(std::string_view path);
+    Material& getMaterial(std::string_view name);
+    Material& createMaterial(std::string_view name, Shader shader);
     void loadDefaultResources();
     void checkFileModification();
 
@@ -44,7 +44,10 @@ private:
     std::unordered_map<std::string, Model> m_models;
     std::unordered_map<std::string, Mesh> m_importedModels;
     std::unordered_map<MeshType, Mesh> m_nativeModels;
-    //std::unordered_map<std::string, Shader> m_shaders;
+    std::unordered_map<std::string, Shader> m_shaders;
+    std::unordered_map<std::string, Material> m_materials;
+
+    std::vector<ShaderUniforms> m_shaderUniforms;
 
     GPUResourceManager<OpenGL>* m_gpurm{};
 };
