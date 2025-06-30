@@ -56,9 +56,9 @@ struct MeshData
 using ModelData = std::vector<MeshData>;
 
 
-std::optional<TextureData> loadTextureFromFile(const std::string &file);
-std::optional<TextureData> loadHDRTextureFromFile(const std::string &file);
-std::optional<TextureData> loadCubeMapFromFiles(std::vector<std::string> &faces);
+std::optional<TextureData> loadTextureFromFile(const std::string& file);
+std::optional<TextureData> loadHDRTextureFromFile(const std::string& file);
+std::optional<TextureData> loadCubeMapFromFiles(const std::vector<std::string>& faces);
 
 std::optional<ShaderData> loadShader(std::string_view path);
 

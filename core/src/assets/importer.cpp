@@ -2,41 +2,43 @@
 
 #include "../logger.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
 #include <stb_image.h>
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
-#include <cassert>
 #include <algorithm>
+#include <filesystem>
 #include <fstream>
-#include <sstream>
 #include <regex>
+#include <sstream>
+#include <string_view>
 
-void processNode(aiNode *node, const aiScene *scene, ModelData *data, bool material);
-MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial);
+constexpr int MAX_INCLUDE_DEPTH = 8;
 
-std::optional<std::stringstream> getStreamFromFile(std::string_view path);
+void processNode(aiNode* node, const aiScene* scene, ModelData* data, bool material);
+MeshData processMesh(aiMesh* mesh, const aiScene* scene, bool importMaterial);
+
+std::optional<std::stringstream> getStreamFromFile(std::filesystem::path path);
 ShaderSourceType getShaderTypeFromString(std::string_view type);
-void shaderPreprocess(std::stringstream &input, ShaderData &shaderData);
-std::string getIncludeFilesAsString(std::stringstream &input, int level);
-void extractDefaultPropertiesValues(std::stringstream &input, ShaderData &shaderData);
+void shaderPreprocess(std::stringstream& input, ShaderData& shaderData);
+std::string resolveIncludes(std::stringstream& input, int level);
+void extractShaderProperties(std::stringstream& input, ShaderData& shaderData);
 
 
 void TextureData::freeData()
 {
-    for (auto &d : data) {
+    for (auto& d : data) {
         stbi_image_free(d);
     }
 }
 
-std::optional<TextureData> loadTextureFromFile(const std::string &file)
+std::optional<TextureData> loadTextureFromFile(const std::string& file)
 {
     TextureData textureData;
     stbi_set_flip_vertically_on_load(true);
 
-    unsigned char *data = stbi_load(file.c_str(),
+    unsigned char* data = stbi_load(file.c_str(),
                                     &textureData.width,
                                     &textureData.height,
                                     &textureData.channels, 0);
@@ -49,12 +51,12 @@ std::optional<TextureData> loadTextureFromFile(const std::string &file)
     return textureData;
 }
 
-std::optional<TextureData> loadHDRTextureFromFile(const std::string &file)
+std::optional<TextureData> loadHDRTextureFromFile(const std::string& file)
 {
     TextureData textureData;
     stbi_set_flip_vertically_on_load(true);
 
-    float *data = stbi_loadf(file.c_str(),
+    float* data = stbi_loadf(file.c_str(),
                              &textureData.width,
                              &textureData.height,
                              &textureData.channels, 0);
@@ -68,14 +70,14 @@ std::optional<TextureData> loadHDRTextureFromFile(const std::string &file)
     return textureData;
 }
 
-std::optional<TextureData> loadCubeMapFromFiles(std::vector<std::string> &faces)
+std::optional<TextureData> loadCubeMapFromFiles(const std::vector<std::string>& faces)
 {
     TextureData textureData;
     stbi_set_flip_vertically_on_load(false);
 
-    for (auto &face : faces)
+    for (const auto& face : faces)
     {
-        unsigned char *data = stbi_load(face.c_str(),
+        unsigned char* data = stbi_load(face.c_str(),
                                         &textureData.width,
                                         &textureData.height,
                                         &textureData.channels, 0);
@@ -103,36 +105,32 @@ std::optional<ShaderData> loadShader(std::string_view path)
     return shaderData;
 }
 
-std::optional<std::stringstream> getStreamFromFile(std::string_view path)
+std::optional<std::stringstream> getStreamFromFile(std::filesystem::path path)
 {
-    std::ifstream shaderFile;
+    std::ifstream shaderFile(path, std::ios::in);
     std::stringstream shaderStream;
 
-    shaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-
-    try
-    {
-        shaderFile.open(path);
-        shaderStream << shaderFile.rdbuf();
-        shaderFile.close();
-    }
-    catch (std::ifstream::failure& e)
-    {
-        logger::logError("Shader file {} not successfully read: {}", path, e.what());
+    if (!shaderFile.is_open()) {
         return std::nullopt;
     }
+
+    shaderStream << shaderFile.rdbuf();
+    shaderFile.close();
 
     return shaderStream;
 }
 
 ShaderSourceType getShaderTypeFromString(std::string_view type)
 {
-    if (type == "vertex")
+    if (type == "vertex") {
         return ShaderSourceType::VERTEX;
-    else if (type == "fragment")
+    }
+    else if (type == "fragment") {
         return ShaderSourceType::FRAGMENT;
-    else if (type == "geometry")
+    }
+    else if (type == "geometry") {
         return ShaderSourceType::GEOMETRY;
+    }
 
     logger::logError("Invalid Shader Type {}", type);
     return ShaderSourceType::NONE;
@@ -140,107 +138,106 @@ ShaderSourceType getShaderTypeFromString(std::string_view type)
 
 void shaderPreprocess(std::stringstream& input, ShaderData& shaderData)
 {
-    std::string line;
-    std::stringstream outTest;
+    constexpr std::string_view typeToken = "#shader";
+    constexpr std::string_view propertiesToken = "#properties";
+    constexpr std::string_view endPropertiesToken = "#endproperties";
+
+    std::stringstream shaderStream;
+    std::stringstream propertiesStream;
     ShaderSourceType shaderType = ShaderSourceType::NONE;
 
-    const char* typeToken = "#shader";
-    std::size_t typeTokenLength = strnlen(typeToken, 16);
+    bool readingProperties = false;
 
-    const char* propertiesToken = "#properties";
-    const char* endPropertiesToken = "#endproperties";
-    bool shouldReadProperties = false;
-    std::stringstream propertiesStream;
+    auto flushStream = [&]() {
+        if (shaderType != ShaderSourceType::NONE)
+        {
+            shaderData.shaders[shaderType] = resolveIncludes(shaderStream, 0);
+            shaderStream.str(std::string{});
+            shaderStream.clear();
+        }
+    };
 
+    std::string line;
     while (std::getline(input, line))
     {
-        if (line.find(typeToken) != std::string::npos)
+        if (line.starts_with(typeToken))
         {
-            if (shaderType != ShaderSourceType::NONE)
-            {
-                shaderData.shaders[shaderType] = getIncludeFilesAsString(outTest, 0);
-                outTest.str(std::string());
-                outTest.clear();
-            }
-
-            shaderType = getShaderTypeFromString(line.substr(typeTokenLength + 1));
+            flushStream();
+            shaderType = getShaderTypeFromString(line.substr(typeToken.size() + 1));
         }
-        else if (line.find(propertiesToken) != std::string::npos)
-        {
-            shouldReadProperties = true;
+        else if (line.find(propertiesToken) != std::string::npos) {
+            readingProperties = true;
         }
-        else if ((line.find(endPropertiesToken) != std::string::npos))
-        {
-            shouldReadProperties = false;
-            extractDefaultPropertiesValues(propertiesStream, shaderData);
+        else if ((line.find(endPropertiesToken) != std::string::npos)) {
+            readingProperties = false;
+            extractShaderProperties(propertiesStream, shaderData);
         }
-        else if (shouldReadProperties)
-        {
-            propertiesStream << line << std::endl;
+        else if (readingProperties) {
+            propertiesStream << line << "\n";
         }
-        else
-        {
-            outTest << line << std::endl;
+        else {
+            shaderStream << line << "\n";
         }
     }
-    shaderData.shaders[shaderType] = getIncludeFilesAsString(outTest, 0);
+    flushStream();
 }
 
-std::string getIncludeFilesAsString(std::stringstream& input, int level)
+std::string resolveIncludes(std::stringstream& input, int level)
 {
-    std::regex re("^[ ]*#[ ]*include[ ]+[\"<](.*)[\">].*");
-    std::smatch matches;
+    if (level > MAX_INCLUDE_DEPTH) {
+        logger::logWarning("Header inclusion depth limit reached, might be caused by cyclic header inclusion");
+        return "";
+    }
 
-    assert(level < 8 && "Header inclusion depth limit reached, might be caused by cyclic header inclusion");
+    std::regex includeRegex("^[ ]*#[ ]*include[ ]+[\"<](.*)[\">].*");
+    std::smatch match;
 
     std::stringstream output;
-    size_t line_number = 1;
-
     std::string line;
     while(std::getline(input, line))
     {
-        if (std::regex_search(line, matches, re))
+        if (std::regex_search(line, match, includeRegex))
         {
-            std::string include_file = matches[1];
-            std::optional<std::stringstream> include_string = getStreamFromFile("resources/shaders/" + include_file);
+            std::filesystem::path include_file = "resources/shaders";
+            include_file /= match[1].str();
+            std::optional<std::stringstream> include_string = getStreamFromFile(include_file);
 
-            if (!include_string.has_value())
-            {
-                logger::logError("Include file {} not successfully read: ignoring it!", include_file);
-                continue;
+            if (include_string.has_value()) {
+                output << resolveIncludes(include_string.value(), level + 1) << "\n";
             }
-
-            output << getIncludeFilesAsString(include_string.value(), level + 1) << std::endl;
+            else {
+                logger::logError("Include file {} not successfully read: ignoring it!", include_file.string());
+            }
         }
         else {
-            output <<  line << std::endl;
+            output <<  line << "\n";
         }
-        ++line_number;
     }
     return output.str();
 }
 
-void extractDefaultPropertiesValues(std::stringstream &input, ShaderData &shaderData)
+void extractShaderProperties(std::stringstream& input, ShaderData& shaderData)
 {
-    std::regex re("^[ ]*(.*?)[ ]+(.*?)[ ]*=[ ]*(.*)");
-    std::smatch matches;
+    std::regex propertyRegex("^[ ]*(.*?)[ ]+(.*?)[ ]*=[ ]*(.*)");
+    std::smatch match;
     std::string line;
 
     while(std::getline(input, line))
     {
-        if (std::regex_search(line, matches, re))
+        if (std::regex_search(line, match, propertyRegex))
         {
-            if (matches[1] == "Color" || matches[1] == "Float") {
-                shaderData.uniformDefaultValues.push_back({ matches[1], matches[2], matches[3] });
+            const auto& type = match[1];
+            const auto& name = match[2];
+            const auto& value = match[3];
+            if (type == "Color" || type == "Float") {
+                shaderData.uniformDefaultValues.emplace_back(type, name, value);
             }
-            else if (matches[1] == "2D") {
-                shaderData.texDefaultValues.push_back({ matches[1], matches[2], matches[3] });
+            else if (type == "2D") {
+                shaderData.texDefaultValues.emplace_back(type, name, value);
             }
         }
-        else
-        {
-            // TODO: Show error msg and fallback to a default shader
-            logger::logError("Could not parse properties!");
+        else {
+            logger::logError("Failed to parse shader property line: {}", line);
         }
     }
 }
@@ -250,7 +247,7 @@ std::optional<ModelData> loadModel(std::string_view path, bool material)
     ModelData data;
 
     Assimp::Importer import;
-    const aiScene *scene = import.ReadFile(path.data(), aiProcess_Triangulate);
+    const aiScene* scene = import.ReadFile(path.data(), aiProcess_Triangulate);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -264,11 +261,11 @@ std::optional<ModelData> loadModel(std::string_view path, bool material)
     return data;
 }
 
-void processNode(aiNode *node, const aiScene *scene, ModelData *data, bool material)
+void processNode(aiNode* node, const aiScene* scene, ModelData* data, bool material)
 {
     for(unsigned int i = 0; i < node->mNumMeshes; i++)
     {
-        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         data->push_back(processMesh(mesh, scene, material));
     }
 
@@ -277,7 +274,7 @@ void processNode(aiNode *node, const aiScene *scene, ModelData *data, bool mater
     }
 }
 
-MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial)
+MeshData processMesh(aiMesh* mesh, const aiScene* scene, bool importMaterial)
 {
     VertexIndexTuple m;
 
@@ -293,12 +290,18 @@ MeshData processMesh(aiMesh *mesh, const aiScene *scene, bool importMaterial)
         vec.z = mesh->mVertices[i].z;
         vert.position = vec;
 
-        vec.x = mesh->mNormals[i].x;
-        vec.y = mesh->mNormals[i].y;
-        vec.z = mesh->mNormals[i].z;
+        if (mesh->mNormals)
+        {
+            vec.x = mesh->mNormals[i].x;
+            vec.y = mesh->mNormals[i].y;
+            vec.z = mesh->mNormals[i].z;
+        }
+        else {
+            vec = glm::vec3{ 0.0 };
+        }
         vert.normal = vec;
 
-        glm::vec2 uv;
+        glm::vec2 uv{ 0.0 };
         uv.x = mesh->mTextureCoords[0][i].x;
         uv.y = mesh->mTextureCoords[0][i].y;
         vert.texcoord = uv;
