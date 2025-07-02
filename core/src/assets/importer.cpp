@@ -229,11 +229,12 @@ void extractShaderProperties(std::stringstream& input, ShaderData& shaderData)
             const auto& type = match[1];
             const auto& name = match[2];
             const auto& value = match[3];
-            if (type == "Color" || type == "Float") {
-                shaderData.uniformDefaultValues.emplace_back(type, name, value);
+            if (type == "Color" || type == "Float" || type == "2D") {
+                shaderData.shaderProperties.emplace_back(type, name, value);
             }
-            else if (type == "2D") {
-                shaderData.texDefaultValues.emplace_back(type, name, value);
+            // TODO: handle error
+            else {
+                logger::logError("Invalid property type {} at line {}", type.str(), line);
             }
         }
         else {

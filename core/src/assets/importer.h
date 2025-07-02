@@ -36,8 +36,7 @@ struct ShaderProperty
 struct ShaderData
 {
     std::unordered_map<ShaderSourceType, std::string> shaders;
-    std::vector<ShaderProperty> uniformDefaultValues;
-    std::vector<ShaderProperty> texDefaultValues;
+    std::vector<ShaderProperty> shaderProperties;
 };
 
 struct MaterialData

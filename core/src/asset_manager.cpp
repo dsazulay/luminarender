@@ -264,12 +264,20 @@ Shader AssetManager::getShader(std::string_view path)
     }
 
     ShaderUniforms uniforms;
-    for (auto& property : shaderData.uniformDefaultValues)
+    for (auto& property : shaderData.shaderProperties)
     {
         if (property.type == "Float") {
             uniforms.floatValues.push_back(std::make_pair(property.name, std::stof(property.value)));
         }
-        else {
+        else if (property.type == "2D")
+        {
+            // TODO: create a variable to cache the default texture handle
+            if (property.value == "white") {
+                uniforms.texValues.push_back(std::make_pair(property.name, getTexture2D("resources/textures/default_white.png").handle));
+            }
+        }
+        else
+        {
             float values[4];
             std::istringstream tokenStream{ property.value };
             std::string token;
@@ -279,14 +287,6 @@ Shader AssetManager::getShader(std::string_view path)
                 values[index++] = std::stof(token);
             }
             uniforms.colorValues.push_back(std::make_pair(property.name, glm::vec4(values[0], values[1], values[2], values[3])));
-        }
-    }
-
-    for (auto& tex : shaderData.texDefaultValues)
-    {
-        // TODO: create a variable to cache the default texture handle
-        if (tex.value == "white") {
-            uniforms.texValues.push_back(std::make_pair(tex.name, getTexture2D("resources/textures/default_white.png").handle));
         }
     }
 
