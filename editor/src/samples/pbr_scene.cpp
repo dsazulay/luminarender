@@ -30,7 +30,7 @@ void PbrScene::loadIrradianceTextures(unsigned int& skyboxTex,
 
 void PbrScene::loadMaterials(AssetManager &assetManager, unsigned int& skyboxTex)
 {
-    Shader pbr = assetManager.getShader("resources/shaders/cook_torrance.glsl");
+    Shader* pbr = &assetManager.getShader("resources/shaders/cook_torrance.glsl");
     Material& blueMat = assetManager.createMaterial("blueMat", pbr);
     blueMat.setColor("u_albedo", glm::vec4(0.2f, 0.2f, 1.0f, 1.0f));
     blueMat.setFloat("u_roughness", 0.9f);
@@ -56,7 +56,7 @@ void PbrScene::loadMaterials(AssetManager &assetManager, unsigned int& skyboxTex
     cerberusMat.setTexture("u_metallicTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_r.png").handle);
     cerberusMat.setTexture("u_roughnessTex", assetManager.getTexture2D("resources/textures/cerberus/cerberus_r.png").handle);
 
-    Shader skytri = assetManager.getShader("resources/shaders/skytriangle.glsl");
+    Shader* skytri = &assetManager.getShader("resources/shaders/skytriangle.glsl");
     Material& skyboxMat = assetManager.createMaterial("skyboxMat", skytri);
     skyboxMat.setTexture("u_mainTex", skyboxTex);
 }

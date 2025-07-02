@@ -30,18 +30,18 @@ void RenderSystem::init(int width, int height, ecs::Coordinator* coordinator,
     m_ssaoBlurBuffer = std::make_unique<ColorBuffer>(width, height, m_gpurm);
 
     // TODO: Move this to asset initalization
-    Shader s = m_assetManager->getShader("resources/shaders/gbuffer.glsl");
+    Shader* s = &m_assetManager->getShader("resources/shaders/gbuffer.glsl");
     m_assetManager->createMaterial("GBuffer", s);
-    s = m_assetManager->getShader("resources/shaders/lightingpass.glsl");
+    s = &m_assetManager->getShader("resources/shaders/lightingpass.glsl");
     m_assetManager->createMaterial("LightingPass", s);
-    s = m_assetManager->getShader("resources/shaders/simple_shadow_depth.glsl");
+    s = &m_assetManager->getShader("resources/shaders/simple_shadow_depth.glsl");
     m_assetManager->createMaterial("shadowMat", s);
-    s = m_assetManager->getShader("resources/shaders/ssao.glsl");
+    s = &m_assetManager->getShader("resources/shaders/ssao.glsl");
     m_assetManager->createMaterial("ssaoMat", s);
-    s = m_assetManager->getShader("resources/shaders/ssao_blur.glsl");
+    s = &m_assetManager->getShader("resources/shaders/ssao_blur.glsl");
     m_assetManager->createMaterial("ssaoBlurMat", s);
     generateSSAONoiseTexture();
-    s = m_assetManager->getShader("resources/shaders/normal_vector.glsl");
+    s = &m_assetManager->getShader("resources/shaders/normal_vector.glsl");
     m_assetManager->createMaterial("normalVector", s);
 }
 
@@ -107,7 +107,7 @@ void RenderSystem::shadowPass()
                 entity);
 
         Material material = m_assetManager->getMaterial("shadowMat");
-        id_t shader = material.shader.handle;
+        id_t shader = material.shader->handle;
         m_gpurm.bindShader(shader);
 
         // set object uniforms (e.g. transform)
@@ -140,9 +140,9 @@ void RenderSystem::geometryPass()
         auto& meshRenderer = m_coordinator->getComponent<ecs::MeshRenderer>(
                 entity);
 
-        Material &origMaterial = *meshRenderer.material;
-        Material &material = m_assetManager->getMaterial("GBuffer");
-        id_t shader = material.shader.handle;
+        Material& origMaterial = *meshRenderer.material;
+        Material& material = m_assetManager->getMaterial("GBuffer");
+        id_t shader = material.shader->handle;
         m_gpurm.bindShader(shader);
 
         m_gpurm.setUniform(shader, "u_model", transform.modelMatrix);
@@ -182,7 +182,7 @@ void RenderSystem::ssaoPass()
 
     Mesh mesh = m_assetManager->getMesh(MeshType::Quad);
     Material material = m_assetManager->getMaterial("ssaoMat");
-    id_t shader = material.shader.handle;
+    id_t shader = material.shader->handle;
     m_gpurm.bindShader(shader);
 
     for (unsigned int i = 0; i < 64; ++i) {
@@ -217,7 +217,7 @@ void RenderSystem::ssaoBlurPass()
 
     Mesh mesh = m_assetManager->getMesh(MeshType::Quad);
     Material material = m_assetManager->getMaterial("ssaoBlurMat");
-    id_t shader = material.shader.handle;
+    id_t shader = material.shader->handle;
     m_gpurm.bindShader(shader);
 
     for (unsigned int i = 0; i < 64; ++i) {
@@ -244,7 +244,7 @@ void RenderSystem::lightingPass()
 
     Mesh mesh = m_assetManager->getMesh(MeshType::Quad);
     Material material = m_assetManager->getMaterial("LightingPass");
-    id_t shader = material.shader.handle;
+    id_t shader = material.shader->handle;
     m_gpurm.bindShader(shader);
 
     m_gpurm.setUniform(shader, "u_depth", 0);
@@ -303,7 +303,7 @@ void RenderSystem::skyboxPass()
 
     Mesh mesh = m_assetManager->getMesh(MeshType::TriangleMap);
     Material material = m_assetManager->getMaterial("skyboxMat");
-    id_t shader = material.shader.handle;
+    id_t shader = material.shader->handle;
     m_gpurm.bindShader(shader);
 
     int texCount = 0;
@@ -332,7 +332,7 @@ void RenderSystem::normalVisualizerPass()
                 entity);
 
         Material material = m_assetManager->getMaterial("normalVector");
-        id_t shader = material.shader.handle;
+        id_t shader = material.shader->handle;
         m_gpurm.bindShader(shader);
 
         m_gpurm.setUniform(shader, "u_model", transform.modelMatrix);

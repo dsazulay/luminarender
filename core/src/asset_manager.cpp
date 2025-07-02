@@ -213,7 +213,7 @@ Model AssetManager::getModel(std::string_view path, bool loadMaterial)
             continue;
         }
 
-        Material& mat = createMaterial(mesh.material.name.c_str(), getShader("resources/shaders/cook_torrance.glsl"));
+        Material& mat = createMaterial(mesh.material.name.c_str(), &getShader("resources/shaders/cook_torrance.glsl"));
         mat.setColor("u_albedo", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
         if (mesh.material.diffusePath == "") {
@@ -230,7 +230,7 @@ Model AssetManager::getModel(std::string_view path, bool loadMaterial)
     return model.first->second;
 }
 
-Shader AssetManager::getShader(std::string_view path)
+Shader& AssetManager::getShader(std::string_view path)
 {
     auto it = m_shaders.find(path.data());
     if (it != m_shaders.end()) { return it->second; }
@@ -263,17 +263,19 @@ Shader AssetManager::getShader(std::string_view path)
         }
     }
 
-    ShaderUniforms uniforms;
+    Shader shader;
+    shader.handle = m_gpurm->createShader(shaderInfo);
+
     for (auto& property : shaderData.shaderProperties)
     {
         if (property.type == "Float") {
-            uniforms.floatValues.push_back(std::make_pair(property.name, std::stof(property.value)));
+            shader.uniformsDefaultValues.floatValues[property.name] = std::stof(property.value);
         }
         else if (property.type == "2D")
         {
             // TODO: create a variable to cache the default texture handle
             if (property.value == "white") {
-                uniforms.texValues.push_back(std::make_pair(property.name, getTexture2D("resources/textures/default_white.png").handle));
+                shader.uniformsDefaultValues.texValues[property.name] = getTexture2D("resources/textures/default_white.png").handle;
             }
         }
         else
@@ -286,26 +288,18 @@ Shader AssetManager::getShader(std::string_view path)
             {
                 values[index++] = std::stof(token);
             }
-            uniforms.colorValues.push_back(std::make_pair(property.name, glm::vec4(values[0], values[1], values[2], values[3])));
+            shader.uniformsDefaultValues.colorValues[property.name] = glm::vec4(values[0], values[1], values[2], values[3]);
         }
     }
 
-    m_shaderUniforms.push_back(uniforms);
-
-    Shader shader;
-    //logger::logWarning("{}", shaderInfo.sources.find(ShaderType::FRAGMENT)->second);
-    shader.handle = m_gpurm->createShader(shaderInfo);
-    shader.uniformIndex = m_shaderUniforms.size() - 1;
-
 
     glUniformBlockBinding(shader.handle, glGetUniformBlockIndex(shader.handle, "Matrices"), 0);
-
     glUniformBlockBinding(shader.handle, glGetUniformBlockIndex(shader.handle, "Lights"), 1);
 
-    m_shaders.insert(std::make_pair(path, shader));
+    auto& s = m_shaders.insert(std::make_pair(path, shader)).first->second;
     //m_files.push_back(createAssetFile(basePath + ".vert", FileView{ shader }));
     //m_files.push_back(createAssetFile(basePath + ".frag", FileView{ shader }));
-    return shader;
+    return s;
 }
 
 Material& AssetManager::getMaterial(std::string_view name)
@@ -319,7 +313,7 @@ Material& AssetManager::getMaterial(std::string_view name)
     return m_materials.begin()->second;
 }
 
-Material& AssetManager::createMaterial(std::string_view name, Shader shader)
+Material& AssetManager::createMaterial(std::string_view name, Shader* shader)
 {
     auto it = m_materials.find(name.data());
     if (it != m_materials.end())
@@ -331,7 +325,7 @@ Material& AssetManager::createMaterial(std::string_view name, Shader shader)
     Material m;
     m.name = name;
     m.shader = shader;
-    m.uniforms = m_shaderUniforms.at(shader.uniformIndex);
+    m.uniforms = shader->uniformsDefaultValues;
 
     auto& mat = m_materials.insert(std::make_pair(name, m)).first->second;
 

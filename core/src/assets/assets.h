@@ -5,26 +5,24 @@
 #include <glm/vec4.hpp>
 
 #include <string>
-#include <string_view>
-#include <vector>
-#include <utility>
+#include <unordered_map>
 
 struct Texture
 {
     id_t handle;
 };
 
+struct ShaderUniforms
+{
+    std::unordered_map<std::string, float> floatValues;
+    std::unordered_map<std::string, glm::vec4> colorValues;
+    std::unordered_map<std::string, id_t> texValues;
+};
+
 struct Shader
 {
     id_t handle;
-    int uniformIndex;
-};
-
-struct ShaderUniforms
-{
-    std::vector<std::pair<std::string, float>> floatValues;
-    std::vector<std::pair<std::string, glm::vec4>> colorValues;
-    std::vector<std::pair<std::string, id_t>> texValues;
+    ShaderUniforms uniformsDefaultValues;
 };
 
 struct Mesh
@@ -42,25 +40,25 @@ struct Model
 struct Material
 {
     std::string name;
-    Shader shader;
+    Shader* shader;
     ShaderUniforms uniforms;
 
-    void setFloat(std::string_view name, float value);
-    void setColor(std::string_view name, glm::vec4 value);
-    void setTexture(std::string_view name, id_t value);
+    void setFloat(const std::string& name, float value);
+    void setColor(const std::string& name, glm::vec4 value);
+    void setTexture(const std::string& name, id_t value);
 };
 
-inline void Material::setFloat(std::string_view name, float value)
+inline void Material::setFloat(const std::string& name, float value)
 {
-    uniforms.floatValues.push_back(std::make_pair(std::string{ name }, value));
+    uniforms.floatValues[name] = value;
 }
 
-inline void Material::setColor(std::string_view name, glm::vec4 value)
+inline void Material::setColor(const std::string& name, glm::vec4 value)
 {
-    uniforms.colorValues.push_back(std::make_pair(std::string{ name }, value));
+    uniforms.colorValues[name] = value;
 }
 
-inline void Material::setTexture(std::string_view name, id_t value)
+inline void Material::setTexture(const std::string& name, id_t value)
 {
-    uniforms.texValues.push_back(std::make_pair(std::string{ name }, value));
+    uniforms.texValues[name] = value;
 }
