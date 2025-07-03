@@ -110,14 +110,7 @@ void RenderSystem::shadowPass()
         id_t shader = material.shader->handle;
         m_gpurm.bindShader(shader);
 
-        // set object uniforms (e.g. transform)
         m_gpurm.setUniform(shader, "u_model", transform.modelMatrix);
-        for (auto& kv : material.uniforms.floatValues) {
-            m_gpurm.setUniform(shader, kv.first.c_str(), kv.second);
-        }
-        for (auto& kv : material.uniforms.colorValues) {
-            m_gpurm.setUniform(shader, kv.first.c_str(), kv.second);
-        }
 
         glBindVertexArray(meshRenderer.mesh.handle);
         glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh.indexCount, GL_UNSIGNED_INT, nullptr);

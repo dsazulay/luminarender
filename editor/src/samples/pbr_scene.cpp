@@ -68,8 +68,8 @@ void PbrScene::loadLights(ecs::Coordinator& coordinator)
         .color = glm::vec3(0.9, 0.9, 0.8),
     });
     coordinator.addComponent(light, ecs::Transform{
-        .rotation = glm::vec3(-45.0, 20.0, 0.0),
-        .quaternion =  glm::quat(glm::radians(glm::vec3(-45.0, 20.0, 0.0))),
+        .rotation = glm::vec3(-60.0, 20.0, 0.0),
+        .quaternion =  glm::quat(glm::radians(glm::vec3(-60.0, 20.0, 0.0))),
     });
     coordinator.addComponent(light, ecs::Tag{
         .name = "Directional Light"

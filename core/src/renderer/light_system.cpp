@@ -46,11 +46,11 @@ void LightSystem::update(UniformBufferObject& lightUBO)
 glm::mat4 LightSystem::getLightMatrix(ecs::Transform& transform)
 {
     const float near_plane = 0.1f;
-    const float far_plane = 40.0f;
-    const float dimensions = 20.0f;
+    const float far_plane = 80.0f;
+    const float dimensions = 40.0f;
     glm::mat4 lightProjection = glm::ortho(-dimensions, dimensions, 
             -dimensions, dimensions, near_plane, far_plane);
-    glm::mat4 lightView = glm::lookAt(getDirection(transform.quaternion) * -10.f,
+    glm::mat4 lightView = glm::lookAt(getDirection(transform.quaternion) * -20.f,
             getDirection(transform.quaternion), glm::vec3(0.0, 1.0, 0.0));
     return lightProjection * lightView;
 }
