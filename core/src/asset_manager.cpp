@@ -7,6 +7,7 @@
 #include "renderer/gfxapi.h"
 
 #include <cstddef>
+#include <format>
 #include <string_view>
 #include <unordered_map>
 #include <utility>
@@ -201,25 +202,35 @@ Model AssetManager::getModel(std::string_view path, bool loadMaterial)
         return newModel;
     }
 
+    int matCount = 0;
     for (auto& mesh : modelData.value())
     {
         Mesh m = loadMesh(MeshType::Custom, mesh.vertexIndex);
-        m.importedMatName = mesh.material.name;
+
+        if (!loadMaterial)
+        {
+            m_importedModels.insert({mesh.name, m});
+            newModel.meshes.push_back({mesh.name, m});
+
+            continue;
+        }
+
+        if (mesh.material.name == "") {
+            m.importedMatName = std::format("{}_{}", path, matCount++);
+        } else {
+            m.importedMatName = mesh.material.name;
+        }
 
         m_importedModels.insert({mesh.name, m});
         newModel.meshes.push_back({mesh.name, m});
 
-        if (m.importedMatName == "") {
-            continue;
-        }
-
-        Material& mat = createMaterial(mesh.material.name.c_str(), &getShader("resources/shaders/cook_torrance.glsl"));
+        Material& mat = createMaterial(m.importedMatName, &getShader("resources/shaders/cook_torrance.glsl"));
         mat.setColor("u_albedo", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
         if (mesh.material.diffusePath == "") {
             continue;
         }
-        Texture tex = getTexture2D("resources/sponza/" + mesh.material.diffusePath);
+        Texture tex = getTexture2D("resources/sponza_glTF/" + mesh.material.diffusePath);
         mat.setTexture("u_albedoTex", tex.handle);
 
     }

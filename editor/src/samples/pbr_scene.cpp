@@ -6,6 +6,8 @@
 #include "renderer/transform_system.h"
 
 
+constexpr std::string_view SPONZA_PATH = "resources/sponza_glTF/Sponza.gltf";
+
 void PbrScene::loadScene(AssetManager& assetManager,
                          ecs::Coordinator& coordinator)
 {
@@ -92,7 +94,7 @@ void PbrScene::loadObjects(AssetManager& assetManager,
     Mesh sphere = assetManager.getMesh(MeshType::Sphere);
     const Model& spitfire = assetManager.getModel(SampleResources::model_spitfire);
     const Model& cerberus = assetManager.getModel(SampleResources::model_cerberus);
-    const Model& sponza = assetManager.getModel("resources/sponza/sponza.obj", true);
+    const Model& sponza = assetManager.getModel(SPONZA_PATH, true);
 
     Material& greyMat = assetManager.getMaterial("greyMat");
     Material& blueMat = assetManager.getMaterial("blueMat");
@@ -206,7 +208,7 @@ void PbrScene::loadObjects(AssetManager& assetManager,
         coordinator.addComponent(newEntity, ecs::Transform{});
         coordinator.addComponent(newEntity, ecs::MeshRenderer{
             .mesh = mesh.second,
-            .material = &assetManager.getMaterial(mesh.second.importedMatName.c_str()),
+            .material = &assetManager.getMaterial(mesh.second.importedMatName),
         });
         coordinator.addComponent(newEntity, ecs::Tag{
             .name = mesh.first,
