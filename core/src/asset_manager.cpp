@@ -202,7 +202,6 @@ Model AssetManager::getModel(std::string_view path, bool loadMaterial)
         return newModel;
     }
 
-    int matCount = 0;
     for (auto& mesh : modelData.value())
     {
         Mesh m = loadMesh(MeshType::Custom, mesh.vertexIndex);
@@ -216,7 +215,7 @@ Model AssetManager::getModel(std::string_view path, bool loadMaterial)
         }
 
         if (mesh.material.name == "") {
-            m.importedMatName = std::format("{}_{}", path, matCount++);
+            m.importedMatName = std::format("{}_{}", path, mesh.material.index);
         } else {
             m.importedMatName = mesh.material.name;
         }

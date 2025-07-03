@@ -335,6 +335,7 @@ MeshData processMesh(aiMesh* mesh, const aiScene* scene, bool importMaterial)
         aiString matName = material->GetName();
 
         materialData.name = matName.C_Str();
+        materialData.index = mesh->mMaterialIndex;
 
         for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i)
         {

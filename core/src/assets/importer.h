@@ -43,6 +43,7 @@ struct MaterialData
 {
     std::string name;
     std::string diffusePath;
+    int index;
 };
 
 struct MeshData
