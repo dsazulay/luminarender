@@ -26,6 +26,7 @@ private:
     void ssaoBlurPass();
     void lightingPass();
     void skyboxPass();
+    void transparentPass();
     void normalVisualizerPass();
 
     void generateSSAONoiseTexture();

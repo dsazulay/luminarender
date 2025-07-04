@@ -1,6 +1,8 @@
 #include "importer.h"
 
 #include "../logger.h"
+#include "assimp/material.h"
+#include "assimp/types.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
@@ -336,6 +338,14 @@ MeshData processMesh(aiMesh* mesh, const aiScene* scene, bool importMaterial)
 
         materialData.name = matName.C_Str();
         materialData.index = mesh->mMaterialIndex;
+
+        float opacity = 0;
+        if (material->Get(AI_MATKEY_OPACITY, opacity) == AI_SUCCESS) {
+            materialData.type = MaterialType::TRANSPARENT;
+        }
+        else {
+            materialData.type = MaterialType::OPAQUE;
+        }
 
         for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); ++i)
         {

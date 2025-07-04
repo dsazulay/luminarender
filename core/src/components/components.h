@@ -47,6 +47,12 @@ struct MeshRenderer
     Material *material;
 };
 
+struct TransparentMeshRenderer
+{
+    Mesh mesh;
+    Material *material;
+};
+
 struct Tag
 {
     std::string name;

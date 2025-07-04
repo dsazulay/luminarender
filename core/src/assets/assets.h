@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../renderer/gfxapi.h"
+#include "model_types.h"
 
 #include <glm/vec4.hpp>
 
@@ -42,6 +43,7 @@ struct Material
     std::string name;
     Shader* shader;
     ShaderUniforms uniforms;
+    MaterialType type;
 
     void setFloat(const std::string& name, float value);
     void setColor(const std::string& name, glm::vec4 value);

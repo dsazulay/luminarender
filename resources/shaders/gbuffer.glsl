@@ -68,6 +68,10 @@ uniform sampler2D u_aoTex;
 void main()
 {
     vec4 albedo = texture(u_albedoTex, v_in.uv) * u_albedo;
+    if (albedo.a < 0.5)
+    {
+        discard;
+    }
     float ao = texture(u_aoTex, v_in.uv).r;
     float roughness = texture(u_roughnessTex, v_in.uv).r * u_roughness;
     float metallic = texture(u_metallicTex, v_in.uv).r * u_metallic;

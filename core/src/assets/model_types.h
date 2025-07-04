@@ -33,3 +33,10 @@ enum class MeshType : uint8_t
     TriangleMap,
 };
 
+enum class MaterialType : uint8_t
+{
+    OPAQUE,
+    CUTOUT,
+    TRANSPARENT,
+};
+

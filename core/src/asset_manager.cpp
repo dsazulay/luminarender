@@ -1,5 +1,6 @@
 #include "asset_manager.h"
 
+#include "assets/model_types.h"
 #include "logger.h"
 #include "assets/importer.h"
 #include "assets/primitives.h"
@@ -323,7 +324,7 @@ Material& AssetManager::getMaterial(std::string_view name)
     return m_materials.begin()->second;
 }
 
-Material& AssetManager::createMaterial(std::string_view name, Shader* shader)
+Material& AssetManager::createMaterial(std::string_view name, Shader* shader, MaterialType type)
 {
     auto it = m_materials.find(name.data());
     if (it != m_materials.end())
@@ -336,6 +337,7 @@ Material& AssetManager::createMaterial(std::string_view name, Shader* shader)
     m.name = name;
     m.shader = shader;
     m.uniforms = shader->uniformsDefaultValues;
+    m.type = type;
 
     auto& mat = m_materials.insert(std::make_pair(name, m)).first->second;
 

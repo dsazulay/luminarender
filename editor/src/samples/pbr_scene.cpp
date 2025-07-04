@@ -206,9 +206,11 @@ void PbrScene::loadObjects(AssetManager& assetManager,
     {
         auto newEntity = coordinator.createEntity();
         coordinator.addComponent(newEntity, ecs::Transform{});
+
+        Material* mat = &assetManager.getMaterial(mesh.second.importedMatName);
         coordinator.addComponent(newEntity, ecs::MeshRenderer{
             .mesh = mesh.second,
-            .material = &assetManager.getMaterial(mesh.second.importedMatName),
+            .material = mat,
         });
         coordinator.addComponent(newEntity, ecs::Tag{
             .name = mesh.first,

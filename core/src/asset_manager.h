@@ -31,7 +31,7 @@ public:
     Model getModel(std::string_view path, bool loadMaterial = false);
     Shader& getShader(std::string_view path);
     Material& getMaterial(std::string_view name);
-    Material& createMaterial(std::string_view name, Shader* shader);
+    Material& createMaterial(std::string_view name, Shader* shader, MaterialType type = MaterialType::OPAQUE);
     void loadDefaultResources();
     void checkFileModification();
 
