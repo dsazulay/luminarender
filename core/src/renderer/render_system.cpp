@@ -3,7 +3,7 @@
 #include "../components/components.h"
 #include "../irradiance_map_factory.h"
 #include "glad/gl.h"
-#include "../logger.h"
+#include "../locator.h"
 
 #include <random>
 #include <array>
@@ -14,20 +14,19 @@ float lerp(float a, float b, float f)
     return a + f * (b - a);
 }
 
-void RenderSystem::init(int width, int height, ecs::Coordinator* coordinator, 
-        Camera* camera, AssetManager* assetManager)
+void RenderSystem::init(int width, int height, Camera* camera)
 {
+    m_coordinator = Locator::getEcsCoordinator();
+    m_assetManager = Locator::getAssetManager();
     m_width = width;
     m_height = height;
-    m_coordinator = coordinator;
     m_camera = camera;
-    m_assetManager = assetManager;
 
-    m_mainTargetFrameBuffer = std::make_unique<ColorDepthStencilBuffer>(width, height, m_gpurm);
+    m_mainTargetFrameBuffer = std::make_unique<ColorDepthStencilBuffer>(m_width, m_height, m_gpurm);
     m_shadowFrameBuffer = std::make_unique<DepthBuffer>(shadowMapSize, shadowMapSize, m_gpurm);
-    m_gbuffer = std::make_unique<GBuffer>(width, height, m_gpurm);
-    m_ssaoBuffer = std::make_unique<ColorBuffer>(width, height, m_gpurm);
-    m_ssaoBlurBuffer = std::make_unique<ColorBuffer>(width, height, m_gpurm);
+    m_gbuffer = std::make_unique<GBuffer>(m_width, m_height, m_gpurm);
+    m_ssaoBuffer = std::make_unique<ColorBuffer>(m_width, m_height, m_gpurm);
+    m_ssaoBlurBuffer = std::make_unique<ColorBuffer>(m_width, m_height, m_gpurm);
 
     // TODO: Move this to asset initalization
     Shader* s = &m_assetManager->getShader("resources/shaders/gbuffer.glsl");
@@ -66,9 +65,9 @@ void RenderSystem::update()
     //normalVisualizerPass();
 }
 
-void RenderSystem::updateIrradianceMaps(AssetManager& assetManager)
+void RenderSystem::updateIrradianceMaps()
 {
-    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(assetManager.getTextureHDR("resources/textures/skybox/tiber_2.hdr").handle, assetManager);
+    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(m_assetManager->getTextureHDR("resources/textures/skybox/tiber_2.hdr").handle, *m_assetManager);
     m_irradianceMap = maps.irradianceMap;
     m_prefilterMap = maps.prefilterMap;
     m_brdfLUT = maps.brdfLUTMap;
@@ -78,10 +77,10 @@ void RenderSystem::resizeBuffers(int width, int height)
 {
     m_width = width;
     m_height = height;
-    m_mainTargetFrameBuffer->resizeBuffer(width, height);
-    m_gbuffer->resizeBuffer(width, height);
-    m_ssaoBuffer->resizeBuffer(width, height);
-    m_ssaoBlurBuffer->resizeBuffer(width, height);
+    m_mainTargetFrameBuffer->resizeBuffer(m_width, m_height);
+    m_gbuffer->resizeBuffer(m_width, m_height);
+    m_ssaoBuffer->resizeBuffer(m_width, m_height);
+    m_ssaoBlurBuffer->resizeBuffer(m_width, m_height);
 }
 
 void RenderSystem::toggleSSAO(bool enabled)
@@ -329,9 +328,8 @@ void RenderSystem::normalVisualizerPass()
         m_gpurm.bindShader(shader);
 
         m_gpurm.setUniform(shader, "u_model", transform.modelMatrix);
-        m_gpurm.setUniform(shader, "u_normalMatrix", glm::transpose(
-            glm::inverse(glm::mat3(m_camera->getViewMatrix() *
-                    transform.modelMatrix))));
+        m_gpurm.setUniform(shader, "u_normalMatrix", glm::transpose(glm::inverse(
+            glm::mat3(m_camera->getViewMatrix() * transform.modelMatrix))));
 
         for (auto& kv : material.uniforms.floatValues) {
             m_gpurm.setUniform(shader, kv.first.c_str(), kv.second);

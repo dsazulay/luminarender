@@ -42,7 +42,7 @@ void PropertiesSystem::update()
     auto& transform = m_coordinator->getComponent<ecs::Transform>(
             m_selected->value());
     draw(transform);
-    m_coordinator->getSytem<TransformSystem>()->updateSeflAndChilren(m_selected->value());
+    m_coordinator->getSystem<TransformSystem>()->updateSeflAndChilren(m_selected->value());
  
 
     if (m_coordinator->hasComponent<ecs::MeshRenderer>(m_selected->value()))
@@ -84,7 +84,7 @@ void PropertiesSystem::draw(ecs::Transform& transform)
         ImGui::DragFloat3("Rotation", &transform.rotation.x, 0.1f);
         ImGui::DragFloat3("Scale", &transform.scale.x, 0.1f);
 
-        m_coordinator->getSytem<TransformSystem>()->updateModelMatrix(transform);
+        m_coordinator->getSystem<TransformSystem>()->updateModelMatrix(transform);
 
         ImGui::TreePop();
     }

@@ -2,23 +2,31 @@
 
 #include "asset_manager.h"
 #include "components/components.h"
-#include "logger.h"
+#include "renderer/light_system.h"
+#include "renderer/render_system.h"
 #include "renderer/transform_system.h"
 //#include "samples/lighting_skybox_scene.h"
 #include "samples/pbr_scene.h"
-#include "log.h"
+#include "locator.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
 
-int logLevel = LogLevel::ERROR | LogLevel::WARNING | LogLevel::OPENGLAPI;
 float Application::deltaTime;
 
 Application::Application(AppConfig& config) : m_config(config)
 {
     initEcs();
+    Locator::provide(&m_coordinator);
+
     initWindow();
+
     m_assetManager.loadDefaultResources();
+    Locator::provide(&m_assetManager);
+
+    auto transformSystem = m_coordinator.getSystem<TransformSystem>();
+    transformSystem->init();
+
     initRenderer();
     initUiRenderer();
 
@@ -30,28 +38,48 @@ Application::Application(AppConfig& config) : m_config(config)
     // enable seamless cubemap sampling for lower mip levels in the pre-filter map.
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-    PbrScene::loadScene(m_assetManager, *m_coordinator);
-    m_renderer->updateIrradianceMaps(m_assetManager);
+    PbrScene pbrScene;
+    pbrScene.loadScene();
+    m_renderer->updateIrradianceMaps();
 
 }
 
 void Application::initEcs()
 {
-    m_coordinator = std::make_unique<ecs::Coordinator>();
-    m_coordinator->init();
-    m_coordinator->registerComponent<ecs::Transform>();
-    m_coordinator->registerComponent<ecs::Tag>();
-    m_coordinator->registerComponent<ecs::MeshRenderer>();
-    m_coordinator->registerComponent<ecs::Light>();
+    m_coordinator.init();
 
-    TransformSystem* transformSystem =
-        m_coordinator->registerSystem<TransformSystem>().get();
+    m_coordinator.registerComponent<ecs::Transform>();
+    m_coordinator.registerComponent<ecs::Tag>();
+    m_coordinator.registerComponent<ecs::MeshRenderer>();
+    m_coordinator.registerComponent<ecs::Light>();
+
+    m_coordinator.registerSystem<TransformSystem>();
     {
         ecs::Mask mask;
-        mask.set(m_coordinator->getComponentType<ecs::Transform>());
-        m_coordinator->setSystemMask<TransformSystem>(mask);
+        mask.set(m_coordinator.getComponentType<ecs::Transform>());
+        m_coordinator.setSystemMask<TransformSystem>(mask);
     }
-    transformSystem->init(m_coordinator.get());
+
+    m_coordinator.registerSystem<LightSystem>();
+    {
+        ecs::Mask mask;
+        mask.set(m_coordinator.getComponentType<ecs::Transform>());
+        mask.set(m_coordinator.getComponentType<ecs::Light>());
+        m_coordinator.setSystemMask<LightSystem>(mask);
+    }
+
+    auto renderSystem = m_coordinator.registerSystem<RenderSystem>();
+    {
+        ecs::Mask mask;
+        mask.set(m_coordinator.getComponentType<ecs::Transform>());
+        mask.set(m_coordinator.getComponentType<ecs::MeshRenderer>());
+        m_coordinator.setSystemMask<RenderSystem>(mask);
+    }
+
+    // TODO: Check why this is necessary (very strange bug)
+    m_coordinator.getSystem<TransformSystem>();
+    m_coordinator.getSystem<LightSystem>();
+    m_coordinator.getSystem<RenderSystem>();
 }
 
 void Application::initWindow()
@@ -64,14 +92,14 @@ void Application::initRenderer()
 {
     m_renderer = std::make_unique<Renderer>((float) m_config.viewportWidth,
                                             (float) m_config.viewportHeight,
-                                            glm::vec3(0.0, 0.0, 8.0f),
-                                            m_coordinator.get());
-    m_renderer->init(&m_assetManager);
+                                            glm::vec3(0.0, 0.0, 8.0f));
+
+    m_renderer->init();
 }
 
 void Application::initUiRenderer()
 {
-    m_uiRenderer = std::make_unique<UiRenderer>(m_coordinator.get(), &m_assetManager);
+    m_uiRenderer = std::make_unique<UiRenderer>(&m_coordinator, &m_assetManager);
     m_uiRenderer->init();
     m_uiRenderer->setBackendImplementation(m_window.glfwWindow());
     m_uiRenderer->viewportWidth = (float) m_config.viewportWidth;

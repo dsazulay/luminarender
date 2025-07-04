@@ -8,7 +8,7 @@
 class TransformSystem : public ecs::System
 {
 public:
-    void init(ecs::Coordinator* coordinator);
+    void init();
     void update();
     void updateHierarchically();
     void updateModelMatrix(ecs::Entity entity);

@@ -7,16 +7,15 @@
 class PbrScene
 {
 public:
-    static void loadScene(AssetManager& assetManager,
-                          ecs::Coordinator& coordinator);
+    void loadScene();
 
 private:
-    static void loadIrradianceTextures(unsigned int& skyboxTex,
-                                       AssetManager& assetManager);
-    static void loadMaterials(AssetManager& assetManager,
-                              unsigned int& skyboxTex);
-    static void loadLights(ecs::Coordinator& coordinator);
-    static void loadSkybox(AssetManager& assetManager);
-    static void loadObjects(AssetManager& assetManager,
-                            ecs::Coordinator& coordinator);
+    void loadIrradianceTextures(unsigned int& skyboxTex);
+    void loadMaterials(unsigned int& skyboxTex);
+    void loadLights();
+    void loadSkybox();
+    void loadObjects();
+
+    ecs::Coordinator* m_ecsCoordinator;
+    AssetManager* m_assetManager;
 };

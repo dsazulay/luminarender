@@ -20,7 +20,7 @@ struct LightUniformStruct
 class LightSystem : public ecs::System
 {
 public:
-    void init(ecs::Coordinator* coordinator);
+    void init();
     void update(UniformBufferObject& lightUBO);
 private:
     glm::mat4 getLightMatrix(ecs::Transform& transform);

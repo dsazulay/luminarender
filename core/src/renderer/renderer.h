@@ -2,10 +2,7 @@
 
 #include "../camera.h"
 #include "uniform_buffer_object.h"
-#include "frame_buffer.h"
-#include "gpuresourcemanager.h"
 #include "gpucommands.h"
-#include "../asset_manager.h"
 #include "../ecs.h"
 #include "light_system.h"
 #include "render_system.h"
@@ -13,11 +10,10 @@
 
 class Renderer {
 public:
-    Renderer(float viewportWidth, float viewportHeight, 
-            glm::vec3 cameraPos, ecs::Coordinator* coordinator);
-    void init(AssetManager* assetManager);
+    Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos);
+    void init();
     void updateTransformMatrices();
-    void updateIrradianceMaps(AssetManager& assetManager);
+    void updateIrradianceMaps();
     void render();
 
     glm::mat4 cascadeShadows(glm::vec3 lightDir);

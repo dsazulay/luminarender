@@ -13,9 +13,9 @@
 class RenderSystem : public ecs::System
 {
 public:
-    void init(int width, int height, ecs::Coordinator* coordinator, Camera* camera, AssetManager* assetManager);
+    void init(int width, int height, Camera* camera);
     void update();
-    void updateIrradianceMaps(AssetManager& assetManager);
+    void updateIrradianceMaps();
     void resizeBuffers(int width, int height);
     void toggleSSAO(bool enabled);
     id_t getFinalRenderTexID();

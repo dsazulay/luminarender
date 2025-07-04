@@ -34,7 +34,7 @@ private:
     void initRenderer();
     void initUiRenderer();
 
-    std::unique_ptr<ecs::Coordinator> m_coordinator;
+    ecs::Coordinator m_coordinator;
     AssetManager m_assetManager;
     Window m_window;
     std::unique_ptr<Renderer> m_renderer;

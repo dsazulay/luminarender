@@ -9,11 +9,12 @@
 #include "../log.h"
 #include "../ecs.h"
 #include "../components/components.h"
+#include "../locator.h"
+#include "light_system.h"
 
 
-const int MATRICESUBO_SIZE = 2 * sizeof(glm::mat4) + 2 * sizeof(glm::vec4);
-const int LIGHTUBO_SIZE = (2 * sizeof(glm::vec4) + sizeof(glm::mat4) 
-        + 12 * sizeof(LightUniformStruct));
+constexpr int MATRICESUBO_SIZE = 2 * sizeof(glm::mat4) + 2 * sizeof(glm::vec4);
+constexpr int LIGHTUBO_SIZE = (2 * sizeof(glm::vec4) + sizeof(glm::mat4) + 12 * sizeof(LightUniformStruct));
 
 void Renderer::render()
 {
@@ -33,9 +34,9 @@ glm::mat4& Renderer::projMatrix()
     return m_projMatrix;
 }
 
-void Renderer::updateIrradianceMaps(AssetManager& assetManager)
+void Renderer::updateIrradianceMaps()
 {
-    m_renderSystem->updateIrradianceMaps(assetManager);
+    m_renderSystem->updateIrradianceMaps();
 }
 
 void Renderer::updateTransformMatrices()
@@ -53,40 +54,28 @@ void Renderer::updateTransformMatrices()
             sizeof(glm::vec4), glm::value_ptr(glm::vec4(m_camera.front, 1.0)));
 }
 
-Renderer::Renderer(float viewportWidth, float viewportHeight, 
-        glm::vec3 cameraPos, ecs::Coordinator* coordinator) : 
+Renderer::Renderer(float viewportWidth, float viewportHeight, glm::vec3 cameraPos) :
     m_viewportWidth(viewportWidth), m_viewportHeight(viewportHeight),
     m_matricesUBO(MATRICESUBO_SIZE), m_lightUBO(LIGHTUBO_SIZE),
-    m_camera(cameraPos), m_coordinator(coordinator)
+    m_camera(cameraPos)
 {
 }
 
-void Renderer::init(AssetManager* assetManager)
+void Renderer::init()
 {
+    m_coordinator = Locator::getEcsCoordinator();
+
+    m_lightSystem = m_coordinator->getSystem<LightSystem>().get();
+    m_renderSystem = m_coordinator->getSystem<RenderSystem>().get();
+
+    m_lightSystem->init();
+    m_renderSystem->init((int) m_viewportWidth, (int) m_viewportHeight, &m_camera);
+
     m_matricesUBO.bindBufferToIndex(0);
     m_lightUBO.bindBufferToIndex(1);
 
-    m_lightSystem = m_coordinator->registerSystem<LightSystem>().get();
-    {
-        ecs::Mask mask;
-        mask.set(m_coordinator->getComponentType<ecs::Transform>());
-        mask.set(m_coordinator->getComponentType<ecs::Light>());
-        m_coordinator->setSystemMask<LightSystem>(mask);
-    }
-    m_lightSystem->init(m_coordinator);
-
-    m_renderSystem = m_coordinator->registerSystem<RenderSystem>().get();
-    {
-        ecs::Mask mask;
-        mask.set(m_coordinator->getComponentType<ecs::Transform>());
-        mask.set(m_coordinator->getComponentType<ecs::MeshRenderer>());
-        m_coordinator->setSystemMask<RenderSystem>(mask);
-    }
-    m_renderSystem->init((int) m_viewportWidth, (int) m_viewportHeight, 
-            m_coordinator, &m_camera, assetManager);
-
     Dispatcher::instance().subscribe(ViewportResizeEvent::descriptor,
-        std::bind(&Renderer::onViewportResize, this, std::placeholders::_1));
+        [&] (const auto& arg) { Renderer::onViewportResize(arg); });
     Dispatcher::instance().subscribe(UiToggleSSAOEvent::descriptor,
         [&] (const auto& arg) { Renderer::onUiToggleSSAO(arg); });
 }

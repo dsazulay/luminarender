@@ -1,11 +1,11 @@
 #include "light_system.h"
 
 #include "../components/components.h"
-#include "../log.h"
+#include "../locator.h"
 
-void LightSystem::init(ecs::Coordinator* coordinator)
+void LightSystem::init()
 {
-    m_coordinator = coordinator;
+    m_coordinator = Locator::getEcsCoordinator();
 }
 
 void LightSystem::update(UniformBufferObject& lightUBO)

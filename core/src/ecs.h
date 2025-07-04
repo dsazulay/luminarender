@@ -151,7 +151,7 @@ public:
     std::shared_ptr<T> getSystem()
     {
         const char* typeName = typeid(T).name();
-        
+
         assert(m_systems.find(typeName) != m_systems.end() && "System not registered");
         return std::static_pointer_cast<T>(m_systems[typeName]);
     }
@@ -160,7 +160,7 @@ public:
     void setMask(Mask mask)
     {
         const char* typeName = typeid(T).name();
-        
+
         assert(m_systems.find(typeName) != m_systems.end() && "System not registered");
 
         m_masks.insert({typeName, mask});
@@ -246,7 +246,7 @@ public:
     }
 
     template<typename T>
-    std::shared_ptr<T> getSytem()
+    std::shared_ptr<T> getSystem()
     {
         return m_systemManager->getSystem<T>();
     }
