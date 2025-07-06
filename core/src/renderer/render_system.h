@@ -1,13 +1,14 @@
 #pragma once
 
 #include "../ecs.h"
+#include "gfxapi.h"
 #include "gpucommands.h"
 #include "frame_buffer.h"
 #include "../asset_manager.h"
 #include "../camera.h"
 
 #include <memory>
-#include <array>
+#include <string>
 #include <glm/vec3.hpp>
 
 class RenderSystem : public ecs::System
@@ -30,6 +31,8 @@ private:
     void normalVisualizerPass();
 
     void drawMesh(id_t mesh, int indexCount);
+    void setAndBindTexture(id_t shader, const std::string& uniform,
+                           id_t texture, int slot, TextureTarget target);
     void generateSSAONoiseTexture();
 
     void setDefaultRenderState();

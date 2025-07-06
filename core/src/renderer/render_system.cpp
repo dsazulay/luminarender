@@ -160,9 +160,8 @@ void RenderSystem::geometryPass()
 
         int texCount = 0;
         for (auto& kv : origMaterial.uniforms.texValues) {
-            m_gpurm->setUniform(shader, kv.first.c_str(), texCount);
-            glActiveTexture(GL_TEXTURE0 + texCount);
-            glBindTexture(GL_TEXTURE_2D, kv.second);
+            setAndBindTexture(shader, kv.first, kv.second, texCount,
+                              TextureTarget::TEX2D);
             ++texCount;
         }
 
@@ -188,17 +187,12 @@ void RenderSystem::ssaoPass()
         m_gpurm->setUniform(shader, std::format("u_samples[{}]", i).c_str(), m_ssaoKernel[i]);
     }
 
-    m_gpurm->setUniform(shader, "u_depth", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getDepthAttachmentID());
-
-    m_gpurm->setUniform(shader, "u_normal", 1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getNormalAttachmentID());
-
-    m_gpurm->setUniform(shader, "u_noise", 2);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, m_ssaoNoiseTex);
+    setAndBindTexture(shader, "u_depth", m_gbuffer->getDepthAttachmentID(),
+                      0, TextureTarget::TEX2D);
+    setAndBindTexture(shader, "u_normal", m_gbuffer->getNormalAttachmentID(),
+                      1, TextureTarget::TEX2D);
+    setAndBindTexture(shader, "u_noise", m_ssaoNoiseTex,
+                      2, TextureTarget::TEX2D);
 
     drawMesh(mesh.handle, mesh.indexCount);
 
@@ -220,10 +214,8 @@ void RenderSystem::ssaoBlurPass()
     for (unsigned int i = 0; i < 64; ++i) {
         m_gpurm->setUniform(shader, std::format("u_samples[{}]", i).c_str(), m_ssaoKernel[i]);
     }
-
-    m_gpurm->setUniform(shader, "u_ssao", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_ssaoBuffer->getColorAttachmentID());
+    setAndBindTexture(shader, "u_ssao", m_ssaoBuffer->getColorAttachmentID(),
+                      0, TextureTarget::TEX2D);
 
     drawMesh(mesh.handle, mesh.indexCount);
 
@@ -242,48 +234,35 @@ void RenderSystem::lightingPass()
     id_t shader = material.shader->handle;
     m_gpurm->bindShader(shader);
 
-    m_gpurm->setUniform(shader, "u_depth", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getDepthAttachmentID());
-
-    m_gpurm->setUniform(shader, "u_normal", 1);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getNormalAttachmentID());
-
-    m_gpurm->setUniform(shader, "u_albedo", 2);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getAlbedoSpecAttachmentID());
-
-    m_gpurm->setUniform(shader, "u_shadowMap", 3);
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, m_shadowFrameBuffer->getDepthAttachmentID());
-
-    m_gpurm->setUniform(shader, "u_ssao", 4);
-    glActiveTexture(GL_TEXTURE4);
-    if (m_ssaoEnabled)
-        glBindTexture(GL_TEXTURE_2D, m_ssaoBlurBuffer->getColorAttachmentID());
-    else
-    {
-        glBindTexture(GL_TEXTURE_2D, m_assetManager->getTexture2D(
-            "resources/textures/default_white.png").handle);
+    setAndBindTexture(shader, "u_depth", m_gbuffer->getDepthAttachmentID(),
+                      0, TextureTarget::TEX2D);
+    setAndBindTexture(shader, "u_normal", m_gbuffer->getNormalAttachmentID(),
+                      1, TextureTarget::TEX2D);
+    setAndBindTexture(shader, "u_albedo",
+                      m_gbuffer->getAlbedoSpecAttachmentID(),
+                      2, TextureTarget::TEX2D);
+    setAndBindTexture(shader, "u_shadowMap",
+                      m_shadowFrameBuffer->getDepthAttachmentID(),
+                      3, TextureTarget::TEX2D);
+    id_t ssaoTex;
+    if (m_ssaoEnabled) {
+        ssaoTex = m_ssaoBlurBuffer->getColorAttachmentID();
     }
-
-    m_gpurm->setUniform(shader, "u_orm", 5);
-    glActiveTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, m_gbuffer->getPositionAttachmentID());
+    else {
+        ssaoTex = m_assetManager->getTexture2D(
+            "resources/textures/default_white.png").handle;
+    }
+    setAndBindTexture(shader, "u_ssao", ssaoTex, 4, TextureTarget::TEX2D);
+    setAndBindTexture(shader, "u_orm", m_gbuffer->getPositionAttachmentID(),
+                      5, TextureTarget::TEX2D);
 
     // bind global illumination textures
-    m_gpurm->setUniform(shader, "u_irradianceTex", 10);
-    glActiveTexture(GL_TEXTURE10);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_irradianceMap);
-
-    m_gpurm->setUniform(shader, "u_prefilterMap", 11);
-    glActiveTexture(GL_TEXTURE11);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, m_prefilterMap);
-
-    m_gpurm->setUniform(shader, "u_brdfLUT", 12);
-    glActiveTexture(GL_TEXTURE12);
-    glBindTexture(GL_TEXTURE_2D, m_brdfLUT);
+    setAndBindTexture(shader, "u_irradianceTex", m_irradianceMap, 10,
+                      TextureTarget::CUBEMAP);
+    setAndBindTexture(shader, "u_prefilterMap", m_prefilterMap, 11,
+                      TextureTarget::CUBEMAP);
+    setAndBindTexture(shader, "u_brdfLUT", m_brdfLUT, 12,
+                      TextureTarget::TEX2D);
 
     drawMesh(mesh.handle, mesh.indexCount);
 
@@ -301,9 +280,8 @@ void RenderSystem::skyboxPass()
 
     int texCount = 0;
     for (auto& kv : material.uniforms.texValues) {
-        m_gpurm->setUniform(shader, kv.first.c_str(), texCount);
-        glActiveTexture(GL_TEXTURE0 + texCount);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, kv.second);
+        setAndBindTexture(shader, kv.first, kv.second, texCount,
+                          TextureTarget::CUBEMAP);
         ++texCount;
     }
 
@@ -340,9 +318,8 @@ void RenderSystem::normalVisualizerPass()
 
         int texCount = 0;
         for (auto& kv : material.uniforms.texValues) {
-            m_gpurm->setUniform(shader, kv.first.c_str(), texCount);
-            glActiveTexture(GL_TEXTURE0 + texCount);
-            glBindTexture(GL_TEXTURE_2D, kv.second);
+            setAndBindTexture(shader, kv.first, kv.second, texCount,
+                              TextureTarget::TEX2D);
             ++texCount;
         }
 
@@ -357,6 +334,15 @@ void RenderSystem::drawMesh(id_t mesh, int indexCount)
     m_gpurm->bindMesh(mesh);
     m_gpurm->drawTriangleElements(indexCount);
     m_gpurm->unbindMesh();
+}
+
+void RenderSystem::setAndBindTexture(
+    id_t shader, const std::string& uniform, id_t texture, 
+    int slot, TextureTarget target)
+{
+    m_gpurm->setUniform(shader, uniform.c_str(), slot);
+    m_gpurm->activeTexture(slot);
+    m_gpurm->bindTexture(texture, target);
 }
 
 // TODO: move this to asset library init

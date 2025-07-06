@@ -42,6 +42,9 @@ public:
     void unbindMesh();
     void drawTriangleElements(int indexCount);
 
+    void bindTexture(id_t texture, TextureTarget target);
+    void activeTexture(int slot);
+
     // Commands
     void setViewportSize(int x, int y, int width, int height);
     void setClearColor(float r, float g, float b, float a);

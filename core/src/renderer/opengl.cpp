@@ -258,6 +258,16 @@ void OpenGL::drawTriangleElements(int indexCount)
     glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
 }
 
+void OpenGL::bindTexture(id_t texture, TextureTarget target)
+{
+    glBindTexture(getTextureTarget(target), texture);
+}
+
+void OpenGL::activeTexture(int slot)
+{
+    glActiveTexture(GL_TEXTURE0 + slot);
+}
+
 // Commands
 void OpenGL::setViewportSize(int x, int y, int width, int height)
 {

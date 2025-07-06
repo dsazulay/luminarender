@@ -137,6 +137,16 @@ public:
         m_backend.drawTriangleElements(indexCount);
     }
 
+    void bindTexture(id_t texture, TextureTarget target)
+    {
+        m_backend.bindTexture(texture, target);
+    }
+
+    void activeTexture(int slot)
+    {
+        m_backend.activeTexture(slot);
+    }
+
 private:
     T m_backend;
 };
