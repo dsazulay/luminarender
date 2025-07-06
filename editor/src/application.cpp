@@ -119,6 +119,8 @@ void Application::mainloop()
 
         m_window.swapBuffers();
         m_window.pollEvents();
+
+        m_assetManager.checkFileModification();
     }
 }
 

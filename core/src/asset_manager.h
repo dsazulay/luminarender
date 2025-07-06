@@ -1,7 +1,5 @@
 #pragma once
 
-#include "file_view.h"
-
 #include "assets/model_types.h"
 #include "assets/assets.h"
 
@@ -17,7 +15,7 @@ struct AssetFile
 {
     std::string path;
     std::filesystem::file_time_type lastWriteTime;
-    FileView handle;
+    std::function<void(std::string_view)> onFileChange;
 };
 
 class AssetManager
@@ -33,6 +31,8 @@ public:
     Material& getMaterial(std::string_view name);
     Material& createMaterial(std::string_view name, Shader* shader, MaterialType type = MaterialType::OPAQUE);
     void loadDefaultResources();
+
+    void reloadShader(std::string_view path);
     void checkFileModification();
 
 private:
@@ -50,4 +50,4 @@ private:
     GPUResourceManager<OpenGL>* m_gpurm{};
 };
 
-AssetFile createAssetFile(std::string_view path, FileView fileView);
+AssetFile createAssetFile(std::string_view path, std::function<void(std::string_view)> callback);
