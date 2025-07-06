@@ -99,6 +99,25 @@ enum class FrameBufferOp
     READWRITE,
 };
 
+enum class Capability
+{
+    CULL,
+    DEPTHTEST,
+    CUBEMAP_SEAMLESS,
+};
+
+enum class DepthFunction
+{
+    NEVER,
+    LESS,
+    EQUAL,
+    LEQUAL,
+    GREATER,
+    NOTEQUAL,
+    GEQUAL,
+    ALWAYS,
+};
+
 template <typename T>
 struct MeshInfo
 {

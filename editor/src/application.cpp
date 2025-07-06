@@ -16,32 +16,23 @@ float Application::deltaTime;
 
 Application::Application(AppConfig& config) : m_config(config)
 {
-    initEcs();
+    Locator::provide(&m_gpucommands);
+    Locator::provide(&m_gpurm);
     Locator::provide(&m_coordinator);
-
-    initWindow();
-
-    m_assetManager.loadDefaultResources();
     Locator::provide(&m_assetManager);
+
+    initEcs();
+    m_assetManager.loadDefaultResources();
+    initWindow();
+    initRenderer();
+    initUiRenderer();
 
     auto transformSystem = m_coordinator.getSystem<TransformSystem>();
     transformSystem->init();
 
-    initRenderer();
-    initUiRenderer();
-
-    // TODO: move to render config location
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    // set depth function to less than AND equal for skybox depth trick.
-    glDepthFunc(GL_LEQUAL);
-    // enable seamless cubemap sampling for lower mip levels in the pre-filter map.
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
     PbrScene pbrScene;
     pbrScene.loadScene();
     m_renderer->updateIrradianceMaps();
-
 }
 
 void Application::initEcs()
@@ -76,7 +67,7 @@ void Application::initEcs()
         m_coordinator.setSystemMask<RenderSystem>(mask);
     }
 
-    // TODO: Check why this is necessary (very strange bug)
+    // TODO: Check why this is necessary (very strange bug?)
     m_coordinator.getSystem<TransformSystem>();
     m_coordinator.getSystem<LightSystem>();
     m_coordinator.getSystem<RenderSystem>();

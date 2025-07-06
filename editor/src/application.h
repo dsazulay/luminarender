@@ -34,8 +34,11 @@ private:
     void initRenderer();
     void initUiRenderer();
 
+    GPUCommands<OpenGL> m_gpucommands;
+    GPUResourceManager<OpenGL> m_gpurm;
     ecs::Coordinator m_coordinator;
     AssetManager m_assetManager;
+
     Window m_window;
     std::unique_ptr<Renderer> m_renderer;
     std::unique_ptr<UiRenderer> m_uiRenderer;

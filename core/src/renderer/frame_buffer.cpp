@@ -2,6 +2,7 @@
 
 #include "../log.h"
 #include "gfxapi.h"
+#include "../locator.h"
 
 /*
 void FrameBuffer::create3Dbuffer()
@@ -50,9 +51,10 @@ void FrameBuffer::create3Dbuffer()
 }
 */
 
-FrameBuffer::FrameBuffer(int width, int height, GPUResourceManager<OpenGL> rm) 
-    : m_width(width), m_height(height), m_rm(rm)
+FrameBuffer::FrameBuffer(int width, int height)
+    : m_width(width), m_height(height)
 {
+    m_rm = Locator::getGpuResourceManager();
 }
 
 void FrameBuffer::resizeBuffer(int width, int height)
@@ -65,17 +67,17 @@ void FrameBuffer::resizeBuffer(int width, int height)
 
 void FrameBuffer::bind()
 {
-    m_rm.bindFrameBuffer(m_frameBufferID);
+    m_rm->bindFrameBuffer(m_frameBufferID);
 }
 
 void FrameBuffer::bind(FrameBufferOp op)
 {
-    m_rm.bindFrameBuffer(op, m_frameBufferID);
+    m_rm->bindFrameBuffer(op, m_frameBufferID);
 }
 
 void FrameBuffer::unbind()
 {
-    m_rm.unbindFrameBuffer();
+    m_rm->unbindFrameBuffer();
 }
 
 unsigned int FrameBuffer::getID()
@@ -83,8 +85,8 @@ unsigned int FrameBuffer::getID()
     return m_frameBufferID;
 }
 
-ColorDepthStencilBuffer::ColorDepthStencilBuffer(int width, int height, GPUResourceManager<OpenGL> rm)
-    : FrameBuffer(width, height, rm)
+ColorDepthStencilBuffer::ColorDepthStencilBuffer(int width, int height)
+    : FrameBuffer(width, height)
 {
     createBuffer();
 }
@@ -106,16 +108,16 @@ id_t ColorDepthStencilBuffer::getDepthAttachmentID()
 
 void ColorDepthStencilBuffer::createBuffer()
 { 
-    m_frameBufferID = m_rm.createFrameBuffer({
+    m_frameBufferID = m_rm->createFrameBuffer({
         .debugName = "MainFrameBuffer",
     });
-    m_colorAttachmentID = m_rm.createTexture({
+    m_colorAttachmentID = m_rm->createTexture({
         .width = m_width,
         .height = m_height,
         .format = Format::RGB,
         .byteFormat = ByteFormat::RGB,
     });
-    m_depthAttachmentID = m_rm.createTexture({
+    m_depthAttachmentID = m_rm->createTexture({
         .width = m_width,
         .height = m_height,
         .format = Format::DEPTH,
@@ -123,18 +125,18 @@ void ColorDepthStencilBuffer::createBuffer()
         .filtering = Filtering::POINT,
         .type = TexType::FLOAT,
     });
-    m_rm.attachTexture(m_frameBufferID, {
+    m_rm->attachTexture(m_frameBufferID, {
         .attachment = m_colorAttachmentID,
         .type = AttachmentType::COLOR0,
         .target = AttachmentTarget::TEX2D,
     });
-    m_rm.attachRenderBuffer(m_frameBufferID, {
+    m_rm->attachTexture(m_frameBufferID, {
         .attachment = m_depthAttachmentID,
         .type = AttachmentType::DEPTH,
         .target = AttachmentTarget::TEX2D,
     });
 
-    if (!m_rm.isFrameBufferComplete(m_frameBufferID))
+    if (!m_rm->isFrameBufferComplete(m_frameBufferID))
     {
         LOG_ERROR("ColorDepthStencilBuffer is not complete!");
     }
@@ -142,13 +144,13 @@ void ColorDepthStencilBuffer::createBuffer()
 
 void ColorDepthStencilBuffer::deleteBuffer()
 {
-    m_rm.deleteTexture(m_colorAttachmentID);
-    m_rm.deleteRenderBuffer(m_depthAttachmentID);
-    m_rm.deleteFrameBuffer(m_frameBufferID);
+    m_rm->deleteTexture(m_colorAttachmentID);
+    m_rm->deleteRenderBuffer(m_depthAttachmentID);
+    m_rm->deleteFrameBuffer(m_frameBufferID);
 }
 
-ColorBuffer::ColorBuffer(int width, int height, GPUResourceManager<OpenGL> rm)
-    : FrameBuffer(width, height, rm)
+ColorBuffer::ColorBuffer(int width, int height)
+    : FrameBuffer(width, height)
 {
     createBuffer();
 }
@@ -165,10 +167,10 @@ id_t ColorBuffer::getColorAttachmentID()
 
 void ColorBuffer::createBuffer()
 { 
-    m_frameBufferID = m_rm.createFrameBuffer({
+    m_frameBufferID = m_rm->createFrameBuffer({
         .debugName = "ColorFrameBuffer",
     });
-    m_colorAttachmentID = m_rm.createTexture({
+    m_colorAttachmentID = m_rm->createTexture({
         .width = m_width,
         .height = m_height,
         .format = Format::RED,
@@ -176,13 +178,13 @@ void ColorBuffer::createBuffer()
         .filtering = Filtering::POINT,
         .type = TexType::FLOAT,
     });
-    m_rm.attachTexture(m_frameBufferID, {
+    m_rm->attachTexture(m_frameBufferID, {
         .attachment = m_colorAttachmentID,
         .type = AttachmentType::COLOR0,
         .target = AttachmentTarget::TEX2D,
     });
 
-    if (!m_rm.isFrameBufferComplete(m_frameBufferID))
+    if (!m_rm->isFrameBufferComplete(m_frameBufferID))
     {
         LOG_ERROR("ColorBuffer is not complete!");
     }
@@ -190,12 +192,12 @@ void ColorBuffer::createBuffer()
 
 void ColorBuffer::deleteBuffer()
 {
-    m_rm.deleteTexture(m_colorAttachmentID);
-    m_rm.deleteFrameBuffer(m_frameBufferID);
+    m_rm->deleteTexture(m_colorAttachmentID);
+    m_rm->deleteFrameBuffer(m_frameBufferID);
 }
 
-DepthBuffer::DepthBuffer(int width, int height, GPUResourceManager<OpenGL> rm)
-    : FrameBuffer(width, height, rm)
+DepthBuffer::DepthBuffer(int width, int height)
+    : FrameBuffer(width, height)
 {
     createBuffer();
 }
@@ -212,11 +214,11 @@ id_t DepthBuffer::getDepthAttachmentID()
 
 void DepthBuffer::createBuffer()
 {
-    m_frameBufferID = m_rm.createFrameBuffer({
+    m_frameBufferID = m_rm->createFrameBuffer({
         .debugName = "ShadowFrameBuffer",
         .hasColorBuffer = false,
     });
-    m_depthAttachmentID = m_rm.createTexture({
+    m_depthAttachmentID = m_rm->createTexture({
         .width = m_width,
         .height = m_height,
         .format = Format::DEPTH,
@@ -225,13 +227,13 @@ void DepthBuffer::createBuffer()
         .wrap = Wrap::CLAMPBORDER,
         .type = TexType::FLOAT,
     });
-    m_rm.attachTexture(m_frameBufferID, {
+    m_rm->attachTexture(m_frameBufferID, {
         .attachment = m_depthAttachmentID,
         .type = AttachmentType::DEPTH,
         .target = AttachmentTarget::TEX2D,
     });
-    
-    if (!m_rm.isFrameBufferComplete(m_frameBufferID))
+
+    if (!m_rm->isFrameBufferComplete(m_frameBufferID))
     {
         LOG_ERROR("DepthBuffer is not complete!");
     }
@@ -239,12 +241,12 @@ void DepthBuffer::createBuffer()
 
 void DepthBuffer::deleteBuffer()
 {
-    m_rm.deleteTexture(m_depthAttachmentID);
-    m_rm.deleteFrameBuffer(m_frameBufferID);
+    m_rm->deleteTexture(m_depthAttachmentID);
+    m_rm->deleteFrameBuffer(m_frameBufferID);
 }
 
-GBuffer::GBuffer(int width, int height, GPUResourceManager<OpenGL> rm)
-    : FrameBuffer(width, height, rm)
+GBuffer::GBuffer(int width, int height)
+    : FrameBuffer(width, height)
 {
     createBuffer();
 }
@@ -276,10 +278,10 @@ id_t GBuffer::getDepthAttachmentID()
 
 void GBuffer::createBuffer()
 {
-    m_frameBufferID = m_rm.createFrameBuffer({
+    m_frameBufferID = m_rm->createFrameBuffer({
         .debugName = "GBuffer",
     });
-    m_positionAttachmentID = m_rm.createTexture({
+    m_positionAttachmentID = m_rm->createTexture({
         .debugName = "PositionTex",
         .width = m_width,
         .height = m_height,
@@ -289,7 +291,7 @@ void GBuffer::createBuffer()
         .wrap = Wrap::CLAMPEDGE,
         .type = TexType::FLOAT,
     });
-    m_normalAttachmentID = m_rm.createTexture({
+    m_normalAttachmentID = m_rm->createTexture({
         .debugName = "NormalTex",
         .width = m_width,
         .height = m_height,
@@ -298,7 +300,7 @@ void GBuffer::createBuffer()
         .filtering = Filtering::POINT,
         .type = TexType::FLOAT,
     });
-    m_albedoSpecAttachmentID = m_rm.createTexture({
+    m_albedoSpecAttachmentID = m_rm->createTexture({
         .debugName = "AlbedoTex",
         .width = m_width,
         .height = m_height,
@@ -306,7 +308,7 @@ void GBuffer::createBuffer()
         .byteFormat = ByteFormat::RGBA,
         .filtering = Filtering::POINT,
     });
-    m_depthAttachmentID = m_rm.createTexture({
+    m_depthAttachmentID = m_rm->createTexture({
         .debugName = "DepthTexture",
         .width = m_width,
         .height = m_height,
@@ -315,45 +317,45 @@ void GBuffer::createBuffer()
         .filtering = Filtering::POINT,
         .type = TexType::FLOAT,
     });
-    m_rm.attachTexture(m_frameBufferID, {
+    m_rm->attachTexture(m_frameBufferID, {
         .attachment = m_positionAttachmentID,
         .type = AttachmentType::COLOR0,
         .target = AttachmentTarget::TEX2D,
     });
-    m_rm.attachTexture(m_frameBufferID, {
+    m_rm->attachTexture(m_frameBufferID, {
         .attachment = m_normalAttachmentID,
         .type = AttachmentType::COLOR1,
         .target = AttachmentTarget::TEX2D,
     });
-    m_rm.attachTexture(m_frameBufferID, {
+    m_rm->attachTexture(m_frameBufferID, {
         .attachment = m_albedoSpecAttachmentID,
         .type = AttachmentType::COLOR2,
         .target = AttachmentTarget::TEX2D,
     });
-    m_rm.attachTexture(m_frameBufferID, {
+    m_rm->attachTexture(m_frameBufferID, {
         .attachment = m_depthAttachmentID,
         .type = AttachmentType::DEPTH,
         .target = AttachmentTarget::TEX2D,
     });
 
     AttachmentType types[3] = { AttachmentType::COLOR0, AttachmentType::COLOR1, AttachmentType::COLOR2 };
-    m_rm.setTargetBuffers(m_frameBufferID, {
+    m_rm->setTargetBuffers(m_frameBufferID, {
         .size = 3,
         .types = types,
     });
 
-    if (!m_rm.isFrameBufferComplete(m_frameBufferID))
+    if (!m_rm->isFrameBufferComplete(m_frameBufferID))
     {
-        LOG_ERROR("DepthBuffer is not complete!");
+        LOG_ERROR("GBuffer is not complete!");
     }
 }
 
 void GBuffer::deleteBuffer()
 {
-    m_rm.deleteTexture(m_positionAttachmentID);
-    m_rm.deleteTexture(m_normalAttachmentID);
-    m_rm.deleteTexture(m_albedoSpecAttachmentID);
-    m_rm.deleteRenderBuffer(m_depthAttachmentID);
-    m_rm.deleteFrameBuffer(m_frameBufferID);
+    m_rm->deleteTexture(m_positionAttachmentID);
+    m_rm->deleteTexture(m_normalAttachmentID);
+    m_rm->deleteTexture(m_albedoSpecAttachmentID);
+    m_rm->deleteRenderBuffer(m_depthAttachmentID);
+    m_rm->deleteFrameBuffer(m_frameBufferID);
 }
 

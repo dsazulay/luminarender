@@ -1,17 +1,11 @@
 #include "renderer.h"
 
 #include "../events/dispatcher.h"
+#include "../log.h"
+#include "../locator.h"
 
-#include <glad/gl.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
-#include "../log.h"
-#include "../ecs.h"
-#include "../components/components.h"
-#include "../locator.h"
-#include "light_system.h"
-
 
 constexpr int MATRICESUBO_SIZE = 2 * sizeof(glm::mat4) + 2 * sizeof(glm::vec4);
 constexpr int LIGHTUBO_SIZE = (2 * sizeof(glm::vec4) + sizeof(glm::mat4) + 12 * sizeof(LightUniformStruct));
@@ -42,15 +36,15 @@ void Renderer::updateIrradianceMaps()
 void Renderer::updateTransformMatrices()
 {
     m_viewMatrix = m_camera.getViewMatrix();
-    m_projMatrix = glm::perspective(glm::radians(m_camera.zoom), 
+    m_projMatrix = glm::perspective(glm::radians(m_camera.zoom),
             (float) m_viewportWidth / (float) m_viewportHeight, 0.1f, 100.0f);
 
     m_matricesUBO.setBufferData(0, sizeof(glm::mat4), glm::value_ptr(m_viewMatrix));
-    m_matricesUBO.setBufferData(sizeof(glm::mat4), sizeof(glm::mat4), 
+    m_matricesUBO.setBufferData(sizeof(glm::mat4), sizeof(glm::mat4),
             glm::value_ptr(m_projMatrix));
-    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4), sizeof(glm::vec4), 
+    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4), sizeof(glm::vec4),
             glm::value_ptr(glm::vec4(m_camera.position, 1.0)));
-    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4) + sizeof(glm::vec4), 
+    m_matricesUBO.setBufferData(2 * sizeof(glm::mat4) + sizeof(glm::vec4),
             sizeof(glm::vec4), glm::value_ptr(glm::vec4(m_camera.front, 1.0)));
 }
 

@@ -2,7 +2,7 @@
 
 #include "../components/components.h"
 #include "../irradiance_map_factory.h"
-#include "glad/gl.h"
+#include "gfxapi.h"
 #include "../locator.h"
 
 #include <random>
@@ -16,17 +16,19 @@ float lerp(float a, float b, float f)
 
 void RenderSystem::init(int width, int height, Camera* camera)
 {
+    m_gpucommands = Locator::getGpuCommands();
+    m_gpurm = Locator::getGpuResourceManager();
     m_coordinator = Locator::getEcsCoordinator();
     m_assetManager = Locator::getAssetManager();
     m_width = width;
     m_height = height;
     m_camera = camera;
 
-    m_mainTargetFrameBuffer = std::make_unique<ColorDepthStencilBuffer>(m_width, m_height, m_gpurm);
-    m_shadowFrameBuffer = std::make_unique<DepthBuffer>(shadowMapSize, shadowMapSize, m_gpurm);
-    m_gbuffer = std::make_unique<GBuffer>(m_width, m_height, m_gpurm);
-    m_ssaoBuffer = std::make_unique<ColorBuffer>(m_width, m_height, m_gpurm);
-    m_ssaoBlurBuffer = std::make_unique<ColorBuffer>(m_width, m_height, m_gpurm);
+    m_mainTargetFrameBuffer = std::make_unique<ColorDepthStencilBuffer>(m_width, m_height);
+    m_shadowFrameBuffer = std::make_unique<DepthBuffer>(shadowMapSize, shadowMapSize);
+    m_gbuffer = std::make_unique<GBuffer>(m_width, m_height);
+    m_ssaoBuffer = std::make_unique<ColorBuffer>(m_width, m_height);
+    m_ssaoBlurBuffer = std::make_unique<ColorBuffer>(m_width, m_height);
 
     // TODO: Move this to asset initalization
     Shader* s = &m_assetManager->getShader("resources/shaders/gbuffer.glsl");
@@ -42,6 +44,17 @@ void RenderSystem::init(int width, int height, Camera* camera)
     generateSSAONoiseTexture();
     s = &m_assetManager->getShader("resources/shaders/normal_vector.glsl");
     m_assetManager->createMaterial("normalVector", s);
+
+    setDefaultRenderState();
+}
+
+void RenderSystem::setDefaultRenderState()
+{
+    m_gpucommands->enable(Capability::CULL);
+    m_gpucommands->enable(Capability::DEPTHTEST);
+    m_gpucommands->setDepthFunction(DepthFunction::LEQUAL);
+    // enable seamless cubemap sampling for lower mip levels in the pre-filter map.
+    m_gpucommands->enable(Capability::CUBEMAP_SEAMLESS);
 }
 
 void RenderSystem::update()
@@ -56,10 +69,8 @@ void RenderSystem::update()
 
     // copy depth buffer from geometry pass
     m_gbuffer->bind(FrameBufferOp::READ);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_gbuffer->getDepthAttachmentID(), 0);
     m_mainTargetFrameBuffer->bind(FrameBufferOp::WRITE); 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_mainTargetFrameBuffer->getDepthAttachmentID(), 0);
-    gpucommands.blit(m_width, m_height, ClearMask::DEPTH, Filtering::POINT);
+    m_gpucommands->blit(m_width, m_height, ClearMask::DEPTH, Filtering::POINT);
 
     skyboxPass();
     //normalVisualizerPass();
@@ -96,8 +107,8 @@ id_t RenderSystem::getFinalRenderTexID()
 void RenderSystem::shadowPass()
 {
     m_shadowFrameBuffer->bind();
-    gpucommands.setViewportSize(0, 0, shadowMapSize, shadowMapSize);
-    gpucommands.clear(ClearMask::DEPTH);
+    m_gpucommands->setViewportSize(0, 0, shadowMapSize, shadowMapSize);
+    m_gpucommands->clear(ClearMask::DEPTH);
 
     for (auto entity : m_entities)
     {
@@ -107,13 +118,11 @@ void RenderSystem::shadowPass()
 
         Material material = m_assetManager->getMaterial("shadowMat");
         id_t shader = material.shader->handle;
-        m_gpurm.bindShader(shader);
+        m_gpurm->bindShader(shader);
 
-        m_gpurm.setUniform(shader, "u_model", transform.modelMatrix);
+        m_gpurm->setUniform(shader, "u_model", transform.modelMatrix);
 
-        glBindVertexArray(meshRenderer.mesh.handle);
-        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh.indexCount, GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
+        drawMesh(meshRenderer.mesh.handle, meshRenderer.mesh.indexCount);
     }
 
     m_shadowFrameBuffer->unbind();
@@ -122,9 +131,9 @@ void RenderSystem::shadowPass()
 void RenderSystem::geometryPass()
 {
     m_gbuffer->bind();
-    gpucommands.setViewportSize(0, 0, m_width, m_height);
-    gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    gpucommands.clear(ClearMask::COLORDEPTH);
+    m_gpucommands->setViewportSize(0, 0, m_width, m_height);
+    m_gpucommands->setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    m_gpucommands->clear(ClearMask::COLORDEPTH);
 
     for (auto entity : m_entities)
     {
@@ -135,31 +144,29 @@ void RenderSystem::geometryPass()
         Material& origMaterial = *meshRenderer.material;
         Material& material = m_assetManager->getMaterial("GBuffer");
         id_t shader = material.shader->handle;
-        m_gpurm.bindShader(shader);
+        m_gpurm->bindShader(shader);
 
-        m_gpurm.setUniform(shader, "u_model", transform.modelMatrix);
-        m_gpurm.setUniform(shader, "u_normalMatrix", glm::transpose(
+        m_gpurm->setUniform(shader, "u_model", transform.modelMatrix);
+        m_gpurm->setUniform(shader, "u_normalMatrix", glm::transpose(
             glm::inverse(glm::mat3(transform.modelMatrix))));
 
         for (auto& kv : origMaterial.uniforms.floatValues) {
-            m_gpurm.setUniform(shader, kv.first.c_str(), kv.second);
+            m_gpurm->setUniform(shader, kv.first.c_str(), kv.second);
         }
 
         for (auto& kv : origMaterial.uniforms.colorValues) {
-            m_gpurm.setUniform(shader, kv.first.c_str(), kv.second);
+            m_gpurm->setUniform(shader, kv.first.c_str(), kv.second);
         }
 
         int texCount = 0;
         for (auto& kv : origMaterial.uniforms.texValues) {
-            m_gpurm.setUniform(shader, kv.first.c_str(), texCount);
+            m_gpurm->setUniform(shader, kv.first.c_str(), texCount);
             glActiveTexture(GL_TEXTURE0 + texCount);
             glBindTexture(GL_TEXTURE_2D, kv.second);
             ++texCount;
         }
 
-        glBindVertexArray(meshRenderer.mesh.handle);
-        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh.indexCount, GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
+        drawMesh(meshRenderer.mesh.handle, meshRenderer.mesh.indexCount);
     }
 
     m_gbuffer->unbind();
@@ -168,34 +175,32 @@ void RenderSystem::geometryPass()
 void RenderSystem::ssaoPass()
 {
     m_ssaoBuffer->bind();
-    gpucommands.setViewportSize(0, 0, m_width, m_height);
-    gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    gpucommands.clear(ClearMask::COLOR);
+    m_gpucommands->setViewportSize(0, 0, m_width, m_height);
+    m_gpucommands->setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    m_gpucommands->clear(ClearMask::COLOR);
 
     Mesh mesh = m_assetManager->getMesh(MeshType::Quad);
     Material material = m_assetManager->getMaterial("ssaoMat");
     id_t shader = material.shader->handle;
-    m_gpurm.bindShader(shader);
+    m_gpurm->bindShader(shader);
 
     for (unsigned int i = 0; i < 64; ++i) {
-        m_gpurm.setUniform(shader, std::format("u_samples[{}]", i).c_str(), m_ssaoKernel[i]);
+        m_gpurm->setUniform(shader, std::format("u_samples[{}]", i).c_str(), m_ssaoKernel[i]);
     }
 
-    m_gpurm.setUniform(shader, "u_depth", 0);
+    m_gpurm->setUniform(shader, "u_depth", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getDepthAttachmentID());
 
-    m_gpurm.setUniform(shader, "u_normal", 1);
+    m_gpurm->setUniform(shader, "u_normal", 1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getNormalAttachmentID());
 
-    m_gpurm.setUniform(shader, "u_noise", 2);
+    m_gpurm->setUniform(shader, "u_noise", 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_ssaoNoiseTex);
 
-    glBindVertexArray(mesh.handle);
-    glDrawElements(GL_TRIANGLES, (int) mesh.indexCount, GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+    drawMesh(mesh.handle, mesh.indexCount);
 
     m_ssaoBuffer->unbind();
 }
@@ -203,26 +208,24 @@ void RenderSystem::ssaoPass()
 void RenderSystem::ssaoBlurPass()
 {
     m_ssaoBlurBuffer->bind();
-    gpucommands.setViewportSize(0, 0, m_width, m_height);
-    gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    gpucommands.clear(ClearMask::COLOR);
+    m_gpucommands->setViewportSize(0, 0, m_width, m_height);
+    m_gpucommands->setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    m_gpucommands->clear(ClearMask::COLOR);
 
     Mesh mesh = m_assetManager->getMesh(MeshType::Quad);
     Material material = m_assetManager->getMaterial("ssaoBlurMat");
     id_t shader = material.shader->handle;
-    m_gpurm.bindShader(shader);
+    m_gpurm->bindShader(shader);
 
     for (unsigned int i = 0; i < 64; ++i) {
-        m_gpurm.setUniform(shader, std::format("u_samples[{}]", i).c_str(), m_ssaoKernel[i]);
+        m_gpurm->setUniform(shader, std::format("u_samples[{}]", i).c_str(), m_ssaoKernel[i]);
     }
 
-    m_gpurm.setUniform(shader, "u_ssao", 0);
+    m_gpurm->setUniform(shader, "u_ssao", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_ssaoBuffer->getColorAttachmentID());
 
-    glBindVertexArray(mesh.handle);
-    glDrawElements(GL_TRIANGLES, (int) mesh.indexCount, GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+    drawMesh(mesh.handle, mesh.indexCount);
 
     m_ssaoBuffer->unbind();
 }
@@ -230,32 +233,32 @@ void RenderSystem::ssaoBlurPass()
 void RenderSystem::lightingPass()
 {
     m_mainTargetFrameBuffer->bind();
-    gpucommands.setViewportSize(0, 0, m_width, m_height);
-    gpucommands.setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    gpucommands.clear(ClearMask::COLORDEPTH);
+    m_gpucommands->setViewportSize(0, 0, m_width, m_height);
+    m_gpucommands->setClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    m_gpucommands->clear(ClearMask::COLORDEPTH);
 
     Mesh mesh = m_assetManager->getMesh(MeshType::Quad);
     Material material = m_assetManager->getMaterial("LightingPass");
     id_t shader = material.shader->handle;
-    m_gpurm.bindShader(shader);
+    m_gpurm->bindShader(shader);
 
-    m_gpurm.setUniform(shader, "u_depth", 0);
+    m_gpurm->setUniform(shader, "u_depth", 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getDepthAttachmentID());
 
-    m_gpurm.setUniform(shader, "u_normal", 1);
+    m_gpurm->setUniform(shader, "u_normal", 1);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getNormalAttachmentID());
 
-    m_gpurm.setUniform(shader, "u_albedo", 2);
+    m_gpurm->setUniform(shader, "u_albedo", 2);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getAlbedoSpecAttachmentID());
 
-    m_gpurm.setUniform(shader, "u_shadowMap", 3);
+    m_gpurm->setUniform(shader, "u_shadowMap", 3);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, m_shadowFrameBuffer->getDepthAttachmentID());
 
-    m_gpurm.setUniform(shader, "u_ssao", 4);
+    m_gpurm->setUniform(shader, "u_ssao", 4);
     glActiveTexture(GL_TEXTURE4);
     if (m_ssaoEnabled)
         glBindTexture(GL_TEXTURE_2D, m_ssaoBlurBuffer->getColorAttachmentID());
@@ -265,26 +268,24 @@ void RenderSystem::lightingPass()
             "resources/textures/default_white.png").handle);
     }
 
-    m_gpurm.setUniform(shader, "u_orm", 5);
+    m_gpurm->setUniform(shader, "u_orm", 5);
     glActiveTexture(GL_TEXTURE5);
     glBindTexture(GL_TEXTURE_2D, m_gbuffer->getPositionAttachmentID());
 
     // bind global illumination textures
-    m_gpurm.setUniform(shader, "u_irradianceTex", 10);
+    m_gpurm->setUniform(shader, "u_irradianceTex", 10);
     glActiveTexture(GL_TEXTURE10);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_irradianceMap);
 
-    m_gpurm.setUniform(shader, "u_prefilterMap", 11);
+    m_gpurm->setUniform(shader, "u_prefilterMap", 11);
     glActiveTexture(GL_TEXTURE11);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_prefilterMap);
 
-    m_gpurm.setUniform(shader, "u_brdfLUT", 12);
+    m_gpurm->setUniform(shader, "u_brdfLUT", 12);
     glActiveTexture(GL_TEXTURE12);
     glBindTexture(GL_TEXTURE_2D, m_brdfLUT);
 
-    glBindVertexArray(mesh.handle);
-    glDrawElements(GL_TRIANGLES, (int) mesh.indexCount, GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+    drawMesh(mesh.handle, mesh.indexCount);
 
     m_mainTargetFrameBuffer->unbind();
 }
@@ -296,19 +297,17 @@ void RenderSystem::skyboxPass()
     Mesh mesh = m_assetManager->getMesh(MeshType::TriangleMap);
     Material material = m_assetManager->getMaterial("skyboxMat");
     id_t shader = material.shader->handle;
-    m_gpurm.bindShader(shader);
+    m_gpurm->bindShader(shader);
 
     int texCount = 0;
     for (auto& kv : material.uniforms.texValues) {
-        m_gpurm.setUniform(shader, kv.first.c_str(), texCount);
+        m_gpurm->setUniform(shader, kv.first.c_str(), texCount);
         glActiveTexture(GL_TEXTURE0 + texCount);
         glBindTexture(GL_TEXTURE_CUBE_MAP, kv.second);
         ++texCount;
     }
 
-    glBindVertexArray(mesh.handle);
-    glDrawElements(GL_TRIANGLES, (int)mesh.indexCount, GL_UNSIGNED_INT, nullptr);
-    glBindVertexArray(0);
+    drawMesh(mesh.handle, mesh.indexCount);
 
     m_mainTargetFrameBuffer->unbind();
 }
@@ -325,34 +324,39 @@ void RenderSystem::normalVisualizerPass()
 
         Material material = m_assetManager->getMaterial("normalVector");
         id_t shader = material.shader->handle;
-        m_gpurm.bindShader(shader);
+        m_gpurm->bindShader(shader);
 
-        m_gpurm.setUniform(shader, "u_model", transform.modelMatrix);
-        m_gpurm.setUniform(shader, "u_normalMatrix", glm::transpose(glm::inverse(
+        m_gpurm->setUniform(shader, "u_model", transform.modelMatrix);
+        m_gpurm->setUniform(shader, "u_normalMatrix", glm::transpose(glm::inverse(
             glm::mat3(m_camera->getViewMatrix() * transform.modelMatrix))));
 
         for (auto& kv : material.uniforms.floatValues) {
-            m_gpurm.setUniform(shader, kv.first.c_str(), kv.second);
+            m_gpurm->setUniform(shader, kv.first.c_str(), kv.second);
         }
 
         for (auto& kv : material.uniforms.colorValues) {
-            m_gpurm.setUniform(shader, kv.first.c_str(), kv.second);
+            m_gpurm->setUniform(shader, kv.first.c_str(), kv.second);
         }
 
         int texCount = 0;
         for (auto& kv : material.uniforms.texValues) {
-            m_gpurm.setUniform(shader, kv.first.c_str(), texCount);
+            m_gpurm->setUniform(shader, kv.first.c_str(), texCount);
             glActiveTexture(GL_TEXTURE0 + texCount);
             glBindTexture(GL_TEXTURE_2D, kv.second);
             ++texCount;
         }
 
-        glBindVertexArray(meshRenderer.mesh.handle);
-        glDrawElements(GL_TRIANGLES, (int) meshRenderer.mesh.indexCount, GL_UNSIGNED_INT, nullptr);
-        glBindVertexArray(0);
+        drawMesh(meshRenderer.mesh.handle, meshRenderer.mesh.indexCount);
     }
 
     m_mainTargetFrameBuffer->unbind();
+}
+
+void RenderSystem::drawMesh(id_t mesh, int indexCount)
+{
+    m_gpurm->bindMesh(mesh);
+    m_gpurm->drawTriangleElements(indexCount);
+    m_gpurm->unbindMesh();
 }
 
 // TODO: move this to asset library init
@@ -381,7 +385,7 @@ void RenderSystem::generateSSAONoiseTexture()
         ssaoNoise[i] = noise;
     }
 
-    m_ssaoNoiseTex = m_gpurm.createTexture({
+    m_ssaoNoiseTex = m_gpurm->createTexture({
         .width = 4,
         .height = 4,
         .format = Format::RGB,

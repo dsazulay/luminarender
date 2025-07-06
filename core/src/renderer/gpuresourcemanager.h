@@ -122,6 +122,21 @@ public:
         m_backend.setUniform(shader, name, value);
     }
 
+    void bindMesh(id_t mesh)
+    {
+        m_backend.bindMesh(mesh);
+    }
+
+    void unbindMesh()
+    {
+        m_backend.unbindMesh();
+    }
+
+    void drawTriangleElements(int indexCount)
+    {
+        m_backend.drawTriangleElements(indexCount);
+    }
+
 private:
     T m_backend;
 };

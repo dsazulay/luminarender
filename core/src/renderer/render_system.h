@@ -29,12 +29,12 @@ private:
     void transparentPass();
     void normalVisualizerPass();
 
+    void drawMesh(id_t mesh, int indexCount);
     void generateSSAONoiseTexture();
 
-private:
-    GPUResourceManager<OpenGL> m_gpurm{};
-    GPUCommands<OpenGL> gpucommands{};
+    void setDefaultRenderState();
 
+private:
     std::unique_ptr<ColorDepthStencilBuffer> m_mainTargetFrameBuffer;
     std::unique_ptr<DepthBuffer> m_shadowFrameBuffer;
     std::unique_ptr<GBuffer> m_gbuffer;
@@ -54,6 +54,8 @@ private:
 
     bool m_ssaoEnabled = true;
 
+    GPUCommands<OpenGL>* m_gpucommands;
+    GPUResourceManager<OpenGL>* m_gpurm;
     ecs::Coordinator* m_coordinator;
     AssetManager* m_assetManager;
     Camera* m_camera;

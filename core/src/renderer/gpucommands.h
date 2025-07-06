@@ -26,6 +26,16 @@ public:
         backend.blit(width, height, mask, filtering);
     }
 
+    void enable(Capability capability)
+    {
+        backend.enable(capability);
+    }
+
+    void setDepthFunction(DepthFunction depthFunction)
+    {
+        backend.setDepthFunction(depthFunction);
+    }
+
 private:
     T backend;
 };

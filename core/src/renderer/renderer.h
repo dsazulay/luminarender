@@ -1,12 +1,12 @@
 #pragma once
 
-#include "../camera.h"
-#include "uniform_buffer_object.h"
-#include "gpucommands.h"
 #include "../ecs.h"
 #include "light_system.h"
 #include "render_system.h"
+#include "../camera.h"
+#include "uniform_buffer_object.h"
 
+#include <glm/mat4x4.hpp>
 
 class Renderer {
 public:
@@ -27,8 +27,6 @@ public:
 private:
     void onViewportResize(const Event& e);
     void onUiToggleSSAO(const Event& e);
-
-    GPUCommands<OpenGL> gpucommands{};
 
     UniformBufferObject m_matricesUBO;
     UniformBufferObject m_lightUBO;

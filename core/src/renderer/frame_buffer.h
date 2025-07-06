@@ -7,7 +7,7 @@
 class FrameBuffer
 {
 public:
-    FrameBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
+    FrameBuffer(int width, int height);
     void resizeBuffer(int width, int height);
     void bind();
     void bind(FrameBufferOp op);
@@ -21,13 +21,13 @@ protected:
     int m_width;
     int m_height;
     unsigned int m_frameBufferID;
-    GPUResourceManager<OpenGL> m_rm;
+    GPUResourceManager<OpenGL>* m_rm;
 };
 
 class ColorDepthStencilBuffer : public FrameBuffer
 {
 public:
-    ColorDepthStencilBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
+    ColorDepthStencilBuffer(int width, int height);
     ~ColorDepthStencilBuffer();
     id_t getColorAttachmentID();
     id_t getDepthAttachmentID();
@@ -43,7 +43,7 @@ private:
 class ColorBuffer : public FrameBuffer
 {
 public:
-    ColorBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
+    ColorBuffer(int width, int height);
     ~ColorBuffer();
     id_t getColorAttachmentID();
 
@@ -57,7 +57,7 @@ private:
 class DepthBuffer : public FrameBuffer
 {
 public:
-    DepthBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
+    DepthBuffer(int width, int height);
     ~DepthBuffer();
     id_t getDepthAttachmentID();
 
@@ -71,7 +71,7 @@ private:
 class GBuffer : public FrameBuffer
 {
 public:
-    GBuffer(int width, int height, GPUResourceManager<OpenGL> rm);
+    GBuffer(int width, int height);
     ~GBuffer();
 
     id_t getPositionAttachmentID();

@@ -38,11 +38,17 @@ public:
     void setUniform(id_t shader, const char *name, glm::mat3 &value);
     void setUniform(id_t shader, const char *name, glm::mat4 &value);
 
+    void bindMesh(id_t mesh);
+    void unbindMesh();
+    void drawTriangleElements(int indexCount);
+
     // Commands
     void setViewportSize(int x, int y, int width, int height);
     void setClearColor(float r, float g, float b, float a);
     void clear(ClearMask mask);
     void blit(int width, int height, ClearMask mask, Filtering filtering);
+    void enable(Capability capability);
+    void setDepthFunction(DepthFunction depthFunction);
 
 private:
     GLenum getFormat(Format format);
@@ -56,6 +62,8 @@ private:
     GLbitfield getClearMask(ClearMask mask);
     GLenum getFrameBufferOp(FrameBufferOp op);
     GLenum getShaderType(ShaderType type);
+    GLenum getCapability(Capability capability);
+    GLenum getDepthFunction(DepthFunction depthFunction);
 };
 
 template <typename T>

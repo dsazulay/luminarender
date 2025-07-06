@@ -1,6 +1,8 @@
 #include "opengl.h"
 
 #include "../log.h"
+#include "gfxapi.h"
+#include "glad/gl.h"
 
 #include <vector>
 
@@ -241,6 +243,21 @@ void OpenGL::setUniform(id_t shader, const char *name, glm::mat4 &value)
     glUniformMatrix4fv(glGetUniformLocation(shader, name), 1, GL_FALSE, &value[0][0]);
 }
 
+void OpenGL::bindMesh(id_t mesh)
+{
+    glBindVertexArray(mesh);
+}
+
+void OpenGL::unbindMesh()
+{
+    glBindVertexArray(0);
+}
+
+void OpenGL::drawTriangleElements(int indexCount)
+{
+    glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+}
+
 // Commands
 void OpenGL::setViewportSize(int x, int y, int width, int height)
 {
@@ -263,6 +280,16 @@ void OpenGL::blit(int width, int height, ClearMask mask, Filtering filtering)
     GLbitfield glmask = getClearMask(mask);
     GLint glfiltering = getFiltering(filtering);
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, glmask, glfiltering);
+}
+
+void OpenGL::enable(Capability capability)
+{
+    glEnable(getCapability(capability));
+}
+
+void OpenGL::setDepthFunction(DepthFunction depthFunction)
+{
+    glDepthFunc(getDepthFunction(depthFunction));
 }
 
 GLenum OpenGL::getFormat(Format format)
@@ -425,5 +452,41 @@ GLenum OpenGL::getShaderType(ShaderType type)
             return GL_FRAGMENT_SHADER;
         case ShaderType::GEOMETRY:
             return GL_GEOMETRY_SHADER;
+    }
+}
+
+GLenum OpenGL::getCapability(Capability capability)
+{
+    switch (capability)
+    {
+        case Capability::CULL:
+            return GL_CULL_FACE;
+        case Capability::DEPTHTEST:
+            return GL_DEPTH_TEST;
+        case Capability::CUBEMAP_SEAMLESS:
+            return GL_TEXTURE_CUBE_MAP_SEAMLESS;
+    }
+}
+
+GLenum OpenGL::getDepthFunction(DepthFunction depthFunction)
+{
+    switch (depthFunction)
+    {
+        case DepthFunction::NEVER:
+            return GL_NEVER;
+        case DepthFunction::LESS:
+            return GL_LESS;
+        case DepthFunction::EQUAL:
+            return GL_EQUAL;
+        case DepthFunction::LEQUAL:
+            return GL_LEQUAL;
+        case DepthFunction::GREATER:
+            return GL_GREATER;
+        case DepthFunction::NOTEQUAL:
+            return GL_NOTEQUAL;
+        case DepthFunction::GEQUAL:
+            return GL_GEQUAL;
+        case DepthFunction::ALWAYS:
+            return GL_ALWAYS;
     }
 }
