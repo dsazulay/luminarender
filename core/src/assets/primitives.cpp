@@ -8,22 +8,26 @@ VertexIndexTuple getQuad()
         {
             .position = { -0.5, -0.5, 0.0 },
             .normal = { 0.0, 0.0, 1.0 },
-            .texcoord = { 0.0, 0.0 }
+            .texcoord = { 0.0, 0.0 },
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5, -0.5, 0.0 },
             .normal = { 0.0, 0.0, 1.0 },
-            .texcoord = { 1.0, 0.0 }
+            .texcoord = { 1.0, 0.0 },
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = { -0.5, 0.5, 0.0 },
             .normal = { 0.0, 0.0, 1.0 },
-            .texcoord = { 0.0, 1.0 }
+            .texcoord = { 0.0, 1.0 },
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5, 0.5, 0.0 },
             .normal = { 0.0, 0.0, 1.0 },
-            .texcoord = { 1.0, 1.0 }
+            .texcoord = { 1.0, 1.0 },
+            .tangent = { 1.0, 0.0, 0.0 },
         }
     };
 
@@ -38,127 +42,151 @@ VertexIndexTuple getCube()
         {
             .position = {-0.5f, -0.5f, -0.5f},
             .normal = { 0.0f,  0.0f, -1.0f},
-            .texcoord = {0.0f, 0.0f}
+            .texcoord = {0.0f, 0.0f},
+            .tangent = { -1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5f, -0.5f, -0.5f},
             .normal = { 0.0f,  0.0f, -1.0f},
-            .texcoord = {1.0f, 0.0f}
+            .texcoord = {1.0f, 0.0f},
+            .tangent = { -1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5f,  0.5f, -0.5f},
             .normal = { 0.0f,  0.0f, -1.0f},
-            .texcoord = {1.0f, 1.0f}
+            .texcoord = {1.0f, 1.0f},
+            .tangent = { -1.0, 0.0, 0.0 },
         },
         {
             .position = {-0.5f,  0.5f, -0.5f},
             .normal = { 0.0f,  0.0f, -1.0f},
-            .texcoord = {0.0f, 1.0f}
+            .texcoord = {0.0f, 1.0f},
+            .tangent = { -1.0, 0.0, 0.0 },
         },
 
         {
             .position = {-0.5f, -0.5f,  0.5f},
             .normal = { 0.0f,  0.0f,  1.0f},
-            .texcoord = {0.0f, 0.0f}
+            .texcoord = {0.0f, 0.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5f, -0.5f,  0.5f},
             .normal = { 0.0f,  0.0f,  1.0f},
-            .texcoord = {1.0f, 0.0f}
+            .texcoord = {1.0f, 0.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5f,  0.5f,  0.5f},
             .normal = { 0.0f,  0.0f,  1.0f},
-            .texcoord = {1.0f, 1.0f}
+            .texcoord = {1.0f, 1.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = {-0.5f,  0.5f,  0.5f},
             .normal = { 0.0f,  0.0f,  1.0f},
-            .texcoord = {0.0f, 1.0f}
+            .texcoord = {0.0f, 1.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
 
         {
             .position = {-0.5f,  0.5f,  0.5f},
             .normal = {-1.0f,  0.0f,  0.0f},
-            .texcoord = {1.0f, 0.0f}
+            .texcoord = {1.0f, 0.0f},
+            .tangent = { 0.0, 0.0, 1.0 },
         },
         {
             .position = {-0.5f,  0.5f, -0.5f},
             .normal = {-1.0f,  0.0f,  0.0f},
-            .texcoord = {1.0f, 1.0f}
+            .texcoord = {1.0f, 1.0f},
+            .tangent = { 0.0, 0.0, 1.0 },
         },
         {
             .position = {-0.5f, -0.5f, -0.5f},
             .normal = {-1.0f,  0.0f,  0.0f},
-            .texcoord = {0.0f, 1.0f}
+            .texcoord = {0.0f, 1.0f},
+            .tangent = { 0.0, 0.0, 1.0 },
         },
         {
             .position = {-0.5f, -0.5f,  0.5f},
             .normal = {-1.0f,  0.0f,  0.0f},
-            .texcoord = {0.0f, 0.0f}
+            .texcoord = {0.0f, 0.0f},
+            .tangent = { 0.0, 0.0, 1.0 },
         },
 
         {
             .position = { 0.5f,  0.5f,  0.5f},
             .normal = { 1.0f,  0.0f,  0.0f},
-            .texcoord = {1.0f, 0.0f}
+            .texcoord = {1.0f, 0.0f},
+            .tangent = { 0.0, 0.0, -1.0 },
         },
         {
             .position = { 0.5f,  0.5f, -0.5f},
             .normal = { 1.0f,  0.0f,  0.0f},
-            .texcoord = {1.0f, 1.0f}
+            .texcoord = {1.0f, 1.0f},
+            .tangent = { 0.0, 0.0, -1.0 },
         },
         {
             .position = { 0.5f, -0.5f, -0.5f},
             .normal = { 1.0f,  0.0f,  0.0f},
-            .texcoord = {0.0f, 1.0f}
+            .texcoord = {0.0f, 1.0f},
+            .tangent = { 0.0, 0.0, -1.0 },
         },
         {
             .position = { 0.5f, -0.5f,  0.5f},
             .normal = { 1.0f,  0.0f,  0.0f},
-            .texcoord = {0.0f, 0.0f}
+            .texcoord = {0.0f, 0.0f},
+            .tangent = { 0.0, 0.0, -1.0 },
         },
 
         {
             .position = {-0.5f, -0.5f, -0.5f},
             .normal = { 0.0f, -1.0f,  0.0f},
-            .texcoord = {0.0f, 1.0f}
+            .texcoord = {0.0f, 1.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5f, -0.5f, -0.5f},
             .normal = { 0.0f, -1.0f,  0.0f},
-            .texcoord = {1.0f, 1.0f}
+            .texcoord = {1.0f, 1.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5f, -0.5f,  0.5f},
             .normal = { 0.0f, -1.0f,  0.0f},
-            .texcoord = {1.0f, 0.0f}
+            .texcoord = {1.0f, 0.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = {-0.5f, -0.5f,  0.5f},
             .normal = { 0.0f, -1.0f,  0.0f},
-            .texcoord = {0.0f, 0.0f}
+            .texcoord = {0.0f, 0.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
 
         {
             .position = {-0.5f,  0.5f, -0.5f},
             .normal = { 0.0f,  1.0f,  0.0f},
-            .texcoord = {0.0f, 1.0f}
+            .texcoord = {0.0f, 1.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5f,  0.5f, -0.5f},
             .normal = { 0.0f,  1.0f,  0.0f},
-            .texcoord = {1.0f, 1.0f}
+            .texcoord = {1.0f, 1.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = { 0.5f,  0.5f,  0.5f},
             .normal = { 0.0f,  1.0f,  0.0f},
-            .texcoord = {1.0f, 0.0f}
+            .texcoord = {1.0f, 0.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
         {
             .position = {-0.5f,  0.5f,  0.5f},
             .normal = { 0.0f,  1.0f,  0.0f},
-            .texcoord = {0.0f, 0.0f}
+            .texcoord = {0.0f, 0.0f},
+            .tangent = { 1.0, 0.0, 0.0 },
         },
     };
 

@@ -148,6 +148,7 @@ Mesh AssetManager::loadMesh(MeshType type, VertexIndexTuple& mesh)
             std::make_pair(3, offsetof(Vertex, position)),
             std::make_pair(3, offsetof(Vertex, normal)),
             std::make_pair(2, offsetof(Vertex, texcoord)),
+            std::make_pair(3, offsetof(Vertex, tangent)),
         }
     });
     newMesh.handle = handles.vao;
@@ -218,12 +219,14 @@ Model AssetManager::getModel(std::string_view path, bool loadMaterial)
         Material& mat = createMaterial(m.importedMatName, &getShader("resources/shaders/cook_torrance.glsl"));
         mat.setColor("u_albedo", glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-        if (mesh.material.diffusePath == "") {
-            continue;
+        if (mesh.material.diffusePath != "") {
+            Texture albedoTex = getTexture2D("resources/sponza_glTF/" + mesh.material.diffusePath);
+            mat.setTexture("u_albedoTex", albedoTex.handle);
         }
-        Texture tex = getTexture2D("resources/sponza_glTF/" + mesh.material.diffusePath);
-        mat.setTexture("u_albedoTex", tex.handle);
-
+        if (mesh.material.normalPath != "") {
+            Texture normalTex = getTexture2D("resources/sponza_glTF/" + mesh.material.normalPath);
+            mat.setTexture("u_normalMap", normalTex.handle);
+        }
     }
 
     const auto& model = m_models.insert(std::make_pair(path, newModel));

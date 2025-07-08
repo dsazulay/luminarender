@@ -51,6 +51,7 @@ void PbrScene::loadMaterials(unsigned int& skyboxTex)
 
     Material& metalBoxMat = m_assetManager->createMaterial("metalBoxMat", pbr);
     metalBoxMat.setTexture("u_albedoTex", m_assetManager->getTexture2D("resources/textures/metalbox/metalbox_a.png").handle);
+    metalBoxMat.setTexture("u_normalMap", m_assetManager->getTexture2D("resources/textures/metalbox/metalbox_normal.png").handle);
     metalBoxMat.setTexture("u_roughnessTex", m_assetManager->getTexture2D("resources/textures/metalbox/metalbox_r.png").handle);
     metalBoxMat.setTexture("u_aoTex", m_assetManager->getTexture2D("resources/textures/metalbox/metalbox_ao.png").handle);
 

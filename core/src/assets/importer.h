@@ -43,6 +43,8 @@ struct MaterialData
 {
     std::string name;
     std::string diffusePath;
+    std::string normalPath;
+    std::string ormPath;
     int index;
     MaterialType type;
 };

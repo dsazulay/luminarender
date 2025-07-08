@@ -250,7 +250,7 @@ std::optional<ModelData> loadModel(std::string_view path, bool material)
     ModelData data;
 
     Assimp::Importer import;
-    const aiScene* scene = import.ReadFile(path.data(), aiProcess_Triangulate);
+    const aiScene* scene = import.ReadFile(path.data(), aiProcess_Triangulate | aiProcess_CalcTangentSpace);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
@@ -304,6 +304,17 @@ MeshData processMesh(aiMesh* mesh, const aiScene* scene, bool importMaterial)
         }
         vert.normal = vec;
 
+        if (mesh->mTangents)
+        {
+            vec.x = mesh->mTangents[i].x;
+            vec.y = mesh->mTangents[i].y;
+            vec.z = mesh->mTangents[i].z;
+        }
+        else {
+            vec = glm::vec3{ 0.0 };
+        }
+        vert.tangent = vec;
+
         glm::vec2 uv{ 0.0 };
         uv.x = mesh->mTextureCoords[0][i].x;
         uv.y = mesh->mTextureCoords[0][i].y;
@@ -355,6 +366,17 @@ MeshData processMesh(aiMesh* mesh, const aiScene* scene, bool importMaterial)
 
             #if defined (__unix) || defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
             std::replace(materialData.diffusePath.begin(), materialData.diffusePath.end(), '\\', '/');
+            #endif
+        }
+
+        for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_NORMALS); ++i)
+        {
+            aiString texName;
+            material->GetTexture(aiTextureType_NORMALS, i, &texName);
+            materialData.normalPath = texName.C_Str();
+
+            #if defined (__unix) || defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+            std::replace(materialData.normalPath.begin(), materialData.normalPath.end(), '\\', '/');
             #endif
         }
     }

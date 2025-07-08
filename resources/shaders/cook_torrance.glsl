@@ -1,8 +1,10 @@
+// TODO: add neutral normalMap default tex
 #properties
 Color u_albedo = 1,1,1,1
 Float u_metallic = 0.0
 Float u_roughness = 1.0
 2D u_albedoTex = white
+2D u_normalMap = white
 2D u_metallicTex = white
 2D u_roughnessTex = white
 2D u_aoTex = white
@@ -16,6 +18,7 @@ Float u_roughness = 1.0
 layout (location = 0) in vec3 a_position;
 layout (location = 1) in vec3 a_normal;
 layout (location = 2) in vec2 a_uv;
+layout (location = 3) in vec3 a_tangent;
 
 out Varyings
 {
