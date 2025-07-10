@@ -26,7 +26,7 @@ void PbrScene::loadScene()
 void PbrScene::loadIrradianceTextures(unsigned int& skyboxTex)
 {
 
-    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(m_assetManager->getTextureHDR("resources/textures/skybox/tiber_2.hdr").handle, *m_assetManager);
+    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(m_assetManager->getTextureHDR("resources/textures/skybox/puresky.hdr").handle, *m_assetManager);
 
     skyboxTex = maps.cubeMap;
 }

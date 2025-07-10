@@ -78,7 +78,7 @@ void RenderSystem::update()
 
 void RenderSystem::updateIrradianceMaps()
 {
-    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(m_assetManager->getTextureHDR("resources/textures/skybox/tiber_2.hdr").handle, *m_assetManager);
+    IrradianceMaps maps = IrradianceMapFactory::generateIrradianceMapsFromHDR(m_assetManager->getTextureHDR("resources/textures/skybox/puresky.hdr").handle, *m_assetManager);
     m_irradianceMap = maps.irradianceMap;
     m_prefilterMap = maps.prefilterMap;
     m_brdfLUT = maps.brdfLUTMap;
