@@ -8,6 +8,7 @@
 //#include "samples/lighting_skybox_scene.h"
 #include "samples/pbr_scene.h"
 #include "locator.h"
+#include "timer.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -101,10 +102,7 @@ void Application::mainloop()
 {
     while (!m_window.windowShouldClose())
     {
-        auto currentFrame = (float) glfwGetTime();
-        m_deltaTime = currentFrame - m_lastFrame;
-        m_lastFrame = currentFrame;
-        deltaTime = m_deltaTime;
+        Timer::update();
 
         m_window.processInput();
 

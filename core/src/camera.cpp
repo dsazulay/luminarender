@@ -1,6 +1,7 @@
 #include "camera.h"
 
 #include "events/dispatcher.h"
+#include "timer.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -32,8 +33,7 @@ void Camera::onKeyPress(const Event& e)
     if (modifier != 342)
         return;
 
-    //float velocity = movementSpeed * Application::deltaTime;
-    float velocity = movementSpeed * 0.1;
+    float velocity = movementSpeed * Timer::deltaTime;
     if (keyCode == 87)
         position += front * velocity;
     else if (keyCode == 83)

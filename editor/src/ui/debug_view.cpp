@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "events/event.h"
 #include "events/dispatcher.h"
+#include "timer.h"
 
 
 void DebugView::draw()
@@ -13,6 +14,8 @@ void DebugView::draw()
         UiToggleSSAOEvent e(m_ssao);
         Dispatcher::instance().post(e);
     }
+    ImGui::Text("Frame time: %.5fms", Timer::deltaTime);
+    ImGui::Text("FPS: %d", (int)(1 / Timer::deltaTime));
     ImGui::End();
 }
 
