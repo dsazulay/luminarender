@@ -1,4 +1,5 @@
 #include "primitives.h"
+#include "glm/geometric.hpp"
 
 #include <glm/trigonometric.hpp>
 
@@ -238,6 +239,11 @@ VertexIndexTuple getSphere()
             vec.y = vec.y * lengthInv;
             vec.z = vec.z * lengthInv;
             vert.normal = vec;
+
+            vec.x = -xy * sin(sectorAngle);
+            vec.y = xy * cos(sectorAngle);
+            vec.z = 0.0;
+            vert.tangent = glm::normalize(vec);
 
             glm::vec2 uv;
             uv.x = (float)j / sectorCount;

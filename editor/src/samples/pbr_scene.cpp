@@ -45,6 +45,7 @@ void PbrScene::loadMaterials(unsigned int& skyboxTex)
 
     Material& spitfireMat = m_assetManager->createMaterial("spitfireMat", pbr);
     spitfireMat.setTexture("u_albedoTex", m_assetManager->getTexture2D("resources/textures/spitfire/spitfire_d.png").handle);
+    spitfireMat.setTexture("u_normalMap", m_assetManager->getTexture2D("resources/textures/spitfire/spitfire_n.png").handle);
     spitfireMat.setTexture("u_metallicTex", m_assetManager->getTexture2D("resources/textures/spitfire/spitfire_m.png").handle);
     spitfireMat.setTexture("u_roughnessTex", m_assetManager->getTexture2D("resources/textures/spitfire/spitfire_r.png").handle);
     spitfireMat.setTexture("u_aoTex", m_assetManager->getTexture2D("resources/textures/spitfire/spitfire_ao.png").handle);
@@ -57,7 +58,7 @@ void PbrScene::loadMaterials(unsigned int& skyboxTex)
 
     Material& cerberusMat = m_assetManager->createMaterial("cerberusMat", pbr);
     cerberusMat.setTexture("u_albedoTex", m_assetManager->getTexture2D("resources/textures/cerberus/cerberus_a.png").handle);
-    cerberusMat.setTexture("u_metallicTex", m_assetManager->getTexture2D("resources/textures/cerberus/cerberus_r.png").handle);
+    cerberusMat.setTexture("u_metallicTex", m_assetManager->getTexture2D("resources/textures/cerberus/cerberus_m.png").handle);
     cerberusMat.setTexture("u_roughnessTex", m_assetManager->getTexture2D("resources/textures/cerberus/cerberus_r.png").handle);
 
     Shader* skytri = &m_assetManager->getShader("resources/shaders/skytriangle.glsl");

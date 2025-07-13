@@ -282,6 +282,9 @@ Shader& AssetManager::getShader(std::string_view path)
             if (property.value == "white") {
                 shader.uniformsDefaultValues.texValues[property.name] = getTexture2D("resources/textures/default_white.png").handle;
             }
+            else if (property.value == "normal") {
+                shader.uniformsDefaultValues.texValues[property.name] = getTexture2D("resources/textures/default_normal.png").handle;
+            }
         }
         else
         {

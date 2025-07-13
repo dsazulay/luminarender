@@ -4,7 +4,7 @@ Color u_albedo = 1,1,1,1
 Float u_metallic = 0.0
 Float u_roughness = 1.0
 2D u_albedoTex = white
-2D u_normalMap = white
+2D u_normalMap = normal
 2D u_metallicTex = white
 2D u_roughnessTex = white
 2D u_aoTex = white
@@ -81,6 +81,7 @@ uniform float u_metallic;
 uniform float u_roughness;
 
 uniform sampler2D u_albedoTex;
+uniform sampler2D u_normalMap;
 uniform sampler2D u_metallicTex;
 uniform sampler2D u_roughnessTex;
 uniform sampler2D u_aoTex;
